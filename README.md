@@ -39,19 +39,6 @@
 
 ---
 
-## 🚀 Hosting on GitHub Pages
-
-1. Create a new **public** repository (e.g. `dsa-notes`)
-2. Upload all files from this package (`index.html`, `chapter1.html` … `chapter10.html`, `final_revision.html`)
-3. Go to **Settings → Pages**
-4. Under **Source**, select **Deploy from a branch** → Branch: `main`, Folder: `/ (root)` → **Save**
-5. Wait 1–2 minutes — your live link will be:
-   ```
-   https://<your-username>.github.io/<repo-name>/
-   ```
-
----
-
 ## 📁 File Structure
 
 ```
