@@ -24,7 +24,7 @@ Sabse aasaan tarika (bina Git command line ke):
 4. Branch = `main`, folder = `/ (root)` select karo → **Save**
 5. 1-2 minute wait karo — GitHub ek link degा jaisे:
    ```
-   https://<your-username>.github.io/dsa-notes/
+   https://prashantgautamdev.github.io/dsa-notes/
    ```
 
 ### Step 4 — Check Karo
