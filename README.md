@@ -2,7 +2,7 @@
 
 > A complete, exam-ready & interview-ready Data Structures & Algorithms notebook — written in a handwritten-notebook style with diagrams, Python code, and hundreds of practice questions per chapter.
 
-🔗 **Live Notes:** `https://<your-username>.github.io/<repo-name>/`
+🔗 **Live Notes:** `https://prashantgautamdev.github.io/Full_notas_on_DSA_in_Python/`
 *(update this link once GitHub Pages is enabled — see [Hosting](#-hosting-on-github-pages) below)*
 
 ---
