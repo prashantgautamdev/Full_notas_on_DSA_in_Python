@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TABLE OF CONTENTS ============ -->
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li class="current">Chapter 1 — Introduction to Data Structures &amp; Algorithms</li>
+    <li>Chapter 2 — Arrays (coming next)</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks &amp; Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing &amp; more…</li>
+  </ol>
+  <div class="note">📝 Say "next chapter" any time and I'll write Chapter 2 in the same notebook style.</div>
+</div>
+
+<!-- ============ PAGE 1 : COVER + OBJECTIVES ============ -->
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 1</h1>
+  <div class="subtitle">Introduction to Data Structures &amp; Algorithms</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <p>By the end of this chapter, you will be able to —</p>
+  <ul class="checklist">
+    <li>Explain what a <span class="mark">Data Structure</span> and an <span class="mark">Algorithm</span> are, and why we study them together.</li>
+    <li>Classify data structures as <span class="mark-g">Linear</span> or <span class="mark-g">Non-Linear</span>, and <span class="mark-g">Primitive</span> or <span class="mark-p">Non-Primitive</span>.</li>
+    <li>Understand <span class="mark">Abstract Data Types (ADT)</span> and why they hide implementation detail.</li>
+    <li>Read and reason about <span class="mark">Time Complexity</span> &amp; <span class="mark">Space Complexity</span>.</li>
+    <li>Use <span class="mark">Big-O, Big-Ω, Big-Θ</span> notation to describe algorithm efficiency.</li>
+    <li>Connect every concept to a real-life example — so it actually sticks!</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+
+  <div class="box def">
+    <b>Data Structure</b> — a way of organising, storing and managing data in a computer so that it can be used efficiently. Think of it as the <i>"container"</i> that holds your data in a particular shape.
+  </div>
+
+  <div class="box def">
+    <b>Algorithm</b> — a finite, step-by-step, well-defined set of instructions to solve a particular problem. It must be <span class="red">unambiguous</span>, take some <span class="red">input</span>, produce an <span class="red">output</span>, and <span class="red">terminate</span> in finite time.
+  </div>
+
+  <div class="box def">
+    <b>Abstract Data Type (ADT)</b> — a logical/mathematical description of a data structure — <i>what</i> operations it supports (like insert, delete, search) — without specifying <i>how</i> they are implemented internally.
+  </div>
+
+  <div class="footer-signature">— keep going, page 2 →</div>
+</div>
+
+<!-- ============ PAGE 2 : DS vs ALGO, TYPES OF DS ============ -->
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+
+  <h2 class="sec"><span class="num">3</span> Data Structure vs Algorithm</h2>
+  <p>People often mix these up — here's the simple way to remember it:</p>
+  <table>
+    <tr><th>Data Structure</th><th>Algorithm</th></tr>
+    <tr><td>The <i>container</i> — how data is arranged</td><td>The <i>recipe</i> — steps to solve a problem</td></tr>
+    <tr><td>Example: Array, Stack, Tree</td><td>Example: Binary Search, Bubble Sort</td></tr>
+    <tr><td>Answers: "Where do I keep it?"</td><td>Answers: "How do I process it?"</td></tr>
+  </table>
+  <div class="box tip">
+    Analogy: A <b>kitchen cabinet</b> (data structure) organises your ingredients. A <b>recipe</b> (algorithm) tells you the steps to cook using those ingredients. You need both to make a great dish — just like you need both DS &amp; Algorithms to write efficient programs!
+  </div>
+
+  <h2 class="sec"><span class="num">4</span> Types of Data Structures</h2>
+
+  <h3 class="subsec">(a) Primitive vs Non-Primitive</h3>
+  <ul class="checklist">
+    <li><b>Primitive:</b> basic built-in types — <span class="mark">int, float, char, boolean</span>. Directly operated upon by machine instructions.</li>
+    <li><b>Non-Primitive:</b> derived from primitive types — <span class="mark">Array, Linked List, Stack, Queue, Tree, Graph</span>. Built by the programmer.</li>
+  </ul>
+
+  <h3 class="subsec">(b) Linear vs Non-Linear</h3>
+  <table>
+    <tr><th>Linear DS</th><th>Non-Linear DS</th></tr>
+    <tr><td>Elements arranged sequentially, one after another</td><td>Elements arranged in a hierarchical or networked form</td></tr>
+    <tr><td>Array, Stack, Queue, Linked List</td><td>Tree, Graph, Heap</td></tr>
+    <tr><td>Single-level traversal</td><td>Multi-level / non-sequential traversal</td></tr>
+  </table>
+
+  <div class="diagram">
+    <div>
+      <div style="font-family:'Patrick Hand'; font-size:14px; margin-bottom:4px;">Linear (Array):</div>
+      <div style="display:flex;">
+        <div class="cell">10</div><div class="cell">22</div><div class="cell">7</div><div class="cell">18</div>
+      </div>
+    </div>
+    <div style="margin-left:30px;">
+      <div style="font-family:'Patrick Hand'; font-size:14px; margin-bottom:4px;">Non-Linear (Tree):</div>
+      <svg width="150" height="90">
+        <line x1="75" y1="15" x2="35" y2="55" stroke="#1a3d8f" stroke-width="2"/>
+        <line x1="75" y1="15" x2="115" y2="55" stroke="#1a3d8f" stroke-width="2"/>
+        <line x1="35" y1="55" x2="15" y2="85" stroke="#1a3d8f" stroke-width="2"/>
+        <line x1="35" y1="55" x2="55" y2="85" stroke="#1a3d8f" stroke-width="2"/>
+        <circle cx="75" cy="15" r="14" fill="#fff" stroke="#12296b" stroke-width="2.5"/>
+        <circle cx="35" cy="55" r="14" fill="#fff" stroke="#12296b" stroke-width="2.5"/>
+        <circle cx="115" cy="55" r="14" fill="#fff" stroke="#12296b" stroke-width="2.5"/>
+        <circle cx="15" cy="85" r="12" fill="#fff" stroke="#12296b" stroke-width="2"/>
+        <circle cx="55" cy="85" r="12" fill="#fff" stroke="#12296b" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="footer-signature">— page 3 →</div>
+</div>
+
+<!-- ============ PAGE 3 : REAL LIFE EXAMPLES / DIAGRAMS ============ -->
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples of Data Structures</h2>
+
+  <div class="box example">
+    <b>Stack (LIFO — Last In First Out):</b> a stack of plates in a canteen. The last plate placed on top is the first one picked up.
+    <div class="diagram">
+      <div class="stackbox">
+        <div>Plate 1</div><div>Plate 2</div><div>Plate 3 ← top</div>
+      </div>
+      <span style="font-family:'Patrick Hand'; font-size:14px;">↑ pick from top first (LIFO)</span>
+    </div>
+  </div>
+
+  <div class="box example">
+    <b>Queue (FIFO — First In First Out):</b> a line at a movie ticket counter. The first person to join the line is the first to get a ticket.
+    <div class="diagram">
+      <div class="queuebox">
+        <div>Front → P1</div><div>P2</div><div>P3 ← Rear</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box example">
+    <b>Linked List:</b> a train — each coach (node) is connected to the next, and you can add/remove coaches without shifting the whole train.
+    <div class="diagram">
+      <div class="node">5</div><span class="arrow">→</span>
+      <div class="node">9</div><span class="arrow">→</span>
+      <div class="node">2</div><span class="arrow">→</span>
+      <div class="node">NULL</div>
+    </div>
+  </div>
+
+  <div class="box example">
+    <b>Tree:</b> a family tree / company org-chart — one root (CEO / grandparent) branching into many levels.
+  </div>
+
+  <div class="box example">
+    <b>Graph:</b> a city's road map — junctions (nodes) connected by roads (edges), possibly forming cycles.
+  </div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Choosing the <span class="mark">right</span> data structure can turn an O(n) operation into O(1) or O(log n).</li>
+    <li>Every non-primitive DS can usually be built two ways: using an <span class="mark-g">Array</span> (contiguous memory) or a <span class="mark-g">Linked structure</span> (scattered memory + pointers).</li>
+    <li>ADT = <i>what</i> it does. Data Structure = <i>how</i> it's built. Algorithm = <i>how</i> operations are carried out.</li>
+    <li>A valid algorithm must be <span class="red">finite</span>, <span class="red">definite</span> (unambiguous), and produce correct <span class="red">output</span> for valid input.</li>
+  </ul>
+
+  <div class="footer-signature">— page 4 →</div>
+</div>
+
+<!-- ============ PAGE 4 : COMPLEXITY & BIG-O ============ -->
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time &amp; Space Complexity</h2>
+  <div class="box def">
+    <b>Time Complexity</b> — a measure of the amount of <i>time</i> an algorithm takes to run, as a function of input size <i>n</i>. We don't measure in seconds (that depends on hardware!) — we count the number of <span class="mark">basic operations</span>.
+  </div>
+  <div class="box def">
+    <b>Space Complexity</b> — a measure of the total <i>memory</i> an algorithm needs, including input storage + extra ("auxiliary") space used during execution.
+  </div>
+
+  <h3 class="subsec">Best, Worst &amp; Average Case</h3>
+  <table>
+    <tr><th>Case</th><th>Meaning</th><th>Example: Linear Search</th></tr>
+    <tr><td>Best Case</td><td>Minimum time taken (luckiest input)</td><td>Element found at index 0 → O(1)</td></tr>
+    <tr><td>Worst Case</td><td>Maximum time taken (unluckiest input)</td><td>Element at last index / not found → O(n)</td></tr>
+    <tr><td>Average Case</td><td>Expected time over all possible inputs</td><td>Element found somewhere in middle → O(n)</td></tr>
+  </table>
+  <div class="box tip">We usually design/analyse for the <b>Worst Case</b> — it gives a safety guarantee: "my program will never be slower than this."</div>
+
+  <h2 class="sec"><span class="num">8</span> Asymptotic Notation</h2>
+  <div class="box formula">
+    <b>Big-O (O)</b> — Upper bound → "grows <i>no faster than</i>" (worst case)<br>
+    <b>Big-Omega (Ω)</b> — Lower bound → "grows <i>no slower than</i>" (best case)<br>
+    <b>Big-Theta (Θ)</b> — Tight bound → "grows <i>exactly at the rate of</i>" (both bounds match)
+  </div>
+
+  <h3 class="subsec">Growth Rate Comparison (small n → large n)</h3>
+  <svg class="growth-chart" viewBox="0 0 460 170">
+    <line x1="30" y1="10" x2="30" y2="150" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="30" y1="150" x2="450" y2="150" stroke="#1a3d8f" stroke-width="2"/>
+    <text x="8" y="15" font-family="Patrick Hand" font-size="12" fill="#555">time</text>
+    <text x="430" y="165" font-family="Patrick Hand" font-size="12" fill="#555">n</text>
+    <path d="M30,148 L450,146" stroke="#1e7d32" stroke-width="2.5" fill="none"/>
+    <text x="380" y="140" font-family="Patrick Hand" font-size="13" fill="#1e7d32">O(1)</text>
+    <path d="M30,148 Q 200,140 450,90" stroke="#2e8b57" stroke-width="2.5" fill="none"/>
+    <text x="380" y="98" font-family="Patrick Hand" font-size="13" fill="#2e8b57">O(log n)</text>
+    <path d="M30,148 L450,40" stroke="#c98a00" stroke-width="2.5" fill="none"/>
+    <text x="380" y="35" font-family="Patrick Hand" font-size="13" fill="#c98a00">O(n)</text>
+    <path d="M30,148 Q 250,60 450,10" stroke="#e07b00" stroke-width="2.5" fill="none"/>
+    <text x="330" y="15" font-family="Patrick Hand" font-size="13" fill="#e07b00">O(n log n)</text>
+    <path d="M30,148 C 200,148 300,10 340,-30" stroke="#c0392b" stroke-width="2.5" fill="none"/>
+    <text x="250" y="18" font-family="Patrick Hand" font-size="13" fill="#c0392b">O(n²)</text>
+  </svg>
+
+  <div class="box mistake">
+    Thinking O(2n) and O(n) are "different" — <b>constants are dropped!</b> Both are simply <span class="mark">O(n)</span>. Big-O only cares about growth <i>rate</i>, not exact operation count.
+  </div>
+  <div class="box mistake">
+    Confusing "Big-O = worst case" as a rule — Big-O is just a notation for an <i>upper bound</i>; it can describe best, average, or worst case depending on what you're analysing.
+  </div>
+
+  <div class="footer-signature">— page 5 →</div>
+</div>
+
+<!-- ============ PAGE 5 : CODE EXAMPLES + TIPS ============ -->
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">9</span> Python Code Examples</h2>
+  <p>Let's <i>see</i> complexity in action 👇</p>
+
+  <h3 class="subsec">O(1) — Constant Time</h3>
+  <div class="codebox"><span class="cm"># Accessing an array element by index — always 1 step</span>
+<span class="kw">def</span> get_first(arr):
+    <span class="kw">return</span> arr[0]</div>
+
+  <h3 class="subsec">O(n) — Linear Time</h3>
+  <div class="codebox"><span class="cm"># Linear Search — checks every element in worst case</span>
+<span class="kw">def</span> linear_search(arr, target):
+    <span class="kw">for</span> i <span class="kw">in</span> range(len(arr)):
+        <span class="kw">if</span> arr[i] == target:
+            <span class="kw">return</span> i
+    <span class="kw">return</span> -1</div>
+
+  <h3 class="subsec">O(log n) — Logarithmic Time</h3>
+  <div class="codebox"><span class="cm"># Binary Search — halves the search space each step</span>
+<span class="kw">def</span> binary_search(arr, target):
+    lo, hi = 0, len(arr) - 1
+    <span class="kw">while</span> lo <= hi:
+        mid = (lo + hi) // 2
+        <span class="kw">if</span> arr[mid] == target:
+            <span class="kw">return</span> mid
+        <span class="kw">elif</span> arr[mid] < target:
+            lo = mid + 1
+        <span class="kw">else</span>:
+            hi = mid - 1
+    <span class="kw">return</span> -1</div>
+
+  <h3 class="subsec">O(n²) — Quadratic Time</h3>
+  <div class="codebox"><span class="cm"># Nested loop — every pair is compared</span>
+<span class="kw">def</span> has_duplicate_pair(arr):
+    <span class="kw">for</span> i <span class="kw">in</span> range(len(arr)):
+        <span class="kw">for</span> j <span class="kw">in</span> range(i+1, len(arr)):
+            <span class="kw">if</span> arr[i] == arr[j]:
+                <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">return</span> <span class="kw">False</span></div>
+
+  <h2 class="sec"><span class="num">10</span> Tips &amp; Tricks</h2>
+  <div class="box tip">Count loops, not lines: <b>1 loop over n → O(n)</b>, <b>2 nested loops over n → O(n²)</b>, <b>loop that halves each time → O(log n)</b>.</div>
+  <div class="box tip">When comparing complexities, just plug in a big number like <b>n = 1,000,000</b> mentally — O(log n) ≈ 20 steps, O(n) ≈ 1,000,000 steps. The gap explains why Big-O matters!</div>
+  <div class="box tip">If a problem needs frequent <i>search</i>, think Hash Table/BST first. If it needs frequent <i>insert/delete at ends</i>, think Linked List/Deque. If it needs <i>indexed access</i>, think Array.</div>
+
+  <h2 class="sec"><span class="num">11</span> Common Mistakes</h2>
+  <div class="box mistake">Assuming Array and Linked List are "basically the same" — their memory layout (contiguous vs scattered) changes complexity of almost every operation.</div>
+  <div class="box mistake">Forgetting that <b>space complexity</b> includes auxiliary space (extra variables, recursion stack) — not just the input itself.</div>
+  <div class="box mistake">Writing pseudocode in strict Python/Java/C++ syntax — pseudocode should be language-agnostic, plain-English steps.</div>
+
+  <div class="footer-signature">— page 6 →</div>
+</div>
+
+<!-- ============ PAGE 6: INTERVIEW QUESTIONS ============ -->
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+
+  <ol class="qlist" id="interview-coding-list"></ol>
+
+  <div class="footer-signature">— page 7 →</div>
+</div>
+
+<!-- ============ PAGE 7: PRACTICE QUESTIONS ============ -->
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+
+  <div class="footer-signature">— page 8 →</div>
+</div>
+
+<!-- ============ PAGE 8: SUMMARY + FORMULAE ============ -->
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    A <b>Data Structure</b> organises data; an <b>Algorithm</b> processes it. Structures are <span class="mark-g">Linear</span> (Array, Stack, Queue, Linked List) or <span class="mark-g">Non-Linear</span> (Tree, Graph). An <b>ADT</b> defines <i>what</i> operations exist without fixing <i>how</i>. We measure efficiency using <b>Time</b> &amp; <b>Space Complexity</b>, expressed via <b>Big-O / Big-Ω / Big-Θ</b> notation, typically analysing the <b>worst case</b>. Choosing the right structure for the right problem is the single biggest lever for writing fast, scalable code.
+  </div>
+
+  <h3 class="subsec">Mind-map</h3>
+  <svg width="100%" height="210" viewBox="0 0 500 210">
+    <circle cx="250" cy="30" r="30" fill="#dbe6ff" stroke="#12296b" stroke-width="2.5"/>
+    <text x="250" y="35" text-anchor="middle" font-family="Patrick Hand" font-size="13" fill="#12296b">DSA</text>
+    <line x1="230" y1="55" x2="90" y2="110" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="270" y1="55" x2="410" y2="110" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="250" y1="60" x2="250" y2="110" stroke="#1a3d8f" stroke-width="2"/>
+    <circle cx="90" cy="130" r="42" fill="#c8f7c5" stroke="#1e7d32" stroke-width="2"/>
+    <text x="90" y="126" text-anchor="middle" font-family="Patrick Hand" font-size="12" fill="#1e7d32">Linear DS</text>
+    <text x="90" y="140" text-anchor="middle" font-family="Patrick Hand" font-size="10" fill="#1e7d32">Array•Stack•Queue</text>
+    <circle cx="410" cy="130" r="42" fill="#ffd6e8" stroke="#c0392b" stroke-width="2"/>
+    <text x="410" y="126" text-anchor="middle" font-family="Patrick Hand" font-size="12" fill="#c0392b">Non-Linear DS</text>
+    <text x="410" y="140" text-anchor="middle" font-family="Patrick Hand" font-size="10" fill="#c0392b">Tree•Graph</text>
+    <circle cx="250" cy="150" r="46" fill="#fff59d" stroke="#8e5b00" stroke-width="2"/>
+    <text x="250" y="146" text-anchor="middle" font-family="Patrick Hand" font-size="12" fill="#8e5b00">Complexity</text>
+    <text x="250" y="160" text-anchor="middle" font-family="Patrick Hand" font-size="10" fill="#8e5b00">O • Ω • Θ</text>
+  </svg>
+
+  <h2 class="sec"><span class="num">15</span> Key Formulae / Notation Reference</h2>
+  <table>
+    <tr><th>Notation</th><th>Meaning</th><th>Reads as</th></tr>
+    <tr><td>O(f(n))</td><td>Upper bound</td><td>Grows at most as fast as f(n)</td></tr>
+    <tr><td>Ω(f(n))</td><td>Lower bound</td><td>Grows at least as fast as f(n)</td></tr>
+    <tr><td>Θ(f(n))</td><td>Tight bound</td><td>Grows exactly as fast as f(n)</td></tr>
+  </table>
+  <div class="box formula">
+    Growth rate order (increasing):<br>
+    O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2ⁿ) &lt; O(n!)
+  </div>
+
+  <div class="footer-signature">— end of Chapter 1 · quick revision sheet next →</div>
+</div>
+
+<!-- ============ QUICK REVISION SHEET ============ -->
+<div class="page revision" style="position:relative;">
+  <div class="pin"></div>
+  <div class="pagenum">quick revision</div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 1 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Data Structure</td><td>Way of organising data (the container)</td></tr>
+    <tr><td>Algorithm</td><td>Step-by-step procedure (the recipe)</td></tr>
+    <tr><td>ADT</td><td>What operations exist, not how they're built</td></tr>
+    <tr><td>Linear DS</td><td>Array, Stack, Queue, Linked List</td></tr>
+    <tr><td>Non-Linear DS</td><td>Tree, Graph, Heap</td></tr>
+    <tr><td>Stack</td><td>LIFO — plates in canteen</td></tr>
+    <tr><td>Queue</td><td>FIFO — ticket counter line</td></tr>
+    <tr><td>Time Complexity</td><td>Operations counted vs input size n</td></tr>
+    <tr><td>Space Complexity</td><td>Memory used (input + auxiliary)</td></tr>
+    <tr><td>Big-O</td><td>Upper bound (worst case growth)</td></tr>
+    <tr><td>Big-Ω</td><td>Lower bound (best case growth)</td></tr>
+    <tr><td>Big-Θ</td><td>Tight bound (exact growth)</td></tr>
+  </table>
+  <div class="box formula">O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2ⁿ) &lt; O(n!)</div>
+  <div class="box tip">Golden rule: <b>Right structure + right algorithm = efficient program.</b> Always ask "what operation happens most often?" before choosing a DS.</div>
+</div>
+
+<script id="chapter1-data" type="application/json">{"practice": {"easy": ["In the analogy 'a family tree', which data structure concept is being demonstrated?", "What does the abbreviation 'BST' stand for in DSA?", "Write one advantage of using an Array.", "What symbol/keyword is commonly used in pseudocode to denote a loop?", "List two operations that can be performed on a Deque.", "List two operations that can be performed on a Circular Linked List.", "State one characteristic that every valid algorithm must have.", "Between O(n) and O(log n), which grows slower as n increases?", "Why is understanding Primitive Data Type important before learning individual data structures?", "State one everyday task that can be modeled as a Singly Linked List.", "Is a Stack used to store data in a linear sequence or in a hierarchical/networked form?", "What is the main difference between an algorithm and a program?", "Write one disadvantage of using a Deque.", "What does Big-O notation represent?", "Is a Singly Linked List used to store data in a linear sequence or in a hierarchical/networked form?", "Is Heap a primitive or non-primitive data structure?", "List two operations that can be performed on a Binary Tree.", "Name one real-life example of a Stack.", "Name one real-life example of a Binary Tree.", "What is meant by the 'worst case' of an algorithm?", "Why do we say Big-O notation ignores constant factors?", "What is meant by 'space complexity' of an algorithm?", "Write one disadvantage of using a Circular Linked List.", "Define the term 'Time Complexity' in your own words.", "What does the abbreviation 'DSA' stand for in DSA?", "Fill in the blank: A Hash Table follows the ______ principle.", "Why is understanding Big-Theta Notation important before learning individual data structures?", "What does the abbreviation 'ADT' stand for in DSA?", "State whether the following is True or False: Linked Lists store elements in contiguous memory locations.", "Is a Binary Tree used to store data in a linear sequence or in a hierarchical/networked form?", "Which is easier to compute: Heap insertion or Heap search \u2014 assume unsorted data?", "What is the full form of ADT?", "Fill in the blank: A Binary Tree follows the ______ principle.", "What is the time complexity of accessing an element in an Deque using its index?", "Name one real-life example of a Singly Linked List.", "Convert this everyday instruction into one line of pseudocode: 'repeat until the list is empty'.", "What is meant by the 'best case' of an algorithm?", "Write one advantage of using a Stack.", "Write one advantage of using a Doubly Linked List.", "What does the abbreviation 'FIFO' stand for in DSA?", "Give one example scenario where a music playlist with next/previous.", "Which category does Singly Linked List belong to \u2014 Linear or Non-Linear data structure?", "Fill in the blank: A Deque follows the ______ principle.", "Why is understanding Time Complexity important before learning individual data structures?", "Which is generally faster to access \u2014 an array or a linked list \u2014 and why (one line)?", "Name one real-life example of a Circular Linked List.", "Is Stack a primitive or non-primitive data structure?", "State one everyday task that can be modeled as a Deque.", "Which is easier to compute: Binary Tree insertion or Binary Tree search \u2014 assume unsorted data?", "Fill in the blank: A Array follows the ______ principle.", "Is Doubly Linked List a primitive or non-primitive data structure?", "Define the term 'Non-Linear Data Structure' in your own words.", "Is an Array used to store data in a linear sequence or in a hierarchical/networked form?", "Fill in the blank: A Stack follows the ______ principle.", "Is a Doubly Linked List used to store data in a linear sequence or in a hierarchical/networked form?", "Name one real-life example of a Heap.", "Write one disadvantage of using a Graph.", "What is the time complexity of accessing an element in an Hash Table using its index?", "In the analogy 'a train with connected coaches', which data structure concept is being demonstrated?", "What happens to the number of operations of an O(n) algorithm when n triples?", "List two operations that can be performed on a Doubly Linked List.", "In the analogy 'a city road map with junctions', which data structure concept is being demonstrated?", "State whether the following is True or False: A Tree is an example of a linear data structure.", "In the analogy 'a stack of plates in a canteen', which data structure concept is being demonstrated?", "List two operations that can be performed on a Singly Linked List.", "Give one example scenario where a queue at a movie ticket counter.", "Is Queue a primitive or non-primitive data structure?", "Why is understanding Best Case important before learning individual data structures?", "State whether the following is True or False: Pseudocode is written in a specific programming language syntax.", "Write one disadvantage of using a Binary Search Tree.", "List two operations that can be performed on a Stack.", "Define the term 'Big-O Notation' in your own words.", "What is the time complexity of accessing an element in an Stack using its index?", "Which category does Queue belong to \u2014 Linear or Non-Linear data structure?", "Write one disadvantage of using a Singly Linked List.", "List two operations that can be performed on a Graph.", "State whether the following is True or False: Arrays store elements in contiguous memory locations.", "State whether the following is True or False: A Queue follows the FIFO principle.", "Write one disadvantage of using a Binary Tree.", "Write one disadvantage of using a Heap.", "State whether the following is True or False: A Stack follows the FIFO principle.", "List two operations that can be performed on a Binary Search Tree.", "Define the term 'Pseudocode' in your own words.", "In the analogy 'a printer job scheduler', which data structure concept is being demonstrated?", "Give one example scenario where a to-do list app's undo button.", "Which category does Array belong to \u2014 Linear or Non-Linear data structure?", "Which category does Hash Table belong to \u2014 Linear or Non-Linear data structure?", "What is the time complexity of accessing an element in an Graph using its index?", "What does the abbreviation 'LIFO' stand for in DSA?", "Name one real-life example of a Hash Table.", "Write one advantage of using a Binary Search Tree.", "Why is understanding Worst Case important before learning individual data structures?", "Which is easier to compute: Graph insertion or Graph search \u2014 assume unsorted data?", "In the analogy 'a queue at a movie ticket counter', which data structure concept is being demonstrated?", "Is a Queue used to store data in a linear sequence or in a hierarchical/networked form?", "Why is understanding Space Complexity important before learning individual data structures?", "State whether the following is True or False: An algorithm must always terminate after a finite number of steps.", "Which is easier to compute: Singly Linked List insertion or Singly Linked List search \u2014 assume unsorted data?", "List two operations that can be performed on a Heap.", "State one everyday task that can be modeled as a Binary Search Tree.", "Fill in the blank: A Graph follows the ______ principle.", "Which category does Heap belong to \u2014 Linear or Non-Linear data structure?", "Define the term 'Big-Theta Notation' in your own words.", "Name one real-life example of a Doubly Linked List.", "State one everyday task that can be modeled as a Binary Tree.", "Define the term 'Algorithm' in your own words.", "Is Singly Linked List a primitive or non-primitive data structure?", "Write one advantage of using a Queue.", "Is a Deque used to store data in a linear sequence or in a hierarchical/networked form?", "State one everyday task that can be modeled as a Hash Table.", "State one everyday task that can be modeled as a Circular Linked List.", "Which is easier to compute: Array insertion or Array search \u2014 assume unsorted data?", "Which is easier to compute: Hash Table insertion or Hash Table search \u2014 assume unsorted data?", "Write one disadvantage of using a Queue.", "Write one disadvantage of using a Doubly Linked List.", "Which category does Stack belong to \u2014 Linear or Non-Linear data structure?", "Define the term 'Recursion (intro)' in your own words.", "Write one advantage of using a Heap.", "Which category does Circular Linked List belong to \u2014 Linear or Non-Linear data structure?", "Is a Circular Linked List used to store data in a linear sequence or in a hierarchical/networked form?", "State whether the following is True or False: A Graph can have cycles.", "Write one advantage of using a Graph.", "State whether the following is True or False: Every problem has only one correct algorithm to solve it.", "In the analogy 'browser back button history', which data structure concept is being demonstrated?", "State whether the following is True or False: Space complexity only considers the memory used by input data.", "What is the time complexity of accessing an element in an Circular Linked List using its index?", "Fill in the blank: A Binary Search Tree follows the ______ principle.", "State whether the following is True or False: Big-O notation describes the upper bound of an algorithm's running time.", "Why is understanding Data Structure important before learning individual data structures?", "Define the term 'Worst Case' in your own words.", "Name one real-life example of a Binary Search Tree.", "Give one example scenario where a train with connected coaches.", "What is the time complexity of accessing an element in an Singly Linked List using its index?", "Which is easier to compute: Circular Linked List insertion or Circular Linked List search \u2014 assume unsorted data?", "Why is understanding Big-Omega Notation important before learning individual data structures?", "Is Binary Search Tree a primitive or non-primitive data structure?", "Name one real-life example of a Queue.", "In the analogy 'a to-do list app's undo button', which data structure concept is being demonstrated?", "Give one example scenario where a phone contact list sorted by name.", "Which is easier to compute: Queue insertion or Queue search \u2014 assume unsorted data?", "State one everyday task that can be modeled as a Graph.", "Which category does Binary Tree belong to \u2014 Linear or Non-Linear data structure?", "Give one example scenario where a city road map with junctions.", "Why is understanding Recursion (intro) important before learning individual data structures?", "Is Graph a primitive or non-primitive data structure?", "Why is understanding Abstract Data Type important before learning individual data structures?", "Define the term 'Best Case' in your own words.", "Write one advantage of using a Hash Table.", "Which is easier to compute: Binary Search Tree insertion or Binary Search Tree search \u2014 assume unsorted data?", "Is a Heap used to store data in a linear sequence or in a hierarchical/networked form?", "Give one example scenario where a printer job scheduler.", "Fill in the blank: A Singly Linked List follows the ______ principle.", "List two operations that can be performed on a Hash Table.", "Why is understanding Non-Linear Data Structure important before learning individual data structures?", "Fill in the blank: A Queue follows the ______ principle.", "Name one real-life example of a Deque.", "Is Circular Linked List a primitive or non-primitive data structure?", "In the analogy 'a phone contact list sorted by name', which data structure concept is being demonstrated?", "Write one advantage of using a Circular Linked List.", "Write one advantage of using a Binary Tree.", "Which category does Doubly Linked List belong to \u2014 Linear or Non-Linear data structure?", "Write one disadvantage of using an Array.", "Write one disadvantage of using a Stack.", "Define the term 'Primitive Data Type' in your own words.", "Give one example scenario where a stack of plates in a canteen.", "Which is easier to compute: Stack insertion or Stack search \u2014 assume unsorted data?", "Define the term 'Asymptotic Notation' in your own words.", "Which is easier to compute: Doubly Linked List insertion or Doubly Linked List search \u2014 assume unsorted data?", "Fill in the blank: A Heap follows the ______ principle.", "Why is understanding Non-Primitive Data Type important before learning individual data structures?", "In the analogy 'a music playlist with next/previous', which data structure concept is being demonstrated?", "List two operations that can be performed on an Array.", "What is the time complexity of accessing an element in an Binary Tree using its index?", "Define the term 'Space Complexity' in your own words.", "Why is understanding Algorithm important before learning individual data structures?", "Name one real-life example of an Array.", "Why is understanding Asymptotic Notation important before learning individual data structures?", "State one everyday task that can be modeled as a Stack.", "Why is understanding Linear Data Structure important before learning individual data structures?", "Write one advantage of using a Singly Linked List.", "What is the time complexity of accessing an element in an Array using its index?", "Is Deque a primitive or non-primitive data structure?", "Define the term 'Non-Primitive Data Type' in your own words.", "Fill in the blank: A Circular Linked List follows the ______ principle.", "State whether the following is True or False: The worst-case time complexity is always the most useful measure in practice.", "State one everyday task that can be modeled as a Heap.", "What is the time complexity of accessing an element in an Queue using its index?", "Define the term 'Linear Data Structure' in your own words.", "List two operations that can be performed on a Queue.", "Which category does Deque belong to \u2014 Linear or Non-Linear data structure?", "Is Hash Table a primitive or non-primitive data structure?", "Give one example scenario where a family tree.", "Define the term 'Data Structure' in your own words.", "Why is understanding Big-O Notation important before learning individual data structures?", "Name one real-life example of a Graph.", "Why is understanding Average Case important before learning individual data structures?", "Give one example scenario where browser back button history.", "Why is understanding Pseudocode important before learning individual data structures?", "Define the term 'Abstract Data Type' in your own words.", "Is a Graph used to store data in a linear sequence or in a hierarchical/networked form?"], "medium": ["Which data structure would you choose to implement 'a to-do list app's undo button' and why?", "What is the time complexity of deleting the last element from a Hash Table, and why?", "A program runs a single loop from 1 to n performing constant work each iteration. What is its time complexity?", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n), O(2^n), O(log n).", "Explain how a Hash Table can be implemented using an array versus using a linked list.", "Differentiate between an Abstract Data Type and its concrete implementation, using Circular Linked List as an example.", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n log n), O(2^n), O(n!).", "Compare Array and Graph on the basis of memory (space) usage.", "Why do we usually analyse the worst-case complexity of an algorithm instead of the best case?", "Explain the significance of the phrase 'ignore lower order terms' when computing Big-O.", "Compare Singly Linked List and Binary Search Tree on the basis of insertion time complexity.", "Explain why insertion at the beginning of an Stack is costlier than insertion at the end, for arrays.", "Explain why insertion at the beginning of an Graph is costlier than insertion at the end, for arrays.", "A program halves the input size at every step until it reaches 1. What is its time complexity?", "What is the time complexity of deleting the last element from a Queue, and why?", "Differentiate between an Abstract Data Type and its concrete implementation, using Binary Tree as an example.", "A program runs two nested loops, each from 1 to n. What is its time complexity?", "Differentiate between an Abstract Data Type and its concrete implementation, using Binary Search Tree as an example.", "Explain why insertion at the beginning of an Heap is costlier than insertion at the end, for arrays.", "Explain how an Array can be implemented using an array versus using a linked list.", "Explain why insertion at the beginning of an Binary Search Tree is costlier than insertion at the end, for arrays.", "Explain why insertion at the beginning of an Queue is costlier than insertion at the end, for arrays.", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n^2), O(n), O(n log n).", "What is the time complexity of the following operation on a Stack: searching for an element? Justify your answer briefly.", "Compare Hash Table and Array on the basis of memory (space) usage.", "Explain with an example why a Graph is considered a dynamic data structure.", "Compare Circular Linked List and Singly Linked List on the basis of insertion time complexity.", "Differentiate between an Abstract Data Type and its concrete implementation, using Stack as an example.", "Given an unsorted array of n elements, what is the time complexity of finding the maximum element?", "Explain with an example why a Binary Search Tree is considered a dynamic data structure.", "If an algorithm's running time is described as O(n^2), what happens to the running time when the input size is doubled?", "Compare Graph and Queue on the basis of memory (space) usage.", "Compare Stack and Queue on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n log n), O(log n), O(n^3).", "Compare Singly Linked List and Queue on the basis of memory (space) usage.", "Differentiate between an Abstract Data Type and its concrete implementation, using Doubly Linked List as an example.", "Compare Binary Search Tree and Doubly Linked List on the basis of memory (space) usage.", "Explain how a Binary Tree can be implemented using an array versus using a linked list.", "What is the time complexity of deleting the last element from a Heap, and why?", "Arrange the following complexities in increasing order of growth rate: O(n!), O(log n), O(n), O(1).", "Explain why the worst-case complexity of accessing an element in a Binary Search Tree is O(1).", "Why is space-time trade-off an important consideration when choosing a Graph?", "Arrange the following complexities in increasing order of growth rate: O(log n), O(2^n), O(n^3), O(n!).", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(log n), O(n), O(1).", "What is the time complexity of deleting the last element from a Stack, and why?", "Compare Hash Table and Binary Search Tree on the basis of insertion time complexity.", "Compare Array and Circular Linked List on the basis of insertion time complexity.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n^2), O(n), O(2^n).", "Explain with an example why a Binary Tree is considered a dynamic data structure.", "Explain how a Singly Linked List can be implemented using an array versus using a linked list.", "Explain how a Stack can be implemented using an array versus using a linked list.", "Compare Doubly Linked List and Stack on the basis of memory (space) usage.", "Why is space-time trade-off an important consideration when choosing a Circular Linked List?", "What is the time complexity of the following operation on a Queue: searching for an element? Justify your answer briefly.", "Explain with an example why a Singly Linked List is considered a dynamic data structure.", "Compare Hash Table and Binary Tree on the basis of memory (space) usage.", "What is the time complexity of deleting the last element from an Array, and why?", "Compare Binary Search Tree and Hash Table on the basis of memory (space) usage.", "Explain why the worst-case complexity of accessing an element in a Singly Linked List is O(log n).", "Arrange the following complexities in increasing order of growth rate: O(log n), O(1), O(n^3), O(n log n).", "Explain with an example why a Deque is considered a dynamic data structure.", "Why is space-time trade-off an important consideration when choosing a Doubly Linked List?", "What is the time complexity of the following operation on a Doubly Linked List: deletion from the beginning? Justify your answer briefly.", "Compare Binary Search Tree and Heap on the basis of insertion time complexity.", "Explain the difference between Big-O and Big-Omega notation with a one-line example.", "Compare Heap and Doubly Linked List on the basis of insertion time complexity.", "Differentiate between an Abstract Data Type and its concrete implementation, using Graph as an example.", "Differentiate between an Abstract Data Type and its concrete implementation, using Deque as an example.", "Differentiate between an Abstract Data Type and its concrete implementation, using Queue as an example.", "Why is space-time trade-off an important consideration when choosing a Queue?", "Why is space-time trade-off an important consideration when choosing a Deque?", "Explain how a Binary Search Tree can be implemented using an array versus using a linked list.", "Compare Graph and Binary Tree on the basis of insertion time complexity.", "Which data structure would you choose to implement 'a printer job scheduler' and why?", "Compare Queue and Circular Linked List on the basis of insertion time complexity.", "What is the time complexity of the following operation on a Binary Search Tree: deletion from the beginning? Justify your answer briefly.", "Compare Queue and Deque on the basis of insertion time complexity.", "Why is space-time trade-off an important consideration when choosing a Heap?", "Explain with an example why a Circular Linked List is considered a dynamic data structure.", "What is the time complexity of deleting the last element from a Deque, and why?", "What is the time complexity of deleting the last element from a Circular Linked List, and why?", "Which data structure would you choose to implement 'a stack of plates in a canteen' and why?", "Differentiate between an Abstract Data Type and its concrete implementation, using Heap as an example.", "Explain why the worst-case complexity of accessing an element in a Binary Search Tree is O(n^2).", "Differentiate between an Abstract Data Type and its concrete implementation, using Singly Linked List as an example.", "Explain why the worst-case complexity of accessing an element in a Queue is O(log n).", "Which data structure would you choose to implement 'browser back button history' and why?", "Explain why the worst-case complexity of accessing an element in a Graph is O(n^3).", "Compare Stack and Binary Tree on the basis of insertion time complexity.", "Explain with an example why a Queue is considered a dynamic data structure.", "Explain why insertion at the beginning of an Doubly Linked List is costlier than insertion at the end, for arrays.", "Why is space-time trade-off an important consideration when choosing a Stack?", "Why is space-time trade-off an important consideration when choosing a Hash Table?", "Differentiate between an Abstract Data Type and its concrete implementation, using Hash Table as an example.", "Explain why the worst-case complexity of accessing an element in a Deque is O(n^2).", "What is the time complexity of the following operation on a Binary Tree: traversing all elements? Justify your answer briefly.", "Explain why the worst-case complexity of accessing an element in a Heap is O(log n).", "Explain why the worst-case complexity of accessing an element in a Binary Tree is O(2^n).", "Differentiate between an Abstract Data Type and its concrete implementation, using Array as an example.", "Explain why the worst-case complexity of accessing an element in a Doubly Linked List is O(1).", "Which data structure would you choose to implement 'a family tree' and why?", "Arrange the following complexities in increasing order of growth rate: O(2^n), O(1), O(n), O(n log n).", "Arrange the following complexities in increasing order of growth rate: O(2^n), O(n log n), O(n^3), O(log n).", "Explain with an example why an Array is considered a dynamic data structure.", "Arrange the following complexities in increasing order of growth rate: O(log n), O(n^3), O(n log n), O(n).", "Compare Doubly Linked List and Array on the basis of memory (space) usage.", "Compare Binary Search Tree and Singly Linked List on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(2^n), O(n^2), O(1), O(n!).", "Why is space-time trade-off an important consideration when choosing a Binary Search Tree?", "Compare Array and Queue on the basis of memory (space) usage.", "What is the time complexity of the following operation on a Hash Table: deletion from the end? Justify your answer briefly.", "Which data structure would you choose to implement 'a phone contact list sorted by name' and why?", "Compare Array and Deque on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(log n), O(2^n), O(n!), O(n log n).", "Compare Heap and Circular Linked List on the basis of insertion time complexity.", "Compare Graph and Queue on the basis of insertion time complexity.", "Explain why the worst-case complexity of accessing an element in a Queue is O(n^3).", "Arrange the following complexities in increasing order of growth rate: O(n), O(1), O(n^3), O(n^2).", "Explain with an example why a Doubly Linked List is considered a dynamic data structure.", "What is the time complexity of the following operation on a Hash Table: deletion from the beginning? Justify your answer briefly.", "Explain why the worst-case complexity of accessing an element in a Binary Search Tree is O(n!).", "Compare Singly Linked List and Binary Search Tree on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(log n), O(2^n), O(n^2).", "Explain with an example why a Heap is considered a dynamic data structure.", "Compare Hash Table and Heap on the basis of insertion time complexity.", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n^2), O(n log n), O(2^n).", "Explain why the worst-case complexity of accessing an element in a Circular Linked List is O(n log n).", "Explain why the worst-case complexity of accessing an element in a Deque is O(n!).", "Explain how a Deque can be implemented using an array versus using a linked list.", "Explain why the worst-case complexity of accessing an element in a Stack is O(log n).", "What is the time complexity of the following operation on a Heap: insertion at the end? Justify your answer briefly.", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(n^3), O(1), O(2^n).", "Explain with an example why a Stack is considered a dynamic data structure.", "What is the time complexity of the following operation on a Heap: insertion at the beginning? Justify your answer briefly.", "Explain why insertion at the beginning of an Circular Linked List is costlier than insertion at the end, for arrays.", "Explain how a Doubly Linked List can be implemented using an array versus using a linked list.", "Arrange the following complexities in increasing order of growth rate: O(n log n), O(n^3), O(log n), O(1).", "What is the time complexity of the following operation on a Hash Table: insertion at the beginning? Justify your answer briefly.", "Compare Binary Tree and Stack on the basis of insertion time complexity.", "Compare Array and Hash Table on the basis of insertion time complexity.", "Compare Graph and Singly Linked List on the basis of memory (space) usage.", "Explain why insertion at the beginning of an Array is costlier than insertion at the end, for arrays.", "What is the time complexity of the following operation on a Binary Tree: accessing the middle element? Justify your answer briefly.", "Explain why the worst-case complexity of accessing an element in a Graph is O(log n).", "Explain why the worst-case complexity of accessing an element in a Doubly Linked List is O(n^3).", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n^3), O(n log n), O(n).", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n log n), O(n^2), O(n!).", "Compare Heap and Deque on the basis of insertion time complexity.", "What is the time complexity of deleting the last element from a Binary Tree, and why?", "What is the time complexity of the following operation on a Circular Linked List: sorting all elements? Justify your answer briefly.", "Compare Stack and Graph on the basis of memory (space) usage.", "What is the time complexity of the following operation on a Queue: insertion at the end? Justify your answer briefly.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n), O(n log n), O(log n).", "Explain why the worst-case complexity of accessing an element in a Doubly Linked List is O(n^2).", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n log n), O(log n), O(n).", "Compare Singly Linked List and Queue on the basis of insertion time complexity.", "What is the time complexity of deleting the last element from a Binary Search Tree, and why?", "Explain why the worst-case complexity of accessing an element in a Queue is O(n log n).", "Compare Binary Search Tree and Heap on the basis of memory (space) usage.", "Explain how a Circular Linked List can be implemented using an array versus using a linked list.", "Compare Binary Tree and Doubly Linked List on the basis of memory (space) usage.", "Explain why insertion at the beginning of an Binary Tree is costlier than insertion at the end, for arrays.", "What is the time complexity of the following operation on a Binary Search Tree: traversing all elements? Justify your answer briefly.", "What is the time complexity of the following operation on a Singly Linked List: sorting all elements? Justify your answer briefly.", "Compare Binary Search Tree and Binary Tree on the basis of insertion time complexity.", "Explain why the worst-case complexity of accessing an element in a Binary Search Tree is O(n log n).", "Compare Binary Search Tree and Deque on the basis of insertion time complexity.", "Arrange the following complexities in increasing order of growth rate: O(n), O(n^3), O(n log n), O(2^n).", "What is the time complexity of the following operation on a Graph: insertion at the beginning? Justify your answer briefly.", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(1), O(2^n), O(n!).", "Compare Stack and Array on the basis of memory (space) usage.", "Explain why the worst-case complexity of accessing an element in a Singly Linked List is O(1).", "Which data structure would you choose to implement 'a music playlist with next/previous' and why?", "What is the time complexity of deleting the last element from a Singly Linked List, and why?", "Compare Binary Search Tree and Array on the basis of memory (space) usage.", "Compare Binary Search Tree and Doubly Linked List on the basis of insertion time complexity.", "Compare Queue and Graph on the basis of insertion time complexity.", "What is the time complexity of the following operation on a Binary Tree: insertion at the beginning? Justify your answer briefly.", "Which data structure would you choose to implement 'a city road map with junctions' and why?", "Arrange the following complexities in increasing order of growth rate: O(n log n), O(1), O(log n), O(n!).", "What is the time complexity of the following operation on a Binary Tree: searching for an element? Justify your answer briefly.", "Why is space-time trade-off an important consideration when choosing an Array?", "Compare Binary Tree and Circular Linked List on the basis of insertion time complexity.", "Compare Stack and Heap on the basis of memory (space) usage.", "Explain with an example why a Hash Table is considered a dynamic data structure.", "Explain why the worst-case complexity of accessing an element in a Graph is O(n).", "Explain why the worst-case complexity of accessing an element in a Graph is O(n log n).", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(2^n), O(n^2), O(log n).", "Arrange the following complexities in increasing order of growth rate: O(n), O(n log n), O(n^3), O(1).", "Explain why the worst-case complexity of accessing an element in a Hash Table is O(1).", "Arrange the following complexities in increasing order of growth rate: O(1), O(log n), O(2^n), O(n^3).", "Compare Circular Linked List and Singly Linked List on the basis of memory (space) usage.", "What is the time complexity of deleting the last element from a Doubly Linked List, and why?", "What is the time complexity of the following operation on a Singly Linked List: accessing the middle element? Justify your answer briefly.", "Explain why insertion at the beginning of an Deque is costlier than insertion at the end, for arrays.", "Compare Deque and Singly Linked List on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(1), O(n^2), O(n!), O(log n).", "Compare Heap and Graph on the basis of insertion time complexity.", "Compare Array and Binary Tree on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n!), O(2^n), O(n log n).", "Compare Singly Linked List and Hash Table on the basis of insertion time complexity.", "Compare Heap and Queue on the basis of insertion time complexity.", "What is the time complexity of the following operation on a Graph: deletion from the end? Justify your answer briefly.", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(n log n), O(n), O(2^n).", "Explain why the worst-case complexity of accessing an element in an Array is O(2^n).", "What is the time complexity of the following operation on a Heap: deletion from the end? Justify your answer briefly.", "Explain how a Heap can be implemented using an array versus using a linked list.", "Which data structure would you choose to implement 'a queue at a movie ticket counter' and why?", "Compare Doubly Linked List and Array on the basis of insertion time complexity.", "What is the time complexity of the following operation on a Binary Search Tree: sorting all elements? Justify your answer briefly.", "What is the time complexity of the following operation on a Deque: searching for an element? Justify your answer briefly.", "Explain why the worst-case complexity of accessing an element in a Singly Linked List is O(2^n).", "Why is space-time trade-off an important consideration when choosing a Singly Linked List?", "Arrange the following complexities in increasing order of growth rate: O(n), O(n log n), O(2^n), O(1).", "Compare Heap and Doubly Linked List on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(2^n), O(log n), O(n log n), O(1).", "Arrange the following complexities in increasing order of growth rate: O(n), O(n^3), O(log n), O(2^n).", "Arrange the following complexities in increasing order of growth rate: O(n log n), O(n), O(n^3), O(1).", "Compare Stack and Singly Linked List on the basis of memory (space) usage.", "Compare Graph and Deque on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n^2), O(n log n), O(log n).", "Explain why the worst-case complexity of accessing an element in a Graph is O(1).", "Compare Doubly Linked List and Singly Linked List on the basis of insertion time complexity.", "Compare Doubly Linked List and Stack on the basis of insertion time complexity.", "Compare Queue and Array on the basis of insertion time complexity.", "What is the time complexity of the following operation on a Deque: accessing the middle element? Justify your answer briefly.", "Explain why the worst-case complexity of accessing an element in a Deque is O(log n).", "What is the time complexity of the following operation on a Graph: sorting all elements? Justify your answer briefly.", "What is the time complexity of the following operation on a Doubly Linked List: deletion from the end? Justify your answer briefly.", "What is the time complexity of the following operation on a Heap: searching for an element? Justify your answer briefly.", "Compare Binary Tree and Singly Linked List on the basis of memory (space) usage.", "Compare Graph and Doubly Linked List on the basis of insertion time complexity.", "Explain how a Queue can be implemented using an array versus using a linked list.", "Arrange the following complexities in increasing order of growth rate: O(n^3), O(n), O(n!), O(1).", "Explain why the worst-case complexity of accessing an element in a Hash Table is O(n).", "Compare Circular Linked List and Queue on the basis of memory (space) usage.", "Compare Singly Linked List and Circular Linked List on the basis of memory (space) usage.", "Compare Circular Linked List and Deque on the basis of insertion time complexity.", "Compare Deque and Stack on the basis of insertion time complexity.", "Compare Singly Linked List and Stack on the basis of memory (space) usage.", "Compare Hash Table and Queue on the basis of insertion time complexity.", "Explain why insertion at the beginning of an Hash Table is costlier than insertion at the end, for arrays.", "Arrange the following complexities in increasing order of growth rate: O(log n), O(n), O(n^2), O(2^n).", "Arrange the following complexities in increasing order of growth rate: O(1), O(n^2), O(n log n), O(n!).", "Compare Deque and Heap on the basis of insertion time complexity.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(n^3), O(log n), O(1).", "Explain why the worst-case complexity of accessing an element in a Stack is O(n!).", "Compare Circular Linked List and Binary Search Tree on the basis of memory (space) usage.", "What is the time complexity of the following operation on a Heap: traversing all elements? Justify your answer briefly.", "Compare Stack and Deque on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(2^n), O(n log n), O(log n).", "What is the time complexity of the following operation on a Binary Tree: deletion from the beginning? Justify your answer briefly.", "What is the time complexity of the following operation on a Stack: traversing all elements? Justify your answer briefly.", "Compare Array and Queue on the basis of insertion time complexity.", "Compare Doubly Linked List and Binary Tree on the basis of memory (space) usage.", "What is the time complexity of the following operation on a Queue: accessing the middle element? Justify your answer briefly.", "Arrange the following complexities in increasing order of growth rate: O(1), O(n^2), O(n), O(n log n).", "What is the time complexity of the following operation on a Singly Linked List: traversing all elements? Justify your answer briefly.", "Arrange the following complexities in increasing order of growth rate: O(1), O(n^2), O(2^n), O(n).", "Compare Singly Linked List and Doubly Linked List on the basis of insertion time complexity.", "Compare Doubly Linked List and Queue on the basis of insertion time complexity.", "Explain why the worst-case complexity of accessing an element in a Queue is O(2^n).", "Explain why the worst-case complexity of accessing an element in an Array is O(n^2).", "Explain why the worst-case complexity of accessing an element in a Hash Table is O(log n).", "What is the time complexity of the following operation on a Singly Linked List: insertion at the beginning? Justify your answer briefly.", "What is the time complexity of the following operation on a Hash Table: searching for an element? Justify your answer briefly.", "Compare Circular Linked List and Queue on the basis of insertion time complexity.", "Compare Array and Hash Table on the basis of memory (space) usage.", "Compare Binary Search Tree and Binary Tree on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(log n), O(2^n), O(n!), O(n).", "Explain why the worst-case complexity of accessing an element in a Singly Linked List is O(n!).", "Compare Binary Tree and Deque on the basis of insertion time complexity.", "Arrange the following complexities in increasing order of growth rate: O(log n), O(n!), O(n^2), O(n).", "Arrange the following complexities in increasing order of growth rate: O(n!), O(1), O(n log n), O(2^n).", "Compare Deque and Doubly Linked List on the basis of insertion time complexity.", "Explain how a Graph can be implemented using an array versus using a linked list.", "Explain why the worst-case complexity of accessing an element in a Binary Tree is O(n).", "Compare Queue and Doubly Linked List on the basis of memory (space) usage.", "Explain why the worst-case complexity of accessing an element in an Array is O(n!).", "Explain why the worst-case complexity of accessing an element in a Doubly Linked List is O(n log n).", "Arrange the following complexities in increasing order of growth rate: O(2^n), O(n^3), O(n log n), O(log n).", "Compare Graph and Binary Tree on the basis of memory (space) usage.", "Compare Queue and Binary Tree on the basis of memory (space) usage.", "Which data structure would you choose to implement 'a train with connected coaches' and why?", "Arrange the following complexities in increasing order of growth rate: O(n log n), O(1), O(n^2), O(log n).", "Arrange the following complexities in increasing order of growth rate: O(n), O(2^n), O(n^2), O(n^3).", "Explain why the worst-case complexity of accessing an element in a Queue is O(n!).", "Why is space-time trade-off an important consideration when choosing a Binary Tree?", "Compare Binary Tree and Stack on the basis of memory (space) usage.", "Arrange the following complexities in increasing order of growth rate: O(n!), O(1), O(n), O(n^2).", "Compare Binary Tree and Doubly Linked List on the basis of insertion time complexity.", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(n), O(n^3), O(n log n).", "What is the time complexity of deleting the last element from a Graph, and why?", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(1), O(2^n), O(n!).", "Explain why the worst-case complexity of accessing an element in a Stack is O(n).", "Arrange the following complexities in increasing order of growth rate: O(n^2), O(n!), O(n^3), O(1).", "Arrange the following complexities in increasing order of growth rate: O(n log n), O(1), O(n!), O(log n).", "Explain why the worst-case complexity of accessing an element in a Deque is O(n).", "Arrange the following complexities in increasing order of growth rate: O(log n), O(2^n), O(1), O(n log n).", "What is the time complexity of the following operation on a Deque: deletion from the beginning? Justify your answer briefly."], "hard": ["Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Singly Linked List versus a Binary Search Tree.", "Critically evaluate: 'An algorithm with lower time complexity (O(1)) is always better in practice than one with O(n^2).' Discuss with a counter-example involving constant factors.", "Design decision: for an application requiring fast random access with rare insertions/deletions, justify whether a Hash Table, Circular Linked List, or Stack is the optimal choice.", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Binary Search Tree that pre-stores results to save time.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 8n^2 + n as an example.", "Prove informally why f(n) = 6n^2 + 4n + 6 is O(n^2).", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Queue that pre-stores results to save time.", "For a dataset that changes size frequently and needs fast deletion from the beginning, argue why a plain Circular Linked List is not ideal, and suggest a better alternative structure.", "A recursive algorithm calls itself 4 times on inputs of size n/4 each time, doing O(n) extra work per call. Informally reason about its likely complexity class.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Binary Search Tree versus a Binary Tree.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 7n^2 + 7n as an example.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Doubly Linked List versus a Graph.", "Design decision: for an application requiring frequent middle insertions with memory efficiency, justify whether a Stack, Binary Tree, or Doubly Linked List is the optimal choice.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 4n^2 + 3n as an example.", "Design decision: for an application requiring fast random access with rare insertions/deletions, justify whether a Circular Linked List, Hash Table, or Binary Tree is the optimal choice.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 7n^2 + 5n as an example.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in an Array versus a Queue.", "A recursive algorithm calls itself 3 times on inputs of size n/3 each time, doing O(n) extra work per call. Informally reason about its likely complexity class.", "Design decision: for an application requiring ordered traversal with frequent updates, justify whether a Binary Search Tree, Deque, or Doubly Linked List is the optimal choice.", "Critically evaluate: 'An algorithm with lower time complexity (O(1)) is always better in practice than one with O(n^3).' Discuss with a counter-example involving constant factors.", "A recursive algorithm calls itself 2 times on inputs of size n/2 each time, doing O(n) extra work per call. Informally reason about its likely complexity class.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Graph versus a Binary Search Tree.", "Given two algorithms with complexities O(log n) and O(n^2), which one is asymptotically faster for large n? Justify your reasoning.", "For a dataset that changes size frequently and needs fast deletion from the end, argue why a plain Queue is not ideal, and suggest a better alternative structure.", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Graph that pre-stores results to save time.", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Singly Linked List that pre-stores results to save time.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Binary Search Tree versus a Circular Linked List.", "Prove informally why f(n) = 4n^2 + 4n + 7 is O(n^2).", "Explain why an algorithm with time complexity O(2^n) becomes impractical for n > 40, using rough numeric reasoning.", "For a dataset that changes size frequently and needs fast sorting all elements, argue why a plain Deque is not ideal, and suggest a better alternative structure.", "Critically evaluate: 'An algorithm with lower time complexity (O(n^2)) is always better in practice than one with O(log n).' Discuss with a counter-example involving constant factors.", "Prove informally why f(n) = 7n^2 + 7n + 5 is O(n^2).", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Singly Linked List versus a Hash Table.", "Critically evaluate: 'An algorithm with lower time complexity (O(n!)) is always better in practice than one with O(2^n).' Discuss with a counter-example involving constant factors.", "Explain why an algorithm with time complexity O(2^n) becomes impractical for n > 45, using rough numeric reasoning.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 6n^2 + 9n as an example.", "Critically evaluate: 'An algorithm with lower time complexity (O(log n)) is always better in practice than one with O(1).' Discuss with a counter-example involving constant factors.", "Critically evaluate: 'An algorithm with lower time complexity (O(n^2)) is always better in practice than one with O(n!).' Discuss with a counter-example involving constant factors.", "Design decision: for an application requiring frequent insertions at both ends and rare random access, justify whether an Array, Binary Search Tree, or Singly Linked List is the optimal choice.", "Prove informally why f(n) = 5n^2 + 7n + 3 is O(n^2).", "Design decision: for an application requiring frequent middle insertions with memory efficiency, justify whether a Deque, Circular Linked List, or Doubly Linked List is the optimal choice.", "Explain why an algorithm with time complexity O(2^n) becomes impractical for n > 35, using rough numeric reasoning.", "For a dataset that changes size frequently and needs fast sorting all elements, argue why a plain Singly Linked List is not ideal, and suggest a better alternative structure.", "For a dataset that changes size frequently and needs fast searching for an element, argue why a plain Heap is not ideal, and suggest a better alternative structure.", "Prove informally why f(n) = 4n^2 + 7n + 4 is O(n^2).", "Explain why an algorithm with time complexity O(2^n) becomes impractical for n > 50, using rough numeric reasoning.", "Given two algorithms with complexities O(2^n) and O(n^3), which one is asymptotically faster for large n? Justify your reasoning.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Deque versus a Stack.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 8n^2 + 5n as an example.", "Given two algorithms with complexities O(n!) and O(log n), which one is asymptotically faster for large n? Justify your reasoning.", "Given two algorithms with complexities O(n) and O(1), which one is asymptotically faster for large n? Justify your reasoning.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Stack versus a Heap.", "Prove informally why f(n) = 3n^2 + 6n + 9 is O(n^2).", "For a dataset that changes size frequently and needs fast traversing all elements, argue why a plain Heap is not ideal, and suggest a better alternative structure.", "Critically evaluate: 'An algorithm with lower time complexity (O(n!)) is always better in practice than one with O(1).' Discuss with a counter-example involving constant factors.", "Design decision: for an application requiring frequent middle insertions with memory efficiency, justify whether a Heap, Array, or Graph is the optimal choice.", "Prove informally why f(n) = 2n^2 + 7n + 9 is O(n^2).", "Prove informally why f(n) = 7n^2 + 2n + 4 is O(n^2).", "Prove informally why f(n) = 5n^2 + 6n + 3 is O(n^2).", "Prove informally why f(n) = 6n^2 + 7n + 5 is O(n^2).", "Critically evaluate: 'An algorithm with lower time complexity (O(n log n)) is always better in practice than one with O(2^n).' Discuss with a counter-example involving constant factors.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 4n^2 + 8n as an example.", "Design decision: for an application requiring fast random access with rare insertions/deletions, justify whether a Heap, Binary Tree, or Doubly Linked List is the optimal choice.", "Given two algorithms with complexities O(n^3) and O(n log n), which one is asymptotically faster for large n? Justify your reasoning.", "Explain why an algorithm with time complexity O(2^n) becomes impractical for n > 30, using rough numeric reasoning.", "Critically evaluate: 'An algorithm with lower time complexity (O(log n)) is always better in practice than one with O(n!).' Discuss with a counter-example involving constant factors.", "Given two algorithms with complexities O(n^2) and O(n!), which one is asymptotically faster for large n? Justify your reasoning.", "Critically evaluate: 'An algorithm with lower time complexity (O(n)) is always better in practice than one with O(n^3).' Discuss with a counter-example involving constant factors.", "Critically evaluate: 'An algorithm with lower time complexity (O(2^n)) is always better in practice than one with O(n!).' Discuss with a counter-example involving constant factors.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Hash Table versus a Heap.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 2n^2 + 8n as an example.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 8n^2 + 8n as an example.", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Circular Linked List that pre-stores results to save time.", "Design decision: for an application requiring constant-time lookup with unordered data, justify whether a Hash Table, Binary Tree, or Array is the optimal choice.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 4n^2 + 5n as an example.", "Given two algorithms with complexities O(1) and O(2^n), which one is asymptotically faster for large n? Justify your reasoning.", "Given two algorithms with complexities O(n) and O(n log n), which one is asymptotically faster for large n? Justify your reasoning.", "Design decision: for an application requiring constant-time lookup with unordered data, justify whether a Deque, Singly Linked List, or Stack is the optimal choice.", "Given two algorithms with complexities O(n) and O(n^2), which one is asymptotically faster for large n? Justify your reasoning.", "Given two algorithms with complexities O(1) and O(n^2), which one is asymptotically faster for large n? Justify your reasoning.", "For a dataset that changes size frequently and needs fast insertion at the end, argue why a plain Array is not ideal, and suggest a better alternative structure.", "Design decision: for an application requiring ordered traversal with frequent updates, justify whether a Deque, Heap, or Binary Search Tree is the optimal choice.", "Critically evaluate: 'An algorithm with lower time complexity (O(2^n)) is always better in practice than one with O(1).' Discuss with a counter-example involving constant factors.", "Prove informally why f(n) = 7n^2 + 2n + 3 is O(n^2).", "Prove informally why f(n) = 9n^2 + 6n + 2 is O(n^2).", "Given two algorithms with complexities O(n log n) and O(n!), which one is asymptotically faster for large n? Justify your reasoning.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Queue versus a Graph.", "Given two algorithms with complexities O(n log n) and O(log n), which one is asymptotically faster for large n? Justify your reasoning.", "Design decision: for an application requiring frequent insertions at both ends and rare random access, justify whether a Circular Linked List, Singly Linked List, or Graph is the optimal choice.", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Doubly Linked List that pre-stores results to save time.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 4n^2 + 6n as an example.", "Prove informally why f(n) = 4n^2 + 4n + 2 is O(n^2).", "Design decision: for an application requiring fast random access with rare insertions/deletions, justify whether a Circular Linked List, Singly Linked List, or Array is the optimal choice.", "Explain the relationship between space complexity and time complexity trade-offs using an example involving a Deque that pre-stores results to save time.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Hash Table versus a Doubly Linked List.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Queue versus a Binary Search Tree.", "Explain why Big-Theta notation gives a tighter bound than using Big-O and Big-Omega separately, using f(n) = 8n^2 + 6n as an example.", "Design decision: for an application requiring frequent insertions at both ends and rare random access, justify whether a Circular Linked List, Hash Table, or Heap is the optimal choice.", "Given two algorithms with complexities O(log n) and O(2^n), which one is asymptotically faster for large n? Justify your reasoning.", "Explain why the choice of data structure can change an algorithm's complexity class, using the example of searching in a Binary Tree versus a Graph."]}, "interview": {"coding": ["Write a Python function to find the maximum element in an unsorted array. What is its time complexity?", "Write a function to find the minimum and maximum element in a single pass through the array.", "Write a function to reverse an array in-place. What is its space complexity?", "Write a function to check if an array is sorted in ascending order.", "Write a function to find the sum of all elements in an array using a loop. State its complexity.", "Write a function that counts how many times a target value appears in an array.", "Write a function to find the second largest element in an array without sorting it.", "Write a Linear Search function and explain its best, worst, and average case complexity.", "Write a Binary Search function (iterative) and explain why it requires a sorted array.", "Write a recursive version of Binary Search.", "Write a function to check whether a given array contains any duplicate elements.", "Write a function to remove duplicates from a sorted array in-place.", "Write a function to rotate an array to the right by k positions.", "Write a function to merge two sorted arrays into one sorted array.", "Write a function to find the frequency of each element in an array using a dictionary (hash map).", "Write a function to swap two numbers without using a third (temporary) variable.", "Write a function to compute the factorial of a number using a loop, and state its time complexity.", "Write a recursive function to compute the factorial of a number, and explain its space complexity (call stack).", "Write a function to check if a given number is prime, and state its time complexity.", "Write a function to generate the first n Fibonacci numbers iteratively.", "Write a recursive function to generate the nth Fibonacci number, and explain why it is inefficient (exponential time).", "Write a function that measures actual running time of linear search vs binary search using Python's time module.", "Write a function to find the index of the first occurrence of a target value in an array.", "Write a function to check if a string is a palindrome.", "Write a function to count the number of vowels in a given string.", "Write a function to find the union of two arrays (unique elements from both) using basic loops (no set).", "Write a function to find the intersection of two arrays using nested loops, then again using a hash set \u2014 compare complexities.", "Write a function to left-rotate an array by one position, then generalise it to rotate by k positions.", "Write a function that takes an array and returns True if it contains a pair of elements that sum to a given target (brute-force O(n\u00b2) approach).", "Optimise the previous 'pair sum' problem to run in O(n) time using a hash set, and explain the trade-off in space complexity."], "theory": ["What is a Data Structure? Why do we need it?", "What is an Algorithm? What are the characteristics of a good algorithm?", "Differentiate between Data Structure and Algorithm.", "What is the difference between Linear and Non-Linear data structures? Give examples.", "What is an Abstract Data Type (ADT)? How is it different from a Data Structure?", "Explain Time Complexity and Space Complexity with examples.", "What is Big-O notation? Why is it used?", "Differentiate between Big-O, Big-Omega, and Big-Theta notation.", "What are Best Case, Worst Case, and Average Case complexity?", "Why do we usually focus on worst-case complexity while analysing algorithms?", "Is a lower time complexity algorithm always faster in practice? Explain with an example.", "What is the difference between Primitive and Non-Primitive data structures?", "Explain the difference between an Array and a Linked List.", "Why is accessing an element in an Array O(1) but in a Linked List O(n)?", "What is the difference between Stack and Queue? Give real-life examples of each.", "What is the LIFO principle and the FIFO principle? Which data structures use them?", "What is recursion? How is it different from iteration, and what is its space cost?", "What is the space-time trade-off in algorithm design?", "How would you choose between using an Array and a Linked List for a given problem?", "Why is understanding asymptotic notation important before learning sorting and searching algorithms?"]}}</script>
+<script>
+  const raw = document.getElementById('chapter1-data').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

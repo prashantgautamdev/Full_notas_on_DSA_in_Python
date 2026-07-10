@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 9: Searching Algorithms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li class="current">Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 9</h1>
+  <div class="subtitle">Searching Algorithms</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Understand <span class="mark">Linear Search</span> and <span class="mark">Binary Search</span> and their preconditions.</li>
+    <li>Analyse time complexity: O(n) vs O(log n) and why it matters at scale.</li>
+    <li>Learn <span class="mark-g">Jump, Interpolation, and Exponential Search</span> variants.</li>
+    <li>Apply Binary Search to rotated arrays and "search on answer" optimisation problems.</li>
+    <li>Implement iterative and recursive Binary Search in Python.</li>
+    <li>Choose the right search technique for a given real-world scenario.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Linear Search</b> — a search technique that checks every element one by one until the target is found or the array ends — O(n) time, works on unsorted data.</div>
+  <div class="box def"><b>Binary Search</b> — a search technique that repeatedly halves the search space by comparing the target to the middle element — O(log n) time, requires sorted data.</div>
+  <div class="box def"><b>Search Space</b> — the range of possible positions/values being considered at any point during a search algorithm's execution.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Binary Search &amp; Variants</h2>
+
+  <h3 class="subsec">Binary Search — Halving the Search Space</h3>
+  <div class="diagram">
+    <div class="cell">2</div><div class="cell">5</div><div class="cell">8</div><div class="cell">12</div><div class="cell">16</div><div class="cell">23</div><div class="cell">38</div>
+  </div>
+  <p>Searching for <span class="mark">16</span>: check middle (12) → too small → search right half → check middle (23) → too big → search left half → found <b>16</b>. Just <b>3 comparisons</b> instead of up to 7!</p>
+
+  <h3 class="subsec">Why O(log n) is Powerful</h3>
+  <table>
+    <tr><th>Array Size (n)</th><th>Linear Search (worst)</th><th>Binary Search (worst)</th></tr>
+    <tr><td>1,000</td><td>1,000 steps</td><td>~10 steps</td></tr>
+    <tr><td>1,000,000</td><td>1,000,000 steps</td><td>~20 steps</td></tr>
+    <tr><td>1,000,000,000</td><td>1,000,000,000 steps</td><td>~30 steps</td></tr>
+  </table>
+  <div class="box tip">This table is why interviewers love asking "can you do better than O(n)?" — the jump from Linear to Binary Search is often THE key insight.</div>
+
+  <h3 class="subsec">Search Variants</h3>
+  <table>
+    <tr><th>Algorithm</th><th>Precondition</th><th>Time Complexity</th></tr>
+    <tr><td>Linear Search</td><td>None</td><td>O(n)</td></tr>
+    <tr><td>Binary Search</td><td>Sorted</td><td>O(log n)</td></tr>
+    <tr><td>Jump Search</td><td>Sorted</td><td>O(√n)</td></tr>
+    <tr><td>Interpolation Search</td><td>Sorted, uniform distribution</td><td>O(log log n) avg</td></tr>
+    <tr><td>Exponential Search</td><td>Sorted, unbounded size</td><td>O(log n)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples &amp; Key Points</h2>
+
+  <div class="box example"><b>Dictionary:</b> flipping to roughly the right page and narrowing — a real-life Binary Search!</div>
+  <div class="box example"><b>Phone Contact List:</b> sorted alphabetically, Binary Search finds a name in O(log n).</div>
+  <div class="box example"><b>"Guess the Number" Game:</b> "higher or lower" hints let you binary-search the answer in ~log₂(n) guesses.</div>
+  <div class="box example"><b>Debugging with Git Bisect:</b> finding which commit introduced a bug using binary search over commit history!</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li><b>Binary Search requires sorted data</b> — this is the #1 precondition to check before using it.</li>
+    <li>Binary Search isn't just for arrays — it generalises to <b>"search on answer"</b> problems with any monotonic predicate.</li>
+    <li><b>Interpolation Search</b> can beat Binary Search on uniformly distributed data, but degrades badly on skewed data.</li>
+    <li>For unsorted data with frequent lookups, consider a <b>Hash Table</b> instead — O(1) average lookup, no sorting needed.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Linear Search</h3>
+  <div class="codebox"><span class="kw">def</span> linear_search(arr, target):
+    <span class="kw">for</span> i, val <span class="kw">in</span> enumerate(arr):
+        <span class="kw">if</span> val == target:
+            <span class="kw">return</span> i
+    <span class="kw">return</span> -1   <span class="cm"># O(n)</span></div>
+
+  <h3 class="subsec">Binary Search (Iterative)</h3>
+  <div class="codebox"><span class="kw">def</span> binary_search(arr, target):
+    lo, hi = 0, len(arr) - 1
+    <span class="kw">while</span> lo <= hi:
+        mid = (lo + hi) // 2
+        <span class="kw">if</span> arr[mid] == target:
+            <span class="kw">return</span> mid
+        <span class="kw">elif</span> arr[mid] < target:
+            lo = mid + 1
+        <span class="kw">else</span>:
+            hi = mid - 1
+    <span class="kw">return</span> -1   <span class="cm"># O(log n)</span></div>
+
+  <h3 class="subsec">Search in Rotated Sorted Array</h3>
+  <div class="codebox"><span class="kw">def</span> search_rotated(arr, target):
+    lo, hi = 0, len(arr) - 1
+    <span class="kw">while</span> lo <= hi:
+        mid = (lo + hi) // 2
+        <span class="kw">if</span> arr[mid] == target: <span class="kw">return</span> mid
+        <span class="kw">if</span> arr[lo] <= arr[mid]:      <span class="cm"># left half sorted</span>
+            <span class="kw">if</span> arr[lo] <= target < arr[mid]: hi = mid - 1
+            <span class="kw">else</span>: lo = mid + 1
+        <span class="kw">else</span>:                        <span class="cm"># right half sorted</span>
+            <span class="kw">if</span> arr[mid] < target <= arr[hi]: lo = mid + 1
+            <span class="kw">else</span>: hi = mid - 1
+    <span class="kw">return</span> -1</div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">Whenever you see "sorted array" in a problem, your brain should immediately think <b>Binary Search</b>.</div>
+  <div class="box tip">"Find minimum X such that condition holds" → <b>Binary Search on Answer</b>, even if there's no array involved!</div>
+  <div class="box tip">To avoid integer overflow in other languages, compute mid as <code>lo + (hi - lo) // 2</code> instead of <code>(lo + hi) // 2</code> (not an issue in Python, but good habit).</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Applying Binary Search to unsorted data — it silently gives wrong answers instead of erroring.</div>
+  <div class="box mistake">Off-by-one errors in the <code>lo</code>/<code>hi</code> boundary updates, causing infinite loops or missed elements.</div>
+  <div class="box mistake">Forgetting to handle duplicate elements when searching for "first" or "last" occurrence.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Write a Linear Search function.</li>
+    <li>Write an iterative Binary Search function.</li>
+    <li>Write a recursive Binary Search function.</li>
+    <li>Write a function to find the first occurrence of a target in a sorted array with duplicates.</li>
+    <li>Write a function to find the last occurrence of a target in a sorted array with duplicates.</li>
+    <li>Write a function to count the occurrences of a target value in a sorted array using Binary Search.</li>
+    <li>Write a function to find the insertion position for a target in a sorted array (like bisect.insort).</li>
+    <li>Write a function to search for a target in a rotated sorted array.</li>
+    <li>Write a function to find the minimum element in a rotated sorted array.</li>
+    <li>Write a function to find the peak element in an array using a Binary-Search-like approach.</li>
+    <li>Write a function to implement Jump Search on a sorted array.</li>
+    <li>Write a function to implement Interpolation Search on a uniformly distributed sorted array.</li>
+    <li>Write a function to implement Exponential Search for an unbounded sorted array.</li>
+    <li>Write a function to search for a target in a 2D matrix sorted row-wise and column-wise.</li>
+    <li>Write a function to find the square root of a number using Binary Search (Binary Search on Answer).</li>
+    <li>Write a function to find the kth smallest element in a sorted matrix using Binary Search.</li>
+    <li>Write a function to find the minimum capacity needed to ship packages within D days (Binary Search on Answer).</li>
+    <li>Write a function to find the median of two sorted arrays in O(log(min(m,n))) time using Binary Search.</li>
+    <li>Write a function to allocate minimum pages/books among students using Binary Search on Answer.</li>
+    <li>Write a function to search for an element in an infinite (unbounded) sorted array.</li>
+    <li>Write a function to find the closest element to a target value in a sorted array.</li>
+    <li>Write a function to check if a target exists in a sorted array that may contain duplicates and rotations.</li>
+    <li>Write a function to find the smallest divisor such that the sum of divisions is less than or equal to a threshold.</li>
+    <li>Write a function to find the single non-duplicate element in a sorted array where every other element appears twice.</li>
+    <li>Write a function to implement Ternary Search on a unimodal function.</li>
+    <li>Write a function to find the number of times a sorted array has been rotated.</li>
+    <li>Write a function to search in a nearly sorted array (elements may be off by one position).</li>
+    <li>Write a function to find the maximum value in a bitonic array (increases then decreases) using Binary Search.</li>
+    <li>Write a function to determine the minimum speed to eat all bananas within h hours (Koko Eating Bananas — Binary Search on Answer).</li>
+    <li>Write a function to find the k closest elements to a target value in a sorted array.</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    <b>Linear Search</b> (O(n)) works on any data but doesn't scale. <b>Binary Search</b> (O(log n)) requires sorted data but is dramatically faster at scale. Variants like <b>Jump, Interpolation, and Exponential Search</b> trade off preconditions for speed in specific scenarios. Binary Search generalises beyond arrays to any problem with a <b>monotonic predicate</b> — "search on answer".
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">Binary Search comparisons ≈ log₂(n) &nbsp;|&nbsp; Jump Search block size = √n</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 9 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Linear Search</td><td>O(n), works on unsorted data</td></tr>
+    <tr><td>Binary Search</td><td>O(log n), requires sorted data</td></tr>
+    <tr><td>Jump Search</td><td>O(√n), block size = √n</td></tr>
+    <tr><td>Interpolation Search</td><td>O(log log n) avg, needs uniform distribution</td></tr>
+    <tr><td>Exponential Search</td><td>O(log n), good for unbounded arrays</td></tr>
+    <tr><td>Search on Answer</td><td>Binary Search over a monotonic predicate, not just arrays</td></tr>
+    <tr><td>Rotated Array Search</td><td>Modified Binary Search, O(log n)</td></tr>
+    <tr><td>1M elements</td><td>Linear: 1,000,000 steps | Binary: ~20 steps</td></tr>
+  </table>
+  <div class="box formula">Binary Search comparisons ≈ log₂(n)</div>
+  <div class="box tip">Golden rule: <b>Sorted data? → Binary Search. Unsorted + frequent lookups? → Hash Table. Monotonic condition? → Binary Search on Answer.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Write a Linear Search function.", "Write an iterative Binary Search function.", "Write a recursive Binary Search function.", "Write a function to find the first occurrence of a target in a sorted array with duplicates.", "Write a function to find the last occurrence of a target in a sorted array with duplicates.", "Write a function to count the occurrences of a target value in a sorted array using Binary Search.", "Write a function to find the insertion position for a target in a sorted array (like bisect.insort).", "Write a function to search for a target in a rotated sorted array.", "Write a function to find the minimum element in a rotated sorted array.", "Write a function to find the peak element in an array using a Binary-Search-like approach.", "Write a function to implement Jump Search on a sorted array.", "Write a function to implement Interpolation Search on a uniformly distributed sorted array.", "Write a function to implement Exponential Search for an unbounded sorted array.", "Write a function to search for a target in a 2D matrix sorted row-wise and column-wise.", "Write a function to find the square root of a number using Binary Search (Binary Search on Answer).", "Write a function to find the kth smallest element in a sorted matrix using Binary Search.", "Write a function to find the minimum capacity needed to ship packages within D days (Binary Search on Answer).", "Write a function to find the median of two sorted arrays in O(log(min(m,n))) time using Binary Search.", "Write a function to allocate minimum pages/books among students using Binary Search on Answer.", "Write a function to search for an element in an infinite (unbounded) sorted array.", "Write a function to find the closest element to a target value in a sorted array.", "Write a function to check if a target exists in a sorted array that may contain duplicates and rotations.", "Write a function to find the smallest divisor such that the sum of divisions is less than or equal to a threshold.", "Write a function to find the single non-duplicate element in a sorted array where every other element appears twice.", "Write a function to implement Ternary Search on a unimodal function.", "Write a function to find the number of times a sorted array has been rotated.", "Write a function to search in a nearly sorted array (elements may be off by one position).", "Write a function to find the maximum value in a bitonic array (increases then decreases) using Binary Search.", "Write a function to determine the minimum speed to eat all bananas within h hours (Koko Eating Bananas \u2014 Binary Search on Answer).", "Write a function to find the k closest elements to a target value in a sorted array."]}, "practice": {"easy": ["In the context of finding a username's account, why might Ternary Search be preferred over a simple scan through all 10 items?", "Is Hashing-based Search a comparison-based search technique?", "Would Jump Search be a reasonable choice for searching a large sorted dataset on disk with 10^6 items? Answer in one line.", "What is the worst-case time complexity of Linear Search on an array of size n?", "Would Binary Search be a reasonable choice for finding a username's account with 10 items? Answer in one line.", "What is the time complexity of Exponential Search on a sorted array of size 1,000?", "State True or False: Jump Search has a time complexity of O(\u221an).", "What does it mean for Time Complexity of Search to have a search space of size 10?", "Define the term 'Sorted Precondition' in your own words.", "Define the term 'Linear Search' in your own words.", "What does it mean for Time Complexity of Search to have a search space of size n?", "What is the time complexity of Jump Search on a sorted array of size 10^5?", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for finding a username's account.", "Would Interpolation Search be a reasonable choice for finding a word in a dictionary with 10^5 items? Answer in one line.", "What is the best-case time complexity of Linear Search?", "Fill in the blank: Binary Search on an array of size 10^5 takes approximately ______ comparisons.", "Is Linear Search a comparison-based search technique?", "In the context of searching a leaderboard for a specific score, why might Exponential Search be preferred over a simple scan through all n items?", "What precondition must be satisfied before applying Linear Search?", "What does it mean for Binary Search to have a search space of size 10^5?", "Write one advantage of Binary Search over Linear Search, for finding the position to insert a new item in a sorted list.", "For finding a word in a dictionary, would you use Linear Search or Binary Search? Why?", "State True or False: Binary Search has a time complexity of O(log n).", "What happens to the search space at each step of Binary Search on an array of size 100?", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for searching a product in an online catalogue.", "What precondition must be satisfied before applying Binary Search?", "What is the worst-case time complexity of Linear Search on an array of size 10^5?", "What is the time complexity of Jump Search on a sorted array of size n?", "What does it mean for Monotonic Function to have a search space of size 10^5?", "What is the time complexity of Jump Search on a sorted array of size 1,000?", "Define the term 'Monotonic Function' in your own words.", "What happens to the search space at each step of Binary Search on an array of size 10^6?", "What precondition must be satisfied before applying Hashing-based Search?", "What is the main precondition Binary Search on Answer needs that Linear Search does not?", "State True or False: Binary Search always halves the search space at every step.", "What does it mean for Binary Search to have a search space of size 10^6?", "What is the time complexity of Ternary Search on a sorted array of size 1,000?", "Would Hashing-based Search be a reasonable choice for finding a word in a dictionary with n items? Answer in one line.", "In the context of searching a sorted log file for a timestamp, why might Jump Search be preferred over a simple scan through all 10 items?", "What is the main precondition Linear Search needs that Linear Search does not?", "What happens to the search space at each step of Binary Search on an array of size 10^5?", "Would Jump Search be a reasonable choice for searching a leaderboard for a specific score with 1,000 items? Answer in one line.", "Fill in the blank: Binary Search on an array of size 10^6 takes approximately ______ comparisons.", "In the context of searching a sorted log file for a timestamp, why might Binary Search on Answer be preferred over a simple scan through all 10^6 items?", "What is the time complexity of Linear Search on a sorted array of size 1,000?", "Is Binary Search a comparison-based search technique?", "Fill in the blank: Binary Search on an array of size n takes approximately ______ comparisons.", "What is the time complexity of Jump Search on a sorted array of size 10?", "Would Binary Search on Answer be a reasonable choice for searching a rotated sorted array with 10^5 items? Answer in one line.", "What is the worst-case time complexity of Linear Search on an array of size 100?", "What does it mean for Interpolation Search to have a search space of size 100?", "In the context of searching a sorted log file for a timestamp, why might Hashing-based Search be preferred over a simple scan through all 10 items?", "What is the worst-case time complexity of Linear Search on an array of size 10?", "For searching a sorted log file for a timestamp, would you use Linear Search or Binary Search? Why?", "Define the term 'Exponential Search' in your own words.", "What is the time complexity of Binary Search on Answer on a sorted array of size 1,000?", "Is Jump Search a comparison-based search technique?", "For searching for a contact in a phone book, would you use Linear Search or Binary Search? Why?", "What is the main precondition Hashing-based Search needs that Linear Search does not?", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for searching a leaderboard for a specific score.", "Fill in the blank: Binary Search on an array of size 1,000 takes approximately ______ comparisons.", "What happens to the search space at each step of Binary Search on an array of size n?", "What precondition must be satisfied before applying Binary Search on Answer?", "For searching a leaderboard for a specific score, would you use Linear Search or Binary Search? Why?", "In the context of finding a username's account, why might Exponential Search be preferred over a simple scan through all 1,000 items?", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for searching a large sorted dataset on disk.", "What is the worst-case time complexity of Linear Search on an array of size 10^6?", "What does it mean for Binary Search to have a search space of size 1,000?", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for searching a rotated sorted array.", "Write one advantage of Binary Search over Linear Search, for searching for a contact in a phone book.", "What is the main precondition Jump Search needs that Linear Search does not?", "What does it mean for Linear Search to have a search space of size 1,000?", "What is the time complexity of Binary Search on a sorted array of size 10^6?", "What does it mean for Search Space to have a search space of size 10^5?", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for searching for a contact in a phone book.", "What is the time complexity of Exponential Search on a sorted array of size 10?", "Would Hashing-based Search be a reasonable choice for finding a specific record in a sorted database index with n items? Answer in one line.", "What does it mean for Search Space to have a search space of size 1,000?", "What is the time complexity of Exponential Search on a sorted array of size n?", "Would Jump Search be a reasonable choice for searching a large sorted dataset on disk with 1,000 items? Answer in one line.", "Would Binary Search on Answer be a reasonable choice for finding a specific record in a sorted database index with 100 items? Answer in one line.", "Is Interpolation Search a comparison-based search technique?", "What is the time complexity of Linear Search on a sorted array of size 10^5?", "Write one advantage of Binary Search over Linear Search, for finding a specific record in a sorted database index.", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for finding a word in a dictionary.", "Fill in the blank: Binary Search on an array of size 10 takes approximately ______ comparisons.", "What is the time complexity of Binary Search on Answer on a sorted array of size 100?", "For finding a specific record in a sorted database index, would you use Linear Search or Binary Search? Why?", "What precondition must be satisfied before applying Exponential Search?", "In the context of searching a leaderboard for a specific score, why might Hashing-based Search be preferred over a simple scan through all 10^6 items?", "Write one advantage of Binary Search over Linear Search, for searching a large sorted dataset on disk.", "In the context of searching for a contact in a phone book, why might Binary Search be preferred over a simple scan through all 10 items?", "What is the time complexity of Exponential Search on a sorted array of size 100?", "In the context of searching a sorted log file for a timestamp, why might Binary Search on Answer be preferred over a simple scan through all 1,000 items?", "Would Ternary Search be a reasonable choice for searching a leaderboard for a specific score with 10 items? Answer in one line.", "State True or False: Ternary Search divides the search space into three parts each step.", "What is the main precondition Ternary Search needs that Linear Search does not?", "In the context of searching for a contact in a phone book, why might Interpolation Search be preferred over a simple scan through all 100 items?", "Fill in the blank: Binary Search on an array of size 100 takes approximately ______ comparisons.", "Would Interpolation Search be a reasonable choice for searching a rotated sorted array with 100 items? Answer in one line.", "In the context of searching a sorted log file for a timestamp, why might Ternary Search be preferred over a simple scan through all n items?", "Define the term 'Time Complexity of Search' in your own words.", "State True or False: Exponential Search is useful for unbounded or very large sorted arrays.", "Write one advantage of Binary Search over Linear Search, for searching a sorted log file for a timestamp.", "Define the term 'Interpolation Search' in your own words.", "Define the term 'Binary Search' in your own words.", "What precondition must be satisfied before applying Ternary Search?", "State True or False: Interpolation Search can outperform Binary Search on uniformly distributed sorted data.", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for searching a sorted log file for a timestamp.", "What does it mean for Linear Search to have a search space of size n?", "What is the time complexity of Linear Search on a sorted array of size n?", "Would Interpolation Search be a reasonable choice for finding the position to insert a new item in a sorted list with 10^6 items? Answer in one line.", "What is the time complexity of Interpolation Search on a sorted array of size 10?", "What is the time complexity of Interpolation Search on a sorted array of size 10^5?", "What does it mean for Sorted Precondition to have a search space of size 100?", "Would Linear Search be a reasonable choice for finding the position to insert a new item in a sorted list with n items? Answer in one line.", "Define the term 'Search Space' in your own words.", "What does it mean for Monotonic Function to have a search space of size 10?", "State True or False: Binary Search requires the input array to be sorted.", "In the context of finding a word in a dictionary, why might Interpolation Search be preferred over a simple scan through all 10 items?", "Write one advantage of Binary Search over Linear Search, for searching a rotated sorted array.", "Would Exponential Search be a reasonable choice for searching for a contact in a phone book with 10^6 items? Answer in one line.", "What is the time complexity of Binary Search on Answer on a sorted array of size 10?", "Is Ternary Search a comparison-based search technique?", "Is Exponential Search a comparison-based search technique?", "In the context of finding the position to insert a new item in a sorted list, why might Linear Search be preferred over a simple scan through all 10 items?", "In the context of searching a large sorted dataset on disk, why might Ternary Search be preferred over a simple scan through all 10^6 items?", "What is the worst-case time complexity of Linear Search on an array of size 1,000?", "Would Binary Search on Answer be a reasonable choice for searching a large sorted dataset on disk with 10^6 items? Answer in one line.", "In the context of searching for a contact in a phone book, why might Jump Search be preferred over a simple scan through all n items?", "In the context of finding the position to insert a new item in a sorted list, why might Hashing-based Search be preferred over a simple scan through all 10^6 items?", "What is the time complexity of Binary Search on a sorted array of size 1,000?", "What is the main precondition Binary Search needs that Linear Search does not?", "Write one advantage of Binary Search over Linear Search, for finding a username's account.", "What does it mean for Linear Search to have a search space of size 10^5?", "For finding a username's account, would you use Linear Search or Binary Search? Why?", "Would Linear Search be a reasonable choice for searching a product in an online catalogue with 10 items? Answer in one line.", "In the context of searching a sorted log file for a timestamp, why might Binary Search be preferred over a simple scan through all n items?", "Would Exponential Search be a reasonable choice for finding a word in a dictionary with 10^5 items? Answer in one line.", "What does it mean for Binary Search to have a search space of size 10?", "In the context of finding the position to insert a new item in a sorted list, why might Binary Search on Answer be preferred over a simple scan through all 100 items?", "Would Binary Search on Answer be a reasonable choice for searching a leaderboard for a specific score with 1,000 items? Answer in one line.", "In the context of finding a word in a dictionary, why might Exponential Search be preferred over a simple scan through all 10 items?", "Write one advantage of Binary Search over Linear Search, for searching a leaderboard for a specific score.", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for finding a specific record in a sorted database index.", "Write one disadvantage/limitation of Binary Search compared to Linear Search, for finding the position to insert a new item in a sorted list.", "What happens to the search space at each step of Binary Search on an array of size 1,000?", "What is the time complexity of Ternary Search on a sorted array of size 10^5?", "Is Binary Search on Answer a comparison-based search technique?", "What happens to the search space at each step of Binary Search on an array of size 10?", "What does it mean for Exponential Search to have a search space of size 100?", "What is the main precondition Exponential Search needs that Linear Search does not?", "In the context of finding a username's account, why might Ternary Search be preferred over a simple scan through all 100 items?", "Would Jump Search be a reasonable choice for searching a rotated sorted array with 100 items? Answer in one line.", "Would Jump Search be a reasonable choice for searching a rotated sorted array with 10^5 items? Answer in one line.", "State True or False: Linear Search works on both sorted and unsorted arrays.", "For finding the position to insert a new item in a sorted list, would you use Linear Search or Binary Search? Why?", "In the context of searching a product in an online catalogue, why might Ternary Search be preferred over a simple scan through all 10^6 items?", "In the context of searching a leaderboard for a specific score, why might Exponential Search be preferred over a simple scan through all 10^5 items?", "What does it mean for Monotonic Function to have a search space of size 1,000?", "What does it mean for Time Complexity of Search to have a search space of size 1,000?", "What precondition must be satisfied before applying Interpolation Search?", "Would Linear Search be a reasonable choice for searching a leaderboard for a specific score with 100 items? Answer in one line.", "In the context of searching a large sorted dataset on disk, why might Exponential Search be preferred over a simple scan through all n items?", "In the context of finding the position to insert a new item in a sorted list, why might Linear Search be preferred over a simple scan through all 10^5 items?", "What does it mean for Divide and Conquer Search to have a search space of size 10^6?", "In the context of finding the position to insert a new item in a sorted list, why might Binary Search be preferred over a simple scan through all 10^5 items?", "Would Hashing-based Search be a reasonable choice for finding a specific record in a sorted database index with 10^6 items? Answer in one line.", "What precondition must be satisfied before applying Jump Search?", "In the context of finding the position to insert a new item in a sorted list, why might Exponential Search be preferred over a simple scan through all n items?", "Write one advantage of Binary Search over Linear Search, for searching a product in an online catalogue.", "Would Hashing-based Search be a reasonable choice for searching a rotated sorted array with 10^5 items? Answer in one line.", "Would Ternary Search be a reasonable choice for searching a sorted log file for a timestamp with 1,000 items? Answer in one line.", "Would Interpolation Search be a reasonable choice for searching a large sorted dataset on disk with 10 items? Answer in one line.", "In the context of finding a specific record in a sorted database index, why might Jump Search be preferred over a simple scan through all 10^5 items?", "In the context of finding a username's account, why might Interpolation Search be preferred over a simple scan through all 100 items?", "What does it mean for Search Space to have a search space of size 100?", "For searching a large sorted dataset on disk, would you use Linear Search or Binary Search? Why?", "Would Hashing-based Search be a reasonable choice for searching a large sorted dataset on disk with 10 items? Answer in one line.", "Would Jump Search be a reasonable choice for finding a username's account with 100 items? Answer in one line.", "Would Exponential Search be a reasonable choice for searching a product in an online catalogue with 10^6 items? Answer in one line.", "For searching a rotated sorted array, would you use Linear Search or Binary Search? Why?", "What does it mean for Divide and Conquer Search to have a search space of size 100?", "Would Exponential Search be a reasonable choice for finding a word in a dictionary with n items? Answer in one line.", "What is the time complexity of Ternary Search on a sorted array of size 10?", "In the context of finding a specific record in a sorted database index, why might Jump Search be preferred over a simple scan through all 100 items?", "What does it mean for Interpolation Search to have a search space of size 10?", "What is the time complexity of Binary Search on a sorted array of size n?", "In the context of searching a product in an online catalogue, why might Interpolation Search be preferred over a simple scan through all 100 items?", "Would Binary Search on Answer be a reasonable choice for finding a username's account with 10 items? Answer in one line.", "Define the term 'Divide and Conquer Search' in your own words.", "What is the time complexity of Ternary Search on a sorted array of size n?", "In the context of finding a word in a dictionary, why might Binary Search on Answer be preferred over a simple scan through all 10^5 items?", "Would Binary Search be a reasonable choice for searching a rotated sorted array with n items? Answer in one line.", "Would Linear Search be a reasonable choice for searching a sorted log file for a timestamp with 1,000 items? Answer in one line.", "What does it mean for Binary Search to have a search space of size n?", "Would Linear Search be a reasonable choice for searching a sorted log file for a timestamp with 10 items? Answer in one line.", "In the context of searching a sorted log file for a timestamp, why might Ternary Search be preferred over a simple scan through all 100 items?", "What does it mean for Interpolation Search to have a search space of size 10^6?", "What does it mean for Search Space to have a search space of size 10?"], "medium": ["Compare the space complexity of iterative vs recursive Binary Search for an array of size 1,000.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: searching a leaderboard for a specific score) in O(log n) time.", "Explain how Exponential Search combines doubling with Binary Search, useful for searching a leaderboard for a specific score with unbounded size.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: finding a word in a dictionary) in O(log n) time.", "Explain the recurrence relation for Binary Search's time complexity and how it resolves to O(log n) for size 10^6.", "Explain why Jump Search's optimal block size is \u221an for an array of size n, and how it compares to Linear and Binary Search.", "Explain the recurrence relation for Binary Search's time complexity and how it resolves to O(log n) for size 1,000.", "Explain the time complexity of Binary Search on Answer for a sorted array of size 10^6, and justify it mathematically.", "Compare the space complexity of iterative vs recursive Binary Search for an array of size 10^6.", "Explain the recurrence relation for Binary Search's time complexity and how it resolves to O(log n) for size 10.", "For finding a username's account with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for searching a leaderboard for a specific score.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a username's account as an example, for size 10^5.", "Explain how Exponential Search combines doubling with Binary Search, useful for searching a large sorted dataset on disk with unbounded size.", "Compare the space complexity of iterative vs recursive Binary Search for an array of size 10.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for finding the position to insert a new item in a sorted list.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for searching a product in an online catalogue.", "Compare the space complexity of iterative vs recursive Binary Search for an array of size n.", "Explain the time complexity of Exponential Search for a sorted array of size 1,000, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for searching for a contact in a phone book.", "Explain the recurrence relation for Binary Search's time complexity and how it resolves to O(log n) for size 10^5.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching for a contact in a phone book as an example, for size 10^5.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for finding a specific record in a sorted database index.", "Explain how Exponential Search combines doubling with Binary Search, useful for finding a word in a dictionary with unbounded size.", "Explain how Interpolation Search estimates the probable position of the target, for finding a word in a dictionary with uniformly distributed data of size 10^5.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for searching a product in an online catalogue.", "Explain how Interpolation Search estimates the probable position of the target, for searching a leaderboard for a specific score with uniformly distributed data of size 100.", "Explain the time complexity of Ternary Search for a sorted array of size 10^5, and justify it mathematically.", "Explain how Exponential Search combines doubling with Binary Search, useful for finding the position to insert a new item in a sorted list with unbounded size.", "Explain how Interpolation Search estimates the probable position of the target, for searching a rotated sorted array with uniformly distributed data of size 10^5.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for finding a specific record in a sorted database index.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for finding the position to insert a new item in a sorted list.", "Explain why Jump Search's optimal block size is \u221an for an array of size 1,000, and how it compares to Linear and Binary Search.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a rotated sorted array as an example, for size 1,000.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a large sorted dataset on disk as an example, for size 10^5.", "For finding a username's account with n entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the time complexity of Hashing-based Search for a sorted array of size 10, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for finding a username's account with uniformly distributed data of size 10^5.", "Explain how Interpolation Search estimates the probable position of the target, for finding a username's account with uniformly distributed data of size 100.", "Explain the time complexity of Binary Search for a sorted array of size 1,000, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: finding a specific record in a sorted database index) in O(log n) time.", "Explain the time complexity of Linear Search for a sorted array of size 100, and justify it mathematically.", "For finding a username's account with 100 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Exponential Search combines doubling with Binary Search, useful for searching for a contact in a phone book with unbounded size.", "Compare the space complexity of iterative vs recursive Binary Search for an array of size 10^5.", "Explain how Exponential Search combines doubling with Binary Search, useful for searching a rotated sorted array with unbounded size.", "Explain how you would search for an element in a rotated sorted array of size n (context: searching a large sorted dataset on disk) in O(log n) time.", "Explain the time complexity of Hashing-based Search for a sorted array of size 10^6, and justify it mathematically.", "Explain why Jump Search's optimal block size is \u221an for an array of size 10, and how it compares to Linear and Binary Search.", "Explain why Jump Search's optimal block size is \u221an for an array of size 10^5, and how it compares to Linear and Binary Search.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for searching a large sorted dataset on disk.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for finding a word in a dictionary.", "For searching a product in an online catalogue with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the recurrence relation for Binary Search's time complexity and how it resolves to O(log n) for size n.", "Explain the time complexity of Exponential Search for a sorted array of size n, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: searching a leaderboard for a specific score) in O(log n) time.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for searching a product in an online catalogue.", "For finding the position to insert a new item in a sorted list with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for searching a sorted log file for a timestamp.", "Explain the recurrence relation for Binary Search's time complexity and how it resolves to O(log n) for size 100.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for finding the position to insert a new item in a sorted list.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: finding a username's account) in O(log n) time.", "Explain the time complexity of Binary Search for a sorted array of size 10^5, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for finding a username's account.", "For searching for a contact in a phone book with n entries, compare Linear Search and Binary Search in terms of time complexity.", "For searching a leaderboard for a specific score with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Exponential Search combines doubling with Binary Search, useful for finding a specific record in a sorted database index with unbounded size.", "Explain the time complexity of Ternary Search for a sorted array of size 100, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: searching a large sorted dataset on disk) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: searching a sorted log file for a timestamp) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: searching a product in an online catalogue) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching for a contact in a phone book as an example, for size 10^6.", "For searching a sorted log file for a timestamp with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "For searching a rotated sorted array with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching for a contact in a phone book as an example, for size n.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching for a contact in a phone book as an example, for size 1,000.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for searching a sorted log file for a timestamp.", "For finding a word in a dictionary with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for searching a leaderboard for a specific score.", "Explain how Interpolation Search estimates the probable position of the target, for searching for a contact in a phone book with uniformly distributed data of size 1,000.", "Explain how Interpolation Search estimates the probable position of the target, for searching a rotated sorted array with uniformly distributed data of size 10.", "Explain the time complexity of Ternary Search for a sorted array of size n, and justify it mathematically.", "For finding the position to insert a new item in a sorted list with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Interpolation Search estimates the probable position of the target, for searching a large sorted dataset on disk with uniformly distributed data of size n.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a product in an online catalogue as an example, for size 10.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: finding a specific record in a sorted database index) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a leaderboard for a specific score as an example, for size 10^6.", "Explain the time complexity of Binary Search for a sorted array of size 100, and justify it mathematically.", "Explain the time complexity of Binary Search on Answer for a sorted array of size 1,000, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: finding the position to insert a new item in a sorted list) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for finding a username's account with uniformly distributed data of size 1,000.", "Compare the space complexity of iterative vs recursive Binary Search for an array of size 100.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a product in an online catalogue as an example, for size 100.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: finding the position to insert a new item in a sorted list) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching for a contact in a phone book as an example, for size 10.", "Explain how Interpolation Search estimates the probable position of the target, for searching a large sorted dataset on disk with uniformly distributed data of size 10.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for finding a word in a dictionary.", "Explain how Exponential Search combines doubling with Binary Search, useful for searching a product in an online catalogue with unbounded size.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a sorted log file for a timestamp as an example, for size n.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: finding a username's account) in O(log n) time.", "Explain the time complexity of Linear Search for a sorted array of size 10, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for searching a sorted log file for a timestamp with uniformly distributed data of size 1,000.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a product in an online catalogue as an example, for size n.", "For finding a word in a dictionary with 100 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for searching a large sorted dataset on disk.", "For searching a large sorted dataset on disk with n entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a word in a dictionary as an example, for size 10^5.", "Explain the time complexity of Ternary Search for a sorted array of size 10, and justify it mathematically.", "For searching a product in an online catalogue with 1,000 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the time complexity of Interpolation Search for a sorted array of size 10^5, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for searching a sorted log file for a timestamp with uniformly distributed data of size 100.", "For searching a leaderboard for a specific score with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the time complexity of Linear Search for a sorted array of size 10^5, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for searching a product in an online catalogue with uniformly distributed data of size n.", "Explain how Interpolation Search estimates the probable position of the target, for finding the position to insert a new item in a sorted list with uniformly distributed data of size 10^5.", "Explain the time complexity of Exponential Search for a sorted array of size 10^5, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for searching a leaderboard for a specific score with uniformly distributed data of size n.", "Explain the time complexity of Interpolation Search for a sorted array of size 10, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: searching a large sorted dataset on disk) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for finding a specific record in a sorted database index with uniformly distributed data of size 10^5.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: searching for a contact in a phone book) in O(log n) time.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for finding a username's account.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: finding a username's account) in O(log n) time.", "Explain why Jump Search's optimal block size is \u221an for an array of size 100, and how it compares to Linear and Binary Search.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for searching a product in an online catalogue.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding the position to insert a new item in a sorted list as an example, for size 10^5.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: searching for a contact in a phone book) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: finding a word in a dictionary) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size n (context: searching a leaderboard for a specific score) in O(log n) time.", "Explain the time complexity of Exponential Search for a sorted array of size 100, and justify it mathematically.", "For searching for a contact in a phone book with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the time complexity of Jump Search for a sorted array of size 10, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for searching for a contact in a phone book with uniformly distributed data of size 10^5.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: finding the position to insert a new item in a sorted list) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for finding the position to insert a new item in a sorted list with uniformly distributed data of size 100.", "Explain the time complexity of Ternary Search for a sorted array of size 1,000, and justify it mathematically.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a large sorted dataset on disk as an example, for size 10.", "Explain how Exponential Search combines doubling with Binary Search, useful for finding a username's account with unbounded size.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a username's account as an example, for size 10^6.", "Explain the time complexity of Jump Search for a sorted array of size n, and justify it mathematically.", "Explain the time complexity of Jump Search for a sorted array of size 100, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for finding a specific record in a sorted database index.", "Explain why Jump Search's optimal block size is \u221an for an array of size 10^6, and how it compares to Linear and Binary Search.", "Explain how Interpolation Search estimates the probable position of the target, for searching a sorted log file for a timestamp with uniformly distributed data of size n.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for searching for a contact in a phone book.", "Explain the time complexity of Linear Search for a sorted array of size 10^6, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: finding the position to insert a new item in a sorted list) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for finding the position to insert a new item in a sorted list with uniformly distributed data of size 10^6.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a username's account as an example, for size 10.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: searching a rotated sorted array) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a product in an online catalogue as an example, for size 1,000.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a specific record in a sorted database index as an example, for size 100.", "Explain how Interpolation Search estimates the probable position of the target, for finding the position to insert a new item in a sorted list with uniformly distributed data of size 10.", "Explain the time complexity of Binary Search for a sorted array of size 10, and justify it mathematically.", "Explain how Exponential Search combines doubling with Binary Search, useful for searching a sorted log file for a timestamp with unbounded size.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a specific record in a sorted database index as an example, for size 10^5.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a large sorted dataset on disk as an example, for size 1,000.", "Explain how Interpolation Search estimates the probable position of the target, for searching for a contact in a phone book with uniformly distributed data of size 10.", "For searching a rotated sorted array with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the time complexity of Linear Search for a sorted array of size n, and justify it mathematically.", "Explain the time complexity of Jump Search for a sorted array of size 10^5, and justify it mathematically.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a sorted log file for a timestamp as an example, for size 100.", "For searching for a contact in a phone book with 100 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a sorted log file for a timestamp as an example, for size 10^5.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: finding a word in a dictionary) in O(log n) time.", "Explain the time complexity of Ternary Search for a sorted array of size 10^6, and justify it mathematically.", "Explain the time complexity of Hashing-based Search for a sorted array of size 100, and justify it mathematically.", "Explain the time complexity of Jump Search for a sorted array of size 1,000, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for finding a word in a dictionary with uniformly distributed data of size 100.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a sorted log file for a timestamp as an example, for size 1,000.", "Explain how Interpolation Search estimates the probable position of the target, for searching a product in an online catalogue with uniformly distributed data of size 100.", "Explain the time complexity of Binary Search for a sorted array of size n, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for searching a product in an online catalogue.", "Explain how Interpolation Search estimates the probable position of the target, for finding a word in a dictionary with uniformly distributed data of size 1,000.", "Explain how Interpolation Search estimates the probable position of the target, for finding a specific record in a sorted database index with uniformly distributed data of size 10.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for searching a sorted log file for a timestamp.", "For searching for a contact in a phone book with 1,000 entries, compare Linear Search and Binary Search in terms of time complexity.", "For finding a word in a dictionary with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: searching a rotated sorted array) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for searching a leaderboard for a specific score with uniformly distributed data of size 10.", "Explain the time complexity of Hashing-based Search for a sorted array of size 1,000, and justify it mathematically.", "Explain the time complexity of Binary Search for a sorted array of size 10^6, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for searching for a contact in a phone book.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: searching a product in an online catalogue) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: searching a large sorted dataset on disk) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding the position to insert a new item in a sorted list as an example, for size 100.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for finding a specific record in a sorted database index.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a rotated sorted array as an example, for size 100.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a leaderboard for a specific score as an example, for size 100.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: searching a product in an online catalogue) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for searching a product in an online catalogue with uniformly distributed data of size 10^6.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for searching for a contact in a phone book.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: finding a specific record in a sorted database index) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding the position to insert a new item in a sorted list as an example, for size 10^6.", "Explain the time complexity of Hashing-based Search for a sorted array of size 10^5, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: searching a rotated sorted array) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a word in a dictionary as an example, for size 1,000.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a leaderboard for a specific score as an example, for size n.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a username's account as an example, for size n.", "For searching a rotated sorted array with 100 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding the position to insert a new item in a sorted list as an example, for size n.", "For searching a product in an online catalogue with 100 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: searching for a contact in a phone book) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: finding a word in a dictionary) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: finding a username's account) in O(log n) time.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for searching a large sorted dataset on disk.", "Explain how Interpolation Search estimates the probable position of the target, for finding a specific record in a sorted database index with uniformly distributed data of size 10^6.", "Explain how Interpolation Search estimates the probable position of the target, for finding a word in a dictionary with uniformly distributed data of size 10.", "For searching a product in an online catalogue with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for finding a word in a dictionary.", "For searching a sorted log file for a timestamp with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a rotated sorted array as an example, for size 10^6.", "Explain the time complexity of Jump Search for a sorted array of size 10^6, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for searching a rotated sorted array.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for finding the position to insert a new item in a sorted list.", "Explain how Interpolation Search estimates the probable position of the target, for searching a sorted log file for a timestamp with uniformly distributed data of size 10^5.", "Explain the time complexity of Interpolation Search for a sorted array of size 10^6, and justify it mathematically.", "For searching a product in an online catalogue with n entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for searching a product in an online catalogue.", "For finding a username's account with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for finding a word in a dictionary.", "Explain how Interpolation Search estimates the probable position of the target, for finding the position to insert a new item in a sorted list with uniformly distributed data of size 1,000.", "Explain how Interpolation Search estimates the probable position of the target, for searching a leaderboard for a specific score with uniformly distributed data of size 1,000.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a large sorted dataset on disk as an example, for size n.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: searching a sorted log file for a timestamp) in O(log n) time.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for searching a leaderboard for a specific score.", "Explain the time complexity of Interpolation Search for a sorted array of size 1,000, and justify it mathematically.", "For finding a specific record in a sorted database index with n entries, compare Linear Search and Binary Search in terms of time complexity.", "For searching for a contact in a phone book with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a sorted log file for a timestamp as an example, for size 10.", "Explain how Interpolation Search estimates the probable position of the target, for finding a specific record in a sorted database index with uniformly distributed data of size 1,000.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a specific record in a sorted database index as an example, for size 1,000.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^5 used for finding a username's account.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: searching for a contact in a phone book) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 10^6 (context: searching a large sorted dataset on disk) in O(log n) time.", "For searching a rotated sorted array with 1,000 entries, compare Linear Search and Binary Search in terms of time complexity.", "For searching a sorted log file for a timestamp with 1,000 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding the position to insert a new item in a sorted list as an example, for size 10.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a username's account as an example, for size 100.", "Explain how you would search for an element in a rotated sorted array of size n (context: finding the position to insert a new item in a sorted list) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a leaderboard for a specific score as an example, for size 1,000.", "Explain the time complexity of Exponential Search for a sorted array of size 10, and justify it mathematically.", "Explain how Interpolation Search estimates the probable position of the target, for searching a rotated sorted array with uniformly distributed data of size 100.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for searching a sorted log file for a timestamp.", "Explain the time complexity of Binary Search on Answer for a sorted array of size 10^5, and justify it mathematically.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for finding a word in a dictionary.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10^6 used for finding a word in a dictionary.", "For searching a sorted log file for a timestamp with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Interpolation Search estimates the probable position of the target, for searching a sorted log file for a timestamp with uniformly distributed data of size 10.", "For searching a large sorted dataset on disk with 10^5 entries, compare Linear Search and Binary Search in terms of time complexity.", "For searching a leaderboard for a specific score with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Interpolation Search estimates the probable position of the target, for searching a large sorted dataset on disk with uniformly distributed data of size 10^6.", "Explain the time complexity of Binary Search on Answer for a sorted array of size 10, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 10^5 (context: finding a word in a dictionary) in O(log n) time.", "For searching a large sorted dataset on disk with 100 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for finding the position to insert a new item in a sorted list.", "Explain how Interpolation Search estimates the probable position of the target, for searching a product in an online catalogue with uniformly distributed data of size 10^5.", "For finding a word in a dictionary with n entries, compare Linear Search and Binary Search in terms of time complexity.", "For finding the position to insert a new item in a sorted list with n entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain the time complexity of Binary Search on Answer for a sorted array of size n, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: searching a leaderboard for a specific score) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a rotated sorted array as an example, for size 10^5.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for searching a large sorted dataset on disk.", "Explain how you would search for an element in a rotated sorted array of size n (context: searching for a contact in a phone book) in O(log n) time.", "Explain how Interpolation Search estimates the probable position of the target, for searching a leaderboard for a specific score with uniformly distributed data of size 10^5.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a word in a dictionary as an example, for size 100.", "Explain how Interpolation Search estimates the probable position of the target, for searching for a contact in a phone book with uniformly distributed data of size 10^6.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a leaderboard for a specific score as an example, for size 10.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: searching a rotated sorted array) in O(log n) time.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a word in a dictionary as an example, for size 10^6.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: searching a large sorted dataset on disk) in O(log n) time.", "Explain how you would search for an element in a rotated sorted array of size 100 (context: searching for a contact in a phone book) in O(log n) time.", "For searching a rotated sorted array with n entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Interpolation Search estimates the probable position of the target, for searching a sorted log file for a timestamp with uniformly distributed data of size 10^6.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for finding a username's account.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using finding a word in a dictionary as an example, for size 10.", "Explain how Interpolation Search estimates the probable position of the target, for finding a username's account with uniformly distributed data of size 10^6.", "Explain how Interpolation Search estimates the probable position of the target, for finding a word in a dictionary with uniformly distributed data of size n.", "Explain how Interpolation Search estimates the probable position of the target, for searching a rotated sorted array with uniformly distributed data of size 10^6.", "Explain how Interpolation Search estimates the probable position of the target, for searching a product in an online catalogue with uniformly distributed data of size 1,000.", "Explain why Binary Search cannot be directly applied to an unsorted array of size n used for searching a leaderboard for a specific score.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for searching a sorted log file for a timestamp.", "For searching a rotated sorted array with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Interpolation Search estimates the probable position of the target, for searching a rotated sorted array with uniformly distributed data of size n.", "Explain how Interpolation Search estimates the probable position of the target, for finding a specific record in a sorted database index with uniformly distributed data of size 100.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 1,000 used for searching a rotated sorted array.", "Explain how Interpolation Search estimates the probable position of the target, for searching a large sorted dataset on disk with uniformly distributed data of size 100.", "Explain the time complexity of Linear Search for a sorted array of size 1,000, and justify it mathematically.", "Explain how you would search for an element in a rotated sorted array of size 10 (context: searching a sorted log file for a timestamp) in O(log n) time.", "For searching a large sorted dataset on disk with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "For finding a specific record in a sorted database index with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "For searching a large sorted dataset on disk with 1,000 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how you would search for an element in a rotated sorted array of size 1,000 (context: searching a product in an online catalogue) in O(log n) time.", "For finding a username's account with 10^6 entries, compare Linear Search and Binary Search in terms of time complexity.", "For finding a word in a dictionary with 10 entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how Interpolation Search estimates the probable position of the target, for finding the position to insert a new item in a sorted list with uniformly distributed data of size n.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 10 used for searching a leaderboard for a specific score.", "Explain why Binary Search cannot be directly applied to an unsorted array of size 100 used for searching a rotated sorted array.", "For searching a leaderboard for a specific score with n entries, compare Linear Search and Binary Search in terms of time complexity.", "Explain how 'Binary Search on Answer' technique applies to optimisation problems, using searching a rotated sorted array as an example, for size n."], "hard": ["Explain how Interpolation Search's average O(log log n) performance can degrade to O(n) for non-uniformly distributed data, using finding a specific record in a sorted database index as an example.", "Explain how Interpolation Search's average O(log log n) performance can degrade to O(n) for non-uniformly distributed data, using searching for a contact in a phone book as an example.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10 (context: finding a username's account) in better than O(n\u00b7m) time.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^5 (context: finding a username's account) in better than O(n\u00b7m) time.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 100 used for finding a specific record in a sorted database index.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^6 (context: finding a username's account) in better than O(n\u00b7m) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10^5, context: finding the position to insert a new item in a sorted list), in O(log n) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10, context: searching a rotated sorted array), in O(log n) time.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching for a contact in a phone book at scale 100.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^5 (context: finding the position to insert a new item in a sorted list) in better than O(n\u00b7m) time.", "Design an approach combining Hashing and Binary Search for searching for a contact in a phone book with 10^6 entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding a username's account at scale 100.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^5 (context: finding a specific record in a sorted database index) in better than O(n\u00b7m) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 1,000, context: searching a rotated sorted array), in O(log n) time.", "Design an algorithm to find the peak element in an unsorted array of size 10 (context: searching a sorted log file for a timestamp) in O(log n) time using a Binary-Search-like approach.", "Design an approach combining Hashing and Binary Search for finding a specific record in a sorted database index with n entries, discussing the trade-offs of each.", "Design an approach combining Hashing and Binary Search for searching a leaderboard for a specific score with n entries, discussing the trade-offs of each.", "Design an approach combining Hashing and Binary Search for searching a sorted log file for a timestamp with 1,000 entries, discussing the trade-offs of each.", "Explain how Interpolation Search's average O(log log n) performance can degrade to O(n) for non-uniformly distributed data, using finding a word in a dictionary as an example.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 1,000 used for searching a product in an online catalogue.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10, context: finding the position to insert a new item in a sorted list), in O(log n) time.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size n (context: finding a username's account) in better than O(n\u00b7m) time.", "Design an approach combining Hashing and Binary Search for searching a product in an online catalogue with 10^5 entries, discussing the trade-offs of each.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching for a contact in a phone book with search space of size 100 \u2014 describe the monotonic predicate needed.", "Design an approach combining Hashing and Binary Search for searching for a contact in a phone book with 100 entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching a sorted log file for a timestamp at scale 10^6.", "Design an approach combining Hashing and Binary Search for finding a specific record in a sorted database index with 1,000 entries, discussing the trade-offs of each.", "Design an algorithm to find the peak element in an unsorted array of size n (context: searching a sorted log file for a timestamp) in O(log n) time using a Binary-Search-like approach.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching a leaderboard for a specific score at scale n.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching for a contact in a phone book at scale 10.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 1,000, context: searching a large sorted dataset on disk), in O(log n) time.", "Design an approach combining Hashing and Binary Search for searching a sorted log file for a timestamp with n entries, discussing the trade-offs of each.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 1,000 used for searching for a contact in a phone book.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching a rotated sorted array with search space of size 10^6 \u2014 describe the monotonic predicate needed.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 10^6 used for finding the position to insert a new item in a sorted list.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^5 (context: searching for a contact in a phone book) in better than O(n\u00b7m) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10, context: finding a specific record in a sorted database index), in O(log n) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 100, context: searching a rotated sorted array), in O(log n) time.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding a specific record in a sorted database index at scale n.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10, context: searching a large sorted dataset on disk), in O(log n) time.", "Design an algorithm to find the peak element in an unsorted array of size 10 (context: searching a leaderboard for a specific score) in O(log n) time using a Binary-Search-like approach.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10, context: searching a sorted log file for a timestamp), in O(log n) time.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 100 used for searching a large sorted dataset on disk.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching a product in an online catalogue with search space of size 10 \u2014 describe the monotonic predicate needed.", "Design a 'Binary Search on Answer' approach for an optimisation problem in finding a username's account with search space of size 10 \u2014 describe the monotonic predicate needed.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding a specific record in a sorted database index at scale 10^6.", "Design a 'Binary Search on Answer' approach for an optimisation problem in finding the position to insert a new item in a sorted list with search space of size n \u2014 describe the monotonic predicate needed.", "Explain how Interpolation Search's average O(log log n) performance can degrade to O(n) for non-uniformly distributed data, using finding a username's account as an example.", "Design an algorithm to find the peak element in an unsorted array of size n (context: finding a word in a dictionary) in O(log n) time using a Binary-Search-like approach.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10^6, context: finding a word in a dictionary), in O(log n) time.", "Design a 'Binary Search on Answer' approach for an optimisation problem in finding a username's account with search space of size 10^5 \u2014 describe the monotonic predicate needed.", "Design an algorithm to find the peak element in an unsorted array of size 10^5 (context: searching for a contact in a phone book) in O(log n) time using a Binary-Search-like approach.", "Design an approach combining Hashing and Binary Search for searching a product in an online catalogue with 1,000 entries, discussing the trade-offs of each.", "Design an approach combining Hashing and Binary Search for searching a rotated sorted array with 10 entries, discussing the trade-offs of each.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10, context: searching for a contact in a phone book), in O(log n) time.", "Design an approach combining Hashing and Binary Search for searching a rotated sorted array with 10^6 entries, discussing the trade-offs of each.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 1,000 (context: searching a leaderboard for a specific score) in better than O(n\u00b7m) time.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 100 (context: searching a rotated sorted array) in better than O(n\u00b7m) time.", "Design an approach combining Hashing and Binary Search for finding a specific record in a sorted database index with 10 entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding a username's account at scale 10^5.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size n (context: searching a leaderboard for a specific score) in better than O(n\u00b7m) time.", "Design an approach combining Hashing and Binary Search for finding the position to insert a new item in a sorted list with 1,000 entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding the position to insert a new item in a sorted list at scale 10^6.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching a leaderboard for a specific score at scale 10^6.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 100 (context: searching a leaderboard for a specific score) in better than O(n\u00b7m) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10^6, context: finding a username's account), in O(log n) time.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching for a contact in a phone book at scale n.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size n used for searching a leaderboard for a specific score.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 1,000, context: searching for a contact in a phone book), in O(log n) time.", "Design an approach combining Hashing and Binary Search for searching a large sorted dataset on disk with n entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding a specific record in a sorted database index at scale 1,000.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^6 (context: finding a word in a dictionary) in better than O(n\u00b7m) time.", "Design an approach combining Hashing and Binary Search for searching a large sorted dataset on disk with 10 entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching a leaderboard for a specific score at scale 1,000.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 10^5, context: searching a product in an online catalogue), in O(log n) time.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching a leaderboard for a specific score with search space of size 100 \u2014 describe the monotonic predicate needed.", "Design an algorithm to find the peak element in an unsorted array of size 10^6 (context: searching a rotated sorted array) in O(log n) time using a Binary-Search-like approach.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using finding a username's account at scale 10^6.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^6 (context: finding a specific record in a sorted database index) in better than O(n\u00b7m) time.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size n, context: searching a product in an online catalogue), in O(log n) time.", "Design an approach combining Hashing and Binary Search for finding a word in a dictionary with 100 entries, discussing the trade-offs of each.", "Design an approach combining Hashing and Binary Search for searching a rotated sorted array with 10^5 entries, discussing the trade-offs of each.", "Explain how Interpolation Search's average O(log log n) performance can degrade to O(n) for non-uniformly distributed data, using searching a large sorted dataset on disk as an example.", "Design an algorithm to find the peak element in an unsorted array of size 100 (context: searching for a contact in a phone book) in O(log n) time using a Binary-Search-like approach.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching a sorted log file for a timestamp at scale n.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 1,000, context: finding a word in a dictionary), in O(log n) time.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 10^5 (context: searching a sorted log file for a timestamp) in better than O(n\u00b7m) time.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching for a contact in a phone book with search space of size 1,000 \u2014 describe the monotonic predicate needed.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size n, context: searching for a contact in a phone book), in O(log n) time.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching a leaderboard for a specific score with search space of size 10 \u2014 describe the monotonic predicate needed.", "Design an approach combining Hashing and Binary Search for finding the position to insert a new item in a sorted list with 10^5 entries, discussing the trade-offs of each.", "Critically evaluate: 'Binary Search is always the best choice for searching.' Discuss counter-examples using searching a large sorted dataset on disk at scale 1,000.", "Design an algorithm to find the peak element in an unsorted array of size n (context: searching a rotated sorted array) in O(log n) time using a Binary-Search-like approach.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 10^6 used for finding a word in a dictionary.", "Design an algorithm to find the peak element in an unsorted array of size 100 (context: finding the position to insert a new item in a sorted list) in O(log n) time using a Binary-Search-like approach.", "Explain how Interpolation Search's average O(log log n) performance can degrade to O(n) for non-uniformly distributed data, using finding the position to insert a new item in a sorted list as an example.", "Design a 'Binary Search on Answer' approach for an optimisation problem in searching a sorted log file for a timestamp with search space of size n \u2014 describe the monotonic predicate needed.", "Explain how to search in a sorted array that has been rotated an unknown number of times (size 1,000, context: finding a specific record in a sorted database index), in O(log n) time.", "Explain how you would efficiently search for an element in a 2D sorted matrix of size 1,000 (context: finding the position to insert a new item in a sorted list) in better than O(n\u00b7m) time.", "Design a Binary Search variant to find the first and last occurrence of a target value in a sorted array of size 10 used for searching for a contact in a phone book."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

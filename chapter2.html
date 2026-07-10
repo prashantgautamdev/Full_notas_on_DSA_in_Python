@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 2: Arrays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li class="current">Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 2</h1>
+  <div class="subtitle">Arrays</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Explain what an <span class="mark">Array</span> is and how it is stored in memory.</li>
+    <li>Differentiate between <span class="mark-g">1D, 2D and Multi-dimensional</span> arrays.</li>
+    <li>Understand <span class="mark-g">Static vs Dynamic</span> arrays and amortised time complexity.</li>
+    <li>Analyse the time complexity of all basic array operations.</li>
+    <li>Solve classic array problems: rotation, reversal, duplicates, subarray sum.</li>
+    <li>Apply the <span class="mark">Two-Pointer</span> and <span class="mark">Sliding Window</span> techniques.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Array</b> — a linear data structure that stores elements of the same type in contiguous memory locations, accessed using an index.</div>
+  <div class="box def"><b>Static Array</b> — an array whose size is fixed at creation time and cannot grow or shrink.</div>
+  <div class="box def"><b>Dynamic Array</b> — an array that automatically resizes (usually by doubling) when it runs out of capacity — e.g. Python's <code>list</code>.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Memory Layout, Static vs Dynamic, 2D Arrays</h2>
+
+  <h3 class="subsec">Memory Layout</h3>
+  <p>Because array elements sit in <span class="mark">contiguous memory</span>, the address of any element can be computed instantly:</p>
+  <div class="box formula">address(arr[i]) = base_address + i × size_of(element)</div>
+  <div class="diagram">
+    <div><div style="font-family:'Patrick Hand'; font-size:14px;">Index:</div><div style="display:flex;">
+      <div class="cell">0</div><div class="cell">1</div><div class="cell">2</div><div class="cell">3</div>
+    </div></div>
+  </div>
+  <div class="diagram">
+    <div><div style="font-family:'Patrick Hand'; font-size:14px;">Value:</div><div style="display:flex;">
+      <div class="cell">10</div><div class="cell">22</div><div class="cell">7</div><div class="cell">18</div>
+    </div></div>
+  </div>
+  <p>This is exactly why <span class="mark">arr[i]</span> access is <b>O(1)</b> — no traversal needed, just a direct address calculation!</p>
+
+  <h3 class="subsec">Static vs Dynamic Arrays</h3>
+  <table>
+    <tr><th>Static Array</th><th>Dynamic Array</th></tr>
+    <tr><td>Fixed size, set once</td><td>Grows automatically (usually doubles)</td></tr>
+    <tr><td>C arrays, Java arrays</td><td>Python <code>list</code>, C++ <code>vector</code>, Java <code>ArrayList</code></td></tr>
+    <tr><td>No resizing overhead</td><td>Occasional O(n) resize, but O(1) amortised append</td></tr>
+  </table>
+  <div class="box tip">"Amortised O(1)" means: most appends are O(1), and the occasional expensive O(n) resize gets "averaged out" over many operations — so on average it still behaves like O(1).</div>
+
+  <h3 class="subsec">2D Arrays</h3>
+  <p>A 2D array is an "array of arrays" — think of a grid, like a tic-tac-toe board.</p>
+  <div class="diagram">
+    <table style="width:auto;">
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>4</td><td>5</td><td>6</td></tr>
+      <tr><td>7</td><td>8</td><td>9</td></tr>
+    </table>
+  </div>
+  <p>Accessed as <span class="mark">arr[row][col]</span> — stored in memory using <b>Row-Major Order</b> (row by row) in most languages including Python and C.</p>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples</h2>
+
+  <div class="box example"><b>Class Marksheet:</b> an array of 50 integers storing marks — index = roll number, value = marks.</div>
+  <div class="box example"><b>Tic-Tac-Toe Board:</b> a 2D array (3×3) storing 'X', 'O', or empty at each cell.</div>
+  <div class="box example"><b>Image Pixels:</b> a 2D (or 3D with RGB channels) array where each cell is a pixel's colour value.</div>
+  <div class="box example"><b>Leaderboard:</b> an array of scores that gets sorted to show the top players.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Array access by index is always <b>O(1)</b> — the single biggest advantage over Linked Lists.</li>
+    <li>Insertion/deletion at the <b>beginning or middle</b> is <b>O(n)</b> due to shifting.</li>
+    <li>A <b>Dynamic Array</b> trades a little memory overhead for flexible resizing.</li>
+    <li>2D arrays use <b>Row-Major Order</b> in Python/C — this affects cache performance.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time Complexity Cheat-Table</h2>
+  <table>
+    <tr><th>Operation</th><th>Time Complexity</th></tr>
+    <tr><td>Access by index</td><td>O(1)</td></tr>
+    <tr><td>Search (unsorted)</td><td>O(n)</td></tr>
+    <tr><td>Search (sorted, binary search)</td><td>O(log n)</td></tr>
+    <tr><td>Insert/Delete at end</td><td>O(1) amortised (dynamic array)</td></tr>
+    <tr><td>Insert/Delete at beginning/middle</td><td>O(n)</td></tr>
+    <tr><td>Traverse all elements</td><td>O(n)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Array Traversal &amp; Sum</h3>
+  <div class="codebox"><span class="cm"># O(n) traversal to compute sum</span>
+<span class="kw">def</span> array_sum(arr):
+    total = 0
+    <span class="kw">for</span> x <span class="kw">in</span> arr:
+        total += x
+    <span class="kw">return</span> total</div>
+
+  <h3 class="subsec">Reverse Array In-Place (Two-Pointer)</h3>
+  <div class="codebox"><span class="cm"># O(n) time, O(1) extra space</span>
+<span class="kw">def</span> reverse_array(arr):
+    left, right = 0, len(arr) - 1
+    <span class="kw">while</span> left < right:
+        arr[left], arr[right] = arr[right], arr[left]
+        left += 1
+        right -= 1
+    <span class="kw">return</span> arr</div>
+
+  <h3 class="subsec">Rotate Array Left by k (Reversal Algorithm)</h3>
+  <div class="codebox"><span class="cm"># O(n) time, O(1) extra space</span>
+<span class="kw">def</span> rotate_left(arr, k):
+    n = len(arr)
+    k = k % n
+    arr[:] = arr[k:] + arr[:k]
+    <span class="kw">return</span> arr</div>
+
+  <h3 class="subsec">Prefix Sum Array</h3>
+  <div class="codebox"><span class="cm"># O(n) preprocessing -> O(1) range-sum queries</span>
+<span class="kw">def</span> build_prefix_sum(arr):
+    prefix = [0] * (len(arr) + 1)
+    <span class="kw">for</span> i <span class="kw">in</span> range(len(arr)):
+        prefix[i+1] = prefix[i] + arr[i]
+    <span class="kw">return</span> prefix  <span class="cm"># sum(l, r) = prefix[r+1] - prefix[l]</span></div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">Whenever a problem says "find pair/subarray with sum X" — think <b>Two-Pointer</b> (sorted array) or <b>Hash Set</b> (unsorted array) before brute force.</div>
+  <div class="box tip">"Rotate array" and "reverse array" problems almost always solve elegantly using the <b>reversal trick</b>: reverse whole → reverse parts.</div>
+  <div class="box tip">If a problem needs repeated range-sum queries, precompute a <b>Prefix Sum</b> array once — turns O(n) per query into O(1).</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Forgetting that Python's <code>list</code> is dynamic — assuming append() is always instantly O(1) with zero cost, ignoring occasional resize.</div>
+  <div class="box mistake">Off-by-one errors when computing prefix sums or sliding window boundaries.</div>
+  <div class="box mistake">Confusing row-major vs column-major indexing when working with 2D arrays / matrices.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Write a function to find the maximum element in an array.</li>
+    <li>Write a function to find the minimum and maximum in a single pass.</li>
+    <li>Write a function to compute the sum and average of array elements.</li>
+    <li>Write a function to reverse an array in-place using two pointers.</li>
+    <li>Write a function to check if an array is sorted in ascending order.</li>
+    <li>Write a function to find the second largest element without sorting.</li>
+    <li>Write a Linear Search function and state its time complexity.</li>
+    <li>Write a Binary Search function (iterative) on a sorted array.</li>
+    <li>Write a function to count the frequency of each element using a dictionary.</li>
+    <li>Write a function to check whether an array contains duplicates.</li>
+    <li>Write a function to remove duplicates from a sorted array in-place.</li>
+    <li>Write a function to left-rotate an array by one position.</li>
+    <li>Write a function to rotate an array by k positions using the reversal algorithm.</li>
+    <li>Write a function to merge two sorted arrays into one sorted array.</li>
+    <li>Write a function to find the union of two arrays.</li>
+    <li>Write a function to find the intersection of two arrays using a hash set.</li>
+    <li>Write a function to find all pairs in an array that sum to a target value (brute force O(n²)).</li>
+    <li>Optimise the pair-sum problem to O(n) using a hash set.</li>
+    <li>Write a function to build a prefix sum array and answer a range-sum query in O(1).</li>
+    <li>Write a function to find the maximum sum of any subarray of size k (sliding window).</li>
+    <li>Write a function implementing Kadane's Algorithm to find the maximum subarray sum.</li>
+    <li>Write a function to find the majority element (Boyer-Moore Voting Algorithm).</li>
+    <li>Write a function to move all zeros in an array to the end while keeping relative order of non-zeros.</li>
+    <li>Write a function to find the missing number in an array of 1 to n.</li>
+    <li>Write a function to transpose a 2D matrix (square matrix) in-place.</li>
+    <li>Write a function to rotate a square matrix (2D array) by 90 degrees in-place.</li>
+    <li>Write a function to find the equilibrium index of an array (left sum equals right sum).</li>
+    <li>Write a function to find the longest subarray with a given sum using the sliding window technique.</li>
+    <li>Write a function to find all subarrays with sum equal to zero.</li>
+    <li>Write a function that finds the maximum product subarray in an array (handle negative numbers).</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    An <b>Array</b> stores same-type elements in contiguous memory, giving O(1) index access but O(n) insert/delete at arbitrary positions. <b>Static arrays</b> have fixed size; <b>Dynamic arrays</b> resize automatically with O(1) amortised append. <b>2D arrays</b> model grids/matrices using row-major order. Key techniques: <b>Two-Pointer</b>, <b>Sliding Window</b>, and <b>Prefix Sum</b> — all reduce brute-force O(n²) approaches down to O(n).
+  </div>
+
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">address(arr[i]) = base + i × size_of(type)</div>
+  <div class="box formula">prefix_sum(l, r) = prefix[r+1] − prefix[l]</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 2 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Array</td><td>Contiguous memory, same-type elements, indexed access</td></tr>
+    <tr><td>Static Array</td><td>Fixed size at creation</td></tr>
+    <tr><td>Dynamic Array</td><td>Auto-resizes; O(1) amortised append</td></tr>
+    <tr><td>Access by index</td><td>O(1)</td></tr>
+    <tr><td>Search (unsorted)</td><td>O(n)</td></tr>
+    <tr><td>Search (sorted, binary search)</td><td>O(log n)</td></tr>
+    <tr><td>Insert/Delete at end</td><td>O(1) amortised</td></tr>
+    <tr><td>Insert/Delete at beginning/middle</td><td>O(n)</td></tr>
+    <tr><td>2D Array</td><td>Row-Major order in Python/C</td></tr>
+    <tr><td>Two-Pointer</td><td>Reverse/pair-sum on sorted arrays, O(n)</td></tr>
+    <tr><td>Sliding Window</td><td>Fixed/variable size subarray sum, O(n)</td></tr>
+    <tr><td>Prefix Sum</td><td>O(n) build → O(1) range-sum queries</td></tr>
+  </table>
+  <div class="box formula">address(arr[i]) = base + i × size_of(type)</div>
+  <div class="box tip">Golden rule: <b>Index access = O(1), everything else usually O(n)</b> unless you use Two-Pointer / Sliding Window / Prefix Sum tricks.</div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Write a function to find the maximum element in an array.", "Write a function to find the minimum and maximum in a single pass.", "Write a function to compute the sum and average of array elements.", "Write a function to reverse an array in-place using two pointers.", "Write a function to check if an array is sorted in ascending order.", "Write a function to find the second largest element without sorting.", "Write a Linear Search function and state its time complexity.", "Write a Binary Search function (iterative) on a sorted array.", "Write a function to count the frequency of each element using a dictionary.", "Write a function to check whether an array contains duplicates.", "Write a function to remove duplicates from a sorted array in-place.", "Write a function to left-rotate an array by one position.", "Write a function to rotate an array by k positions using the reversal algorithm.", "Write a function to merge two sorted arrays into one sorted array.", "Write a function to find the union of two arrays.", "Write a function to find the intersection of two arrays using a hash set.", "Write a function to find all pairs in an array that sum to a target value (brute force O(n\u00b2)).", "Optimise the pair-sum problem to O(n) using a hash set.", "Write a function to build a prefix sum array and answer a range-sum query in O(1).", "Write a function to find the maximum sum of any subarray of size k (sliding window).", "Write a function implementing Kadane's Algorithm to find the maximum subarray sum.", "Write a function to find the majority element (Boyer-Moore Voting Algorithm).", "Write a function to move all zeros in an array to the end while keeping relative order of non-zeros.", "Write a function to find the missing number in an array of 1 to n.", "Write a function to transpose a 2D matrix (square matrix) in-place.", "Write a function to rotate a square matrix (2D array) by 90 degrees in-place.", "Write a function to find the equilibrium index of an array (left sum equals right sum).", "Write a function to find the longest subarray with a given sum using the sliding window technique.", "Write a function to find all subarrays with sum equal to zero.", "Write a function that finds the maximum product subarray in an array (handle negative numbers)."]}, "practice": {"easy": ["State whether the following is True or False: The size of a static array can be changed after it is created.", "Write one advantage of using an array over a linked list, in the context of storing daily temperature readings for a month.", "What would you use to check the length of an array in Python?", "What data type mismatch problem can occur if you try to insert a string into an integer array?", "State whether the following is True or False: Python's built-in list behaves like a purely static, fixed-size array.", "How many indices are needed to access an element in a 3D array?", "Fill in the blank: Accessing arr[i] in an array takes ______ time.", "Why is Dynamic Array considered a fundamental building block for other data structures?", "Give one example of an operation on an array that runs in O(n) time, e.g. finding the maximum element.", "Give one example of an operation on an array that runs in O(n) time, e.g. finding the average of all elements.", "In the context of maintaining a circular buffer of recent chat messages, which array operation would you use most frequently \u2014 reversing the array or accessing by index?", "Give one example of an operation on an array that runs in O(n) time, e.g. finding duplicates in the array.", "Why is Multi-dimensional Array considered a fundamental building block for other data structures?", "What is the time complexity of insertion at the beginning in an array of size 100?", "What is the index of the first element in a typical array (0-based indexing)?", "What is the difference between the 'length' and the 'capacity' of a dynamic array?", "Define the term '2D Array' in your own words.", "Define the term 'Column-Major Order' in your own words.", "State whether the following is True or False: Accessing an array element by index takes O(1) time.", "In the scenario of storing daily temperature readings for a month, would you use a 1D or 2D array, and why (one line)?", "In the context of storing a matrix for a tic-tac-toe game, which array operation would you use most frequently \u2014 copying the array or accessing by index?", "Write one disadvantage of using an array over a linked list, in the context of representing a chessboard's cell values.", "Define the term 'Amortised Time Complexity' in your own words.", "What happens if you try to access an index that is out of the array's bounds?", "State whether the following is True or False: Array indices in most programming languages start from 0.", "What is the time complexity of deletion from the beginning in an array of size n?", "Give one example of an operation on an array that runs in O(n) time, e.g. counting occurrences of an element.", "Is a Python list an example of a Static or Dynamic array (conceptually)?", "Define the term 'In-place Operation' in your own words.", "In the context of storing attendance records for a class, which array operation would you use most frequently \u2014 checking if the array is sorted or accessing by index?", "What is a 2D array typically used to represent, for example in storing daily temperature readings for a month?", "What is meant by 'traversing' an array, using storing RGB values of an image row as an example?", "Define the term 'Multi-dimensional Array' in your own words.", "Define the term 'Array Length/Size' in your own words.", "What is the time complexity of finding the average of all elements in an array of size 100?", "What is a 2D array typically used to represent, for example in storing marks of 50 students in a class?", "State whether the following is True or False: A 2D array can be thought of as an array of arrays.", "What is a 2D array typically used to represent, for example in storing inventory counts in a warehouse?", "What is meant by 'traversing' an array, using buffering the last n sensor readings as an example?", "What is meant by 'traversing' an array, using storing marks of 50 students in a class as an example?", "What is the time complexity of counting occurrences of an element in an array of size 100?", "What is meant by 'traversing' an array, using recording scores in a multi-round quiz game as an example?", "Write one disadvantage of using an array over a linked list, in the context of storing marks of 50 students in a class.", "Name one real-world scenario where storing a matrix for a tic-tac-toe game would be modeled using an array.", "What is a 2D array typically used to represent, for example in storing a lookup table of squares for fast access?", "Define the term 'Cache Locality' in your own words.", "What is meant by 'traversing' an array, using storing inventory counts in a warehouse as an example?", "What is the time complexity of merging two arrays in an array of size 100?", "Give one example of an operation on an array that runs in O(n) time, e.g. deletion from the beginning.", "What is the time complexity of finding the average of all elements in an array of size 10^5?", "What is the time complexity of copying the array in an array of size 1,000?", "What is a 2D array typically used to represent, for example in representing a chessboard's cell values?", "Name one real-world scenario where storing a lookup table of squares for fast access would be modeled using an array.", "Write one advantage of using an array over a linked list, in the context of storing a lookup table of squares for fast access.", "Give one example of an operation on an array that runs in O(n) time, e.g. copying the array.", "Name one real-world scenario where maintaining a circular buffer of recent chat messages would be modeled using an array.", "Write one advantage of using an array over a linked list, in the context of storing a matrix for a tic-tac-toe game.", "Write one advantage of using an array over a linked list, in the context of representing a chessboard's cell values.", "Why is Contiguous Memory considered a fundamental building block for other data structures?", "What is a 2D array typically used to represent, for example in maintaining a leaderboard of top scorers?", "In the context of maintaining a circular buffer of recent chat messages, which array operation would you use most frequently \u2014 updating an element by index or accessing by index?", "What is a 2D array typically used to represent, for example in storing pixel values of an image (2D array)?", "Write one disadvantage of using an array over a linked list, in the context of storing daily stock closing prices.", "Write one advantage of using an array over a linked list, in the context of storing marks of 50 students in a class.", "What is a 2D array typically used to represent, for example in implementing a simple to-do list with fixed slots?", "What is a 2D array typically used to represent, for example in storing a matrix for a tic-tac-toe game?", "What is a 2D array typically used to represent, for example in buffering the last n sensor readings?", "Why is Array Length/Size considered a fundamental building block for other data structures?", "Write one disadvantage of using an array over a linked list, in the context of maintaining a leaderboard of top scorers.", "In the scenario of storing RGB values of an image row, would you use a 1D or 2D array, and why (one line)?", "What is the time complexity of accessing an element by index in an array of size 100?", "In the scenario of recording scores in a multi-round quiz game, would you use a 1D or 2D array, and why (one line)?", "In the context of storing RGB values of an image row, which array operation would you use most frequently \u2014 traversing all elements or accessing by index?", "In the scenario of storing daily stock closing prices, would you use a 1D or 2D array, and why (one line)?", "In the context of maintaining a leaderboard of top scorers, which array operation would you use most frequently \u2014 finding the second largest element or accessing by index?", "What is meant by 'traversing' an array, using maintaining a circular buffer of recent chat messages as an example?", "Define the term 'Array Traversal' in your own words.", "In the context of storing inventory counts in a warehouse, which array operation would you use most frequently \u2014 insertion at the beginning or accessing by index?", "Define the term 'Array Resizing' in your own words.", "Why is 3D Array considered a fundamental building block for other data structures?", "State whether the following is True or False: Inserting an element at the beginning of an array requires shifting all other elements.", "Name one real-world scenario where recording scores in a multi-round quiz game would be modeled using an array.", "Write one advantage of using an array over a linked list, in the context of implementing a simple to-do list with fixed slots.", "Write one advantage of using an array over a linked list, in the context of storing pixel values of an image (2D array).", "State whether the following is True or False: Binary search can be applied directly to an unsorted array.", "Give one example of an operation on an array that runs in O(n) time, e.g. deletion at a given index.", "Write one disadvantage of using an array over a linked list, in the context of storing attendance records for a class.", "What is the time complexity of merging two arrays in an array of size 10^6?", "In the context of representing a chessboard's cell values, which array operation would you use most frequently \u2014 merging two arrays or accessing by index?", "State whether the following is True or False: Deleting the last element of an array requires shifting other elements.", "Write one disadvantage of using an array over a linked list, in the context of storing RGB values of an image row.", "Name one real-world scenario where storing marks of 50 students in a class would be modeled using an array.", "In the context of storing attendance records for a class, which array operation would you use most frequently \u2014 searching for an element (sorted array) or accessing by index?", "Write one advantage of using an array over a linked list, in the context of maintaining a circular buffer of recent chat messages.", "What is meant by 'traversing' an array, using storing daily temperature readings for a month as an example?", "What is meant by 'traversing' an array, using storing a lookup table of squares for fast access as an example?", "Why is Array Resizing considered a fundamental building block for other data structures?", "Define the term '1D Array' in your own words.", "Give one example of an operation on an array that runs in O(n) time, e.g. insertion at the beginning.", "State whether the following is True or False: A dynamic array always resizes by exactly one slot each time it grows.", "Name one real-world scenario where implementing a simple to-do list with fixed slots would be modeled using an array.", "What is a 2D array typically used to represent, for example in recording scores in a multi-round quiz game?", "In the context of storing daily temperature readings for a month, which array operation would you use most frequently \u2014 merging two arrays or accessing by index?", "Why is 1D Array considered a fundamental building block for other data structures?", "State whether the following is True or False: Row-major order stores 2D array elements row by row in memory.", "Name one real-world scenario where storing attendance records for a class would be modeled using an array.", "Give one example of an operation on an array that runs in O(n) time, e.g. merging two arrays.", "In the context of implementing a simple to-do list with fixed slots, which array operation would you use most frequently \u2014 finding the minimum element or accessing by index?", "In the scenario of maintaining a leaderboard of top scorers, would you use a 1D or 2D array, and why (one line)?", "Name one real-world scenario where buffering the last n sensor readings would be modeled using an array.", "Give one example of an operation on an array that runs in O(n) time, e.g. removing an element by value.", "State whether the following is True or False: Searching for an element in an unsorted array in the worst case takes O(n) time.", "In the context of maintaining a circular buffer of recent chat messages, which array operation would you use most frequently \u2014 searching for an element (sorted array) or accessing by index?", "In the context of storing daily temperature readings for a month, which array operation would you use most frequently \u2014 finding the second largest element or accessing by index?", "Write one disadvantage of using an array over a linked list, in the context of storing daily temperature readings for a month.", "In the scenario of storing pixel values of an image (2D array), would you use a 1D or 2D array, and why (one line)?", "Define the term 'Array' in your own words.", "Give one example of an operation on an array that runs in O(n) time, e.g. finding the sum of all elements.", "Why is Index considered a fundamental building block for other data structures?", "Write one disadvantage of using an array over a linked list, in the context of storing pixel values of an image (2D array).", "In the scenario of representing a chessboard's cell values, would you use a 1D or 2D array, and why (one line)?", "In the scenario of storing inventory counts in a warehouse, would you use a 1D or 2D array, and why (one line)?", "Name one real-world scenario where maintaining a leaderboard of top scorers would be modeled using an array.", "In the context of representing a chessboard's cell values, which array operation would you use most frequently \u2014 reversing the array or accessing by index?", "Write one advantage of using an array over a linked list, in the context of storing inventory counts in a warehouse.", "Why is Static Array considered a fundamental building block for other data structures?", "What is a 2D array typically used to represent, for example in storing RGB values of an image row?", "What is the time complexity of deletion from the end in an array of size 10^5?", "Write one disadvantage of using an array over a linked list, in the context of buffering the last n sensor readings.", "Define the term '3D Array' in your own words.", "What is meant by 'traversing' an array, using storing daily stock closing prices as an example?", "Give one example of an operation on an array that runs in O(n) time, e.g. checking if the array is sorted.", "Write one advantage of using an array over a linked list, in the context of recording scores in a multi-round quiz game.", "What is meant by 'traversing' an array, using representing a chessboard's cell values as an example?", "In the context of storing marks of 50 students in a class, which array operation would you use most frequently \u2014 finding the second largest element or accessing by index?", "Name one real-world scenario where representing a chessboard's cell values would be modeled using an array.", "In the scenario of storing marks of 50 students in a class, would you use a 1D or 2D array, and why (one line)?", "Name one real-world scenario where storing daily temperature readings for a month would be modeled using an array.", "In the context of storing attendance records for a class, which array operation would you use most frequently \u2014 deletion from the end or accessing by index?", "What is a 2D array typically used to represent, for example in storing attendance records for a class?", "What is meant by 'traversing' an array, using storing attendance records for a class as an example?", "What is the time complexity of finding the average of all elements in an array of size n?", "In the context of maintaining a circular buffer of recent chat messages, which array operation would you use most frequently \u2014 insertion at the beginning or accessing by index?", "Give one example of an operation on an array that runs in O(n) time, e.g. searching for an element (sorted array).", "What is the time complexity of deletion from the beginning in an array of size 10,000?", "What is the time complexity of insertion at the beginning in an array of size n?", "What is the time complexity of finding the second largest element in an array of size 1,000?", "Name one real-world scenario where storing pixel values of an image (2D array) would be modeled using an array.", "Write one disadvantage of using an array over a linked list, in the context of storing a lookup table of squares for fast access.", "State whether the following is True or False: Column-major order stores 2D array elements column by column in memory.", "In the context of recording scores in a multi-round quiz game, which array operation would you use most frequently \u2014 finding the average of all elements or accessing by index?", "Give one example of an operation on an array that runs in O(n) time, e.g. finding the minimum element.", "In the context of implementing a simple to-do list with fixed slots, which array operation would you use most frequently \u2014 counting occurrences of an element or accessing by index?", "In the context of maintaining a circular buffer of recent chat messages, which array operation would you use most frequently \u2014 rotating the array by one position or accessing by index?", "Write one advantage of using an array over a linked list, in the context of buffering the last n sensor readings.", "Define the term 'Index' in your own words.", "What is the time complexity of deletion from the end in an array of size 10^6?", "Give one example of an operation on an array that runs in O(n) time, e.g. finding the second largest element.", "In the context of storing RGB values of an image row, which array operation would you use most frequently \u2014 copying the array or accessing by index?", "What is the time complexity of accessing an element by index in an array of size 10^5?", "Define the term 'Array Bound / Index Out of Range' in your own words.", "Give one example of an operation on an array that runs in O(n) time, e.g. accessing an element by index.", "Write one advantage of using an array over a linked list, in the context of storing attendance records for a class.", "What is the time complexity of counting occurrences of an element in an array of size 10^6?", "In the context of storing daily temperature readings for a month, which array operation would you use most frequently \u2014 counting occurrences of an element or accessing by index?", "What is the time complexity of traversing all elements in an array of size 100?", "Name one real-world scenario where storing daily stock closing prices would be modeled using an array.", "Why is In-place Operation considered a fundamental building block for other data structures?", "What is meant by 'traversing' an array, using maintaining a leaderboard of top scorers as an example?", "What is a 2D array typically used to represent, for example in maintaining a circular buffer of recent chat messages?", "What is the time complexity of finding the sum of all elements in an array of size 100?", "What is meant by 'traversing' an array, using implementing a simple to-do list with fixed slots as an example?", "Name one real-world scenario where storing RGB values of an image row would be modeled using an array.", "In the context of storing pixel values of an image (2D array), which array operation would you use most frequently \u2014 deletion at a given index or accessing by index?", "In the context of storing attendance records for a class, which array operation would you use most frequently \u2014 finding the sum of all elements or accessing by index?", "In the context of storing daily temperature readings for a month, which array operation would you use most frequently \u2014 insertion at a given index or accessing by index?", "What is the time complexity of searching for an element (sorted array) in an array of size n?", "Define the term 'Static Array' in your own words.", "In the context of maintaining a circular buffer of recent chat messages, which array operation would you use most frequently \u2014 copying the array or accessing by index?", "In the context of storing inventory counts in a warehouse, which array operation would you use most frequently \u2014 removing an element by value or accessing by index?", "Why is Sub-array considered a fundamental building block for other data structures?", "Write one disadvantage of using an array over a linked list, in the context of storing inventory counts in a warehouse.", "In the context of representing a chessboard's cell values, which array operation would you use most frequently \u2014 counting occurrences of an element or accessing by index?", "Write one disadvantage of using an array over a linked list, in the context of implementing a simple to-do list with fixed slots.", "What is the time complexity of counting occurrences of an element in an array of size 10,000?", "Define the term 'Jagged Array' in your own words.", "Write one advantage of using an array over a linked list, in the context of storing RGB values of an image row.", "Why is Jagged Array considered a fundamental building block for other data structures?", "What is the time complexity of insertion at a given index in an array of size n?", "In the scenario of storing a matrix for a tic-tac-toe game, would you use a 1D or 2D array, and why (one line)?", "What is the time complexity of updating an element by index in an array of size 10,000?", "What is the time complexity of finding the average of all elements in an array of size 10^6?", "Why is 2D Array considered a fundamental building block for other data structures?", "What is meant by 'traversing' an array, using storing pixel values of an image (2D array) as an example?", "Give one example of an operation on an array that runs in O(n) time, e.g. reversing the array.", "In the context of implementing a simple to-do list with fixed slots, which array operation would you use most frequently \u2014 finding the second largest element or accessing by index?", "In the context of storing a matrix for a tic-tac-toe game, which array operation would you use most frequently \u2014 searching for an element (unsorted array) or accessing by index?", "Give one example of an operation on an array that runs in O(n) time, e.g. rotating the array by one position.", "In the context of storing RGB values of an image row, which array operation would you use most frequently \u2014 deletion from the end or accessing by index?", "Write one disadvantage of using an array over a linked list, in the context of maintaining a circular buffer of recent chat messages."], "medium": ["What is the time complexity of computing a prefix sum array of size 10,000, and how does it help answer range-sum queries faster?", "Explain the two-pointer technique for reversing an array of size 10,000 \u2014 why is it more efficient than using extra space?", "For 'storing attendance records for a class', would you prefer a 1D or 2D array? Justify your choice.", "For 'storing a matrix for a tic-tac-toe game', would you prefer a 1D or 2D array? Justify your choice.", "What is the space complexity of creating a new reversed copy of an array of size 10^5?", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing RGB values of an image row as context.", "Why does merging two sorted arrays of total size 10,000 take O(n) time instead of O(n log n)?", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing marks of 50 students in a class as context.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing a matrix for a tic-tac-toe game.", "For 'storing marks of 50 students in a class', would you prefer a 1D or 2D array? Justify your choice.", "What is the space complexity of creating a new reversed copy of an array of size 10^6?", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing a lookup table of squares for fast access.", "Explain the two-pointer technique for reversing an array of size 10^6 \u2014 why is it more efficient than using extra space?", "For 'recording scores in a multi-round quiz game', would you prefer a 1D or 2D array? Justify your choice.", "Why does merging two sorted arrays of total size 10^6 take O(n) time instead of O(n log n)?", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing a lookup table of squares for fast access.", "For 'storing RGB values of an image row', would you prefer a 1D or 2D array? Justify your choice.", "Why does merging two sorted arrays of total size 1,000 take O(n) time instead of O(n log n)?", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing RGB values of an image row.", "What is the space complexity of creating a new reversed copy of an array of size 100?", "For storing attendance records for a class, compare the cost of updating an element by index versus accessing an element directly by index.", "For 'buffering the last n sensor readings', would you prefer a 1D or 2D array? Justify your choice.", "What is the time complexity of copying the array on an array used for storing RGB values of an image row? Justify with reasoning about memory shifting.", "Explain the two-pointer technique for reversing an array of size n \u2014 why is it more efficient than using extra space?", "Explain the two-pointer technique for reversing an array of size 10^5 \u2014 why is it more efficient than using extra space?", "What is the space complexity of creating a new reversed copy of an array of size 1,000?", "What is the time complexity of finding the maximum element in an unsorted array of size n used for implementing a simple to-do list with fixed slots?", "Explain the difference in time complexity between copying the array and searching for an element in a sorted array of size 10^5.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to representing a chessboard's cell values.", "What is the time complexity of computing a prefix sum array of size 1,000, and how does it help answer range-sum queries faster?", "Explain why binary search requires the array to be sorted, using an example of recording scores in a multi-round quiz game where an unsorted array would cause incorrect results.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling representing a chessboard's cell values.", "What is the time complexity of updating an element by index on an array used for representing a chessboard's cell values? Justify with reasoning about memory shifting.", "Explain the difference in time complexity between finding the second largest element and searching for an element in a sorted array of size 100.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing RGB values of an image row.", "What is the time complexity of computing a prefix sum array of size 10^6, and how does it help answer range-sum queries faster?", "For storing daily stock closing prices, compare the cost of insertion at the end versus accessing an element directly by index.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling implementing a simple to-do list with fixed slots.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing maintaining a leaderboard of top scorers.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing representing a chessboard's cell values.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^5 used for implementing a simple to-do list with fixed slots?", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to implementing a simple to-do list with fixed slots.", "What is the time complexity of finding the maximum element in an unsorted array of size n used for maintaining a circular buffer of recent chat messages?", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing storing daily temperature readings for a month.", "Given an array of size 10^5, what is the time complexity of reversing it in-place?", "Compare the time complexity of insertion at the beginning vs insertion at the end of an array of size 1,000.", "What is the time complexity of insertion at the beginning on an array used for storing a lookup table of squares for fast access? Justify with reasoning about memory shifting.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing storing a lookup table of squares for fast access.", "Explain why binary search requires the array to be sorted, using an example of storing pixel values of an image (2D array) where an unsorted array would cause incorrect results.", "Compare the time complexity of insertion at the beginning vs insertion at the end of an array of size 10^6.", "For storing inventory counts in a warehouse, compare the cost of rotating the array by one position versus accessing an element directly by index.", "Why is deleting an element from the middle of an array of size 1,000 an O(n) operation?", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing daily stock closing prices as context.", "Why does merging two sorted arrays of total size n take O(n) time instead of O(n log n)?", "Compare the time complexity of insertion at the beginning vs insertion at the end of an array of size 10^5.", "For 'implementing a simple to-do list with fixed slots', would you prefer a 1D or 2D array? Justify your choice.", "What is the time complexity of accessing an element by index on an array used for storing attendance records for a class? Justify with reasoning about memory shifting.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for representing a chessboard's cell values.", "Why is deleting an element from the middle of an array of size 10,000 an O(n) operation?", "Explain why binary search requires the array to be sorted, using an example of representing a chessboard's cell values where an unsorted array would cause incorrect results.", "Explain why binary search requires the array to be sorted, using an example of storing marks of 50 students in a class where an unsorted array would cause incorrect results.", "Why is deleting an element from the middle of an array of size 10^6 an O(n) operation?", "Explain the two-pointer technique for reversing an array of size 100 \u2014 why is it more efficient than using extra space?", "Compare the time complexity of insertion at the beginning vs insertion at the end of an array of size 10,000.", "Why does merging two sorted arrays of total size 10^5 take O(n) time instead of O(n log n)?", "What is the time complexity of searching for an element (unsorted array) on an array used for storing attendance records for a class? Justify with reasoning about memory shifting.", "Explain the difference in time complexity between searching for an element (unsorted array) and searching for an element in a sorted array of size 10,000.", "Given an array of size 100 for maintaining a leaderboard of top scorers, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "For 'maintaining a circular buffer of recent chat messages', would you prefer a 1D or 2D array? Justify your choice.", "For implementing a simple to-do list with fixed slots, compare the cost of finding the sum of all elements versus accessing an element directly by index.", "For storing a matrix for a tic-tac-toe game, compare the cost of deletion from the beginning versus accessing an element directly by index.", "Given an array of size 10^6 for maintaining a circular buffer of recent chat messages, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "What is the time complexity of computing a prefix sum array of size 10^5, and how does it help answer range-sum queries faster?", "Why does merging two sorted arrays of total size 100 take O(n) time instead of O(n log n)?", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing daily temperature readings for a month.", "For storing attendance records for a class, compare the cost of checking if the array is sorted versus accessing an element directly by index.", "Given an array of size n for storing attendance records for a class, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing inventory counts in a warehouse.", "What is the time complexity of removing an element by value on an array used for storing RGB values of an image row? Justify with reasoning about memory shifting.", "Explain why binary search requires the array to be sorted, using an example of storing inventory counts in a warehouse where an unsorted array would cause incorrect results.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing attendance records for a class.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing a matrix for a tic-tac-toe game.", "For buffering the last n sensor readings, compare the cost of finding the minimum element versus accessing an element directly by index.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing a matrix for a tic-tac-toe game.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing daily stock closing prices.", "Compare the time complexity of insertion at the beginning vs insertion at the end of an array of size 100.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing marks of 50 students in a class.", "What is the time complexity of deletion from the beginning on an array used for storing pixel values of an image (2D array)? Justify with reasoning about memory shifting.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for recording scores in a multi-round quiz game.", "Given an array of size 10,000 for recording scores in a multi-round quiz game, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for buffering the last n sensor readings.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^5 used for storing attendance records for a class?", "For storing a matrix for a tic-tac-toe game, compare the cost of insertion at a given index versus accessing an element directly by index.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing daily stock closing prices.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing marks of 50 students in a class.", "Given an array of size 1,000 for representing a chessboard's cell values, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Given an array of size n, what is the time complexity of reversing it in-place?", "Explain why binary search requires the array to be sorted, using an example of storing daily temperature readings for a month where an unsorted array would cause incorrect results.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for maintaining a circular buffer of recent chat messages.", "What is the time complexity of finding the second largest element on an array used for representing a chessboard's cell values? Justify with reasoning about memory shifting.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing storing marks of 50 students in a class.", "For 'storing daily temperature readings for a month', would you prefer a 1D or 2D array? Justify your choice.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for implementing a simple to-do list with fixed slots.", "For maintaining a circular buffer of recent chat messages, compare the cost of deletion from the beginning versus accessing an element directly by index.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using buffering the last n sensor readings as context.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing pixel values of an image (2D array).", "For 'representing a chessboard's cell values', would you prefer a 1D or 2D array? Justify your choice.", "For storing inventory counts in a warehouse, compare the cost of updating an element by index versus accessing an element directly by index.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling buffering the last n sensor readings.", "What is the time complexity of searching for an element (unsorted array) on an array used for storing daily stock closing prices? Justify with reasoning about memory shifting.", "Explain the difference in time complexity between merging two arrays and searching for an element in a sorted array of size 10,000.", "What is the time complexity of searching for an element (unsorted array) on an array used for storing marks of 50 students in a class? Justify with reasoning about memory shifting.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to maintaining a leaderboard of top scorers.", "For storing a matrix for a tic-tac-toe game, compare the cost of finding the average of all elements versus accessing an element directly by index.", "Explain the difference in time complexity between rotating the array by one position and searching for an element in a sorted array of size 100.", "For storing inventory counts in a warehouse, compare the cost of insertion at the beginning versus accessing an element directly by index.", "What is the time complexity of rotating the array by one position on an array used for implementing a simple to-do list with fixed slots? Justify with reasoning about memory shifting.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing daily temperature readings for a month as context.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing inventory counts in a warehouse.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for maintaining a leaderboard of top scorers.", "Given an array of size 10,000 for storing daily temperature readings for a month, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing storing a matrix for a tic-tac-toe game.", "For representing a chessboard's cell values, compare the cost of reversing the array versus accessing an element directly by index.", "Given an array of size 10^5 for storing marks of 50 students in a class, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing storing inventory counts in a warehouse.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing daily temperature readings for a month.", "What is the time complexity of finding the maximum element in an unsorted array of size 10,000 used for implementing a simple to-do list with fixed slots?", "Why is deleting an element from the middle of an array of size 100 an O(n) operation?", "For 'maintaining a leaderboard of top scorers', would you prefer a 1D or 2D array? Justify your choice.", "Explain the difference in time complexity between checking if the array is sorted and searching for an element in a sorted array of size 10^6.", "For buffering the last n sensor readings, compare the cost of finding the maximum element versus accessing an element directly by index.", "Explain the difference in time complexity between finding the maximum element and searching for an element in a sorted array of size n.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for buffering the last n sensor readings.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing storing pixel values of an image (2D array).", "Given an array of size 10^5 for maintaining a leaderboard of top scorers, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing RGB values of an image row.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling maintaining a leaderboard of top scorers.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using maintaining a leaderboard of top scorers as context.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing a lookup table of squares for fast access.", "Given an array of size 100, what is the time complexity of reversing it in-place?", "Explain the difference in time complexity between updating an element by index and searching for an element in a sorted array of size 10^6.", "Why is deleting an element from the middle of an array of size n an O(n) operation?", "What is the time complexity of finding the maximum element in an unsorted array of size 10^5 used for storing a lookup table of squares for fast access?", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing inventory counts in a warehouse.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing marks of 50 students in a class.", "What is the time complexity of deletion at a given index on an array used for maintaining a circular buffer of recent chat messages? Justify with reasoning about memory shifting.", "Given an array of size 1,000, what is the time complexity of reversing it in-place?", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing a matrix for a tic-tac-toe game.", "Given an array of size 1,000 for storing a matrix for a tic-tac-toe game, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing pixel values of an image (2D array).", "What is the time complexity of computing a prefix sum array of size n, and how does it help answer range-sum queries faster?", "Why is deleting an element from the middle of an array of size 10^5 an O(n) operation?", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing implementing a simple to-do list with fixed slots.", "Explain the difference in time complexity between deletion at a given index and searching for an element in a sorted array of size 10,000.", "Explain the difference in time complexity between finding the second largest element and searching for an element in a sorted array of size n.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling maintaining a circular buffer of recent chat messages.", "Compare the time complexity of insertion at the beginning vs insertion at the end of an array of size n.", "For representing a chessboard's cell values, compare the cost of finding the maximum element versus accessing an element directly by index.", "Explain the difference in time complexity between insertion at a given index and searching for an element in a sorted array of size 10,000.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using representing a chessboard's cell values as context.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for representing a chessboard's cell values.", "What is the time complexity of finding the minimum element on an array used for storing pixel values of an image (2D array)? Justify with reasoning about memory shifting.", "Given an array of size 10,000 for storing marks of 50 students in a class, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the difference in time complexity between reversing the array and searching for an element in a sorted array of size n.", "For 'storing pixel values of an image (2D array)', would you prefer a 1D or 2D array? Justify your choice.", "What is the time complexity of rotating the array by one position on an array used for representing a chessboard's cell values? Justify with reasoning about memory shifting.", "For storing a lookup table of squares for fast access, compare the cost of insertion at the beginning versus accessing an element directly by index.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to recording scores in a multi-round quiz game.", "Explain why binary search requires the array to be sorted, using an example of storing a matrix for a tic-tac-toe game where an unsorted array would cause incorrect results.", "What is the time complexity of finding the average of all elements on an array used for storing pixel values of an image (2D array)? Justify with reasoning about memory shifting.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using recording scores in a multi-round quiz game as context.", "What is the time complexity of finding the minimum element on an array used for storing a lookup table of squares for fast access? Justify with reasoning about memory shifting.", "Explain why binary search requires the array to be sorted, using an example of storing attendance records for a class where an unsorted array would cause incorrect results.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for maintaining a circular buffer of recent chat messages.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^6 used for storing a matrix for a tic-tac-toe game?", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to buffering the last n sensor readings.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing pixel values of an image (2D array) as context.", "What is the time complexity of finding duplicates in the array on an array used for representing a chessboard's cell values? Justify with reasoning about memory shifting.", "Given an array of size 10,000 for storing a matrix for a tic-tac-toe game, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the two-pointer technique for reversing an array of size 1,000 \u2014 why is it more efficient than using extra space?", "What is the time complexity of finding the maximum element in an unsorted array of size 100 used for buffering the last n sensor readings?", "For 'storing inventory counts in a warehouse', would you prefer a 1D or 2D array? Justify your choice.", "Given an array of size 10^6 for recording scores in a multi-round quiz game, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the difference in time complexity between reversing the array and searching for an element in a sorted array of size 10^6.", "What is the time complexity of deletion at a given index on an array used for recording scores in a multi-round quiz game? Justify with reasoning about memory shifting.", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing marks of 50 students in a class.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for implementing a simple to-do list with fixed slots.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for maintaining a leaderboard of top scorers.", "Given an array of size n for recording scores in a multi-round quiz game, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^6 used for buffering the last n sensor readings?", "What is the time complexity of insertion at a given index on an array used for storing daily temperature readings for a month? Justify with reasoning about memory shifting.", "What is the time complexity of finding duplicates in the array on an array used for maintaining a circular buffer of recent chat messages? Justify with reasoning about memory shifting.", "What is the time complexity of insertion at a given index on an array used for implementing a simple to-do list with fixed slots? Justify with reasoning about memory shifting.", "What is the time complexity of finding the second largest element on an array used for storing daily temperature readings for a month? Justify with reasoning about memory shifting.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing pixel values of an image (2D array).", "For 'storing daily stock closing prices', would you prefer a 1D or 2D array? Justify your choice.", "Given an array of size 10^6, what is the time complexity of reversing it in-place?", "Explain why binary search requires the array to be sorted, using an example of implementing a simple to-do list with fixed slots where an unsorted array would cause incorrect results.", "What is the space complexity of creating a new reversed copy of an array of size 10,000?", "What is the time complexity of finding the maximum element in an unsorted array of size 10,000 used for representing a chessboard's cell values?", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing daily temperature readings for a month.", "What is the time complexity of finding the maximum element in an unsorted array of size 1,000 used for implementing a simple to-do list with fixed slots?", "For 'storing a lookup table of squares for fast access', would you prefer a 1D or 2D array? Justify your choice.", "Explain why binary search requires the array to be sorted, using an example of maintaining a circular buffer of recent chat messages where an unsorted array would cause incorrect results.", "Given an array of size 10^6 for storing a lookup table of squares for fast access, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing attendance records for a class as context.", "What is the time complexity of finding the minimum element on an array used for recording scores in a multi-round quiz game? Justify with reasoning about memory shifting.", "Explain why binary search requires the array to be sorted, using an example of buffering the last n sensor readings where an unsorted array would cause incorrect results.", "What is the time complexity of computing a prefix sum array of size 100, and how does it help answer range-sum queries faster?", "Explain the difference in time complexity between finding the average of all elements and searching for an element in a sorted array of size 10,000.", "Explain the difference in time complexity between finding the minimum element and searching for an element in a sorted array of size 10,000.", "What is the time complexity of deletion from the beginning on an array used for implementing a simple to-do list with fixed slots? Justify with reasoning about memory shifting.", "For recording scores in a multi-round quiz game, compare the cost of insertion at the beginning versus accessing an element directly by index.", "Given an array of size 10^5 for storing inventory counts in a warehouse, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing daily stock closing prices.", "For storing attendance records for a class, compare the cost of insertion at the beginning versus accessing an element directly by index.", "Explain why binary search requires the array to be sorted, using an example of storing daily stock closing prices where an unsorted array would cause incorrect results.", "Explain the difference in time complexity between counting occurrences of an element and searching for an element in a sorted array of size 10^5.", "For representing a chessboard's cell values, compare the cost of finding duplicates in the array versus accessing an element directly by index.", "For recording scores in a multi-round quiz game, compare the cost of finding the average of all elements versus accessing an element directly by index.", "What is the time complexity of finding the maximum element in an unsorted array of size 100 used for maintaining a leaderboard of top scorers?", "What is the time complexity of finding the maximum element in an unsorted array of size 100 used for maintaining a circular buffer of recent chat messages?", "What is the time complexity of checking if the array is sorted on an array used for implementing a simple to-do list with fixed slots? Justify with reasoning about memory shifting.", "For maintaining a leaderboard of top scorers, compare the cost of finding duplicates in the array versus accessing an element directly by index.", "What is the time complexity of finding the maximum element in an unsorted array of size 1,000 used for representing a chessboard's cell values?", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing a matrix for a tic-tac-toe game as context.", "For storing marks of 50 students in a class, compare the cost of reversing the array versus accessing an element directly by index.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to maintaining a circular buffer of recent chat messages.", "What is the time complexity of finding the maximum element in an unsorted array of size 10,000 used for recording scores in a multi-round quiz game?", "Given an array of size 10,000 for maintaining a leaderboard of top scorers, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the difference in time complexity between finding the minimum element and searching for an element in a sorted array of size 10^5.", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for storing attendance records for a class.", "Given an array of size 10,000, what is the time complexity of reversing it in-place?", "Explain the difference in time complexity between deletion from the end and searching for an element in a sorted array of size 10^5.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing buffering the last n sensor readings.", "Given an array of size 10^6 for storing RGB values of an image row, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "What is the time complexity of finding the maximum element in an unsorted array of size 10,000 used for storing daily temperature readings for a month?", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling recording scores in a multi-round quiz game.", "What is the time complexity of insertion at the end on an array used for maintaining a leaderboard of top scorers? Justify with reasoning about memory shifting.", "Given an array of size 1,000 for storing RGB values of an image row, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain the difference in time complexity between merging two arrays and searching for an element in a sorted array of size n.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using storing inventory counts in a warehouse as context.", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using maintaining a circular buffer of recent chat messages as context.", "What is the time complexity of finding the sum of all elements on an array used for storing daily stock closing prices? Justify with reasoning about memory shifting.", "What is the time complexity of accessing an element by index on an array used for implementing a simple to-do list with fixed slots? Justify with reasoning about memory shifting.", "What is the time complexity of traversing all elements on an array used for storing RGB values of an image row? Justify with reasoning about memory shifting.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^6 used for implementing a simple to-do list with fixed slots?", "What is the time complexity of finding the average of all elements on an array used for storing daily temperature readings for a month? Justify with reasoning about memory shifting.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing recording scores in a multi-round quiz game.", "What is the time complexity of accessing an element by index on an array used for storing a matrix for a tic-tac-toe game? Justify with reasoning about memory shifting.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing daily temperature readings for a month.", "Given an array of size 10^6 for storing marks of 50 students in a class, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Given an array of size 10^5 for buffering the last n sensor readings, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^6 used for storing attendance records for a class?", "Explain the difference between a Static Array and a Dynamic Array in terms of memory allocation, using implementing a simple to-do list with fixed slots as context.", "Given an array of size 10,000 for maintaining a circular buffer of recent chat messages, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "What is the time complexity of deletion from the beginning on an array used for storing daily stock closing prices? Justify with reasoning about memory shifting.", "What is the time complexity of finding the maximum element in an unsorted array of size 10^6 used for maintaining a circular buffer of recent chat messages?", "What is the time complexity of finding the maximum element in an unsorted array of size 1,000 used for storing a lookup table of squares for fast access?", "Explain the difference in time complexity between counting occurrences of an element and searching for an element in a sorted array of size 100.", "Explain the concept of a 'sliding window' using an example of finding the sum of every subarray of size k, applied to storing a lookup table of squares for fast access.", "Given an array of size 1,000 for storing a lookup table of squares for fast access, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "For storing inventory counts in a warehouse, compare the cost of finding the sum of all elements versus accessing an element directly by index.", "For storing RGB values of an image row, compare the cost of deletion from the end versus accessing an element directly by index.", "What is the time complexity of finding the maximum element in an unsorted array of size 1,000 used for recording scores in a multi-round quiz game?", "Compare accessing an element in a 1D array vs a 2D array in terms of time complexity, for recording scores in a multi-round quiz game.", "What is the time complexity of finding the maximum element in an unsorted array of size 1,000 used for storing RGB values of an image row?", "Given an array of size n for storing daily temperature readings for a month, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "For maintaining a circular buffer of recent chat messages, compare the cost of searching for an element (unsorted array) versus accessing an element directly by index.", "What is the space complexity of creating a new reversed copy of an array of size n?", "Explain why a Dynamic Array (like Python's list) occasionally has O(n) time for append, even though it's normally O(1) amortised, in a system handling storing attendance records for a class.", "For recording scores in a multi-round quiz game, compare the cost of deletion at a given index versus accessing an element directly by index.", "For recording scores in a multi-round quiz game, compare the cost of counting occurrences of an element versus accessing an element directly by index.", "For recording scores in a multi-round quiz game, compare the cost of updating an element by index versus accessing an element directly by index.", "For storing daily temperature readings for a month, compare the cost of finding the average of all elements versus accessing an element directly by index.", "What is the time complexity of merging two arrays on an array used for storing daily temperature readings for a month? Justify with reasoning about memory shifting.", "Given an array of size n for buffering the last n sensor readings, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "What is the time complexity of deletion from the beginning on an array used for maintaining a circular buffer of recent chat messages? Justify with reasoning about memory shifting.", "Given an array of size 1,000 for implementing a simple to-do list with fixed slots, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Given an array of size 10^6 for maintaining a leaderboard of top scorers, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Given an array of size n for representing a chessboard's cell values, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "For implementing a simple to-do list with fixed slots, compare the cost of finding the maximum element versus accessing an element directly by index.", "Explain the difference in time complexity between reversing the array and searching for an element in a sorted array of size 1,000.", "For storing pixel values of an image (2D array), compare the cost of removing an element by value versus accessing an element directly by index.", "What is the time complexity of finding the maximum element in an unsorted array of size 10,000 used for storing marks of 50 students in a class?", "For representing a chessboard's cell values, compare the cost of finding the minimum element versus accessing an element directly by index.", "Given an array of size 10,000 for storing RGB values of an image row, explain how you'd efficiently check for duplicate values, and state the time complexity of your approach.", "Explain how row-major order is used to compute the memory address of arr[i][j] in a 2D array representing maintaining a circular buffer of recent chat messages.", "Explain the difference in time complexity between counting occurrences of an element and searching for an element in a sorted array of size 10^6.", "Explain why binary search requires the array to be sorted, using an example of storing a lookup table of squares for fast access where an unsorted array would cause incorrect results.", "Explain the difference in time complexity between merging two arrays and searching for an element in a sorted array of size 1,000.", "For maintaining a circular buffer of recent chat messages, compare the cost of finding the sum of all elements versus accessing an element directly by index.", "For storing daily stock closing prices, compare the cost of finding the second largest element versus accessing an element directly by index.", "What is the time complexity of rotating the array by one position on an array used for storing marks of 50 students in a class? Justify with reasoning about memory shifting.", "Explain the difference in time complexity between finding the minimum element and searching for an element in a sorted array of size 1,000.", "What is the time complexity of merging two arrays on an array used for storing inventory counts in a warehouse? Justify with reasoning about memory shifting.", "For storing pixel values of an image (2D array), compare the cost of finding the average of all elements versus accessing an element directly by index.", "What is the time complexity of deletion from the end on an array used for implementing a simple to-do list with fixed slots? Justify with reasoning about memory shifting.", "What is the time complexity of updating an element by index on an array used for storing daily temperature readings for a month? Justify with reasoning about memory shifting.", "Explain why appending to a Python list is usually O(1) amortised, referencing how the underlying array is resized for storing pixel values of an image (2D array)."], "hard": ["For buffering the last n sensor readings, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size n.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size n used in maintaining a leaderboard of top scorers.", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size 10^6 like storing pixel values of an image (2D array) \u2014 describe the trade-off.", "Explain how you would extend the prefix-sum technique to a 2D array (representing implementing a simple to-do list with fixed slots) to answer sub-matrix sum queries efficiently.", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size 100 like storing daily temperature readings for a month \u2014 describe the trade-off.", "For buffering the last n sensor readings, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size 10^6.", "For storing a lookup table of squares for fast access, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size 10^6.", "For implementing a simple to-do list with fixed slots, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size 10,000.", "For a matrix (2D array) of size 10^6 representing storing a matrix for a tic-tac-toe game, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Explain how you would extend the prefix-sum technique to a 2D array (representing storing marks of 50 students in a class) to answer sub-matrix sum queries efficiently.", "Explain amortised time complexity for dynamic array 'append' in a structure used for storing a matrix for a tic-tac-toe game (array size ~n), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10^6 (context: storing RGB values of an image row) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Given an array of size 1,000 used for recording scores in a multi-round quiz game, design an O(n) algorithm to find if there exists a pair of elements that sum to a given target, and explain the space-time trade-off vs the O(n\u00b2) brute-force approach.", "Design an algorithm to rotate an array of size 10,000 to the left by k positions in O(n) time and O(1) extra space, for a use case like storing a matrix for a tic-tac-toe game. Explain your approach.", "Design an approach to find the majority element (appearing more than n/2 times) in an array of size n used for maintaining a leaderboard of top scorers, in O(n) time and O(1) space (Boyer-Moore voting, conceptually).", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size n (context: implementing a simple to-do list with fixed slots) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size 100 like representing a chessboard's cell values \u2014 describe the trade-off.", "Design an algorithm to rotate an array of size 100 to the left by k positions in O(n) time and O(1) extra space, for a use case like storing daily stock closing prices. Explain your approach.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 10^6 used in storing attendance records for a class.", "Explain amortised time complexity for dynamic array 'append' in a structure used for implementing a simple to-do list with fixed slots (array size ~10^6), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Explain how you would extend the prefix-sum technique to a 2D array (representing maintaining a circular buffer of recent chat messages) to answer sub-matrix sum queries efficiently.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of storing daily temperature readings for a month at scale 100.", "For a matrix (2D array) of size 100 representing maintaining a leaderboard of top scorers, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Explain how you would extend the prefix-sum technique to a 2D array (representing recording scores in a multi-round quiz game) to answer sub-matrix sum queries efficiently.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of storing marks of 50 students in a class at scale 100.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 100 used in storing marks of 50 students in a class.", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size 10^6 like storing RGB values of an image row \u2014 describe the trade-off.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10^5 (context: storing RGB values of an image row) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size 10^5 like storing RGB values of an image row \u2014 describe the trade-off.", "Design an approach to find the majority element (appearing more than n/2 times) in an array of size 10^5 used for maintaining a circular buffer of recent chat messages, in O(n) time and O(1) space (Boyer-Moore voting, conceptually).", "For a matrix (2D array) of size 1,000 representing buffering the last n sensor readings, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "For a matrix (2D array) of size 10,000 representing storing attendance records for a class, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 100 used in representing a chessboard's cell values.", "Design an algorithm to rotate an array of size 10^5 to the left by k positions in O(n) time and O(1) extra space, for a use case like buffering the last n sensor readings. Explain your approach.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10^6 (context: representing a chessboard's cell values) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 1,000 (context: buffering the last n sensor readings) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain why array-based implementations generally have better cache locality than linked-list-based implementations for storing inventory counts in a warehouse (size 10^5), and how that affects real-world (not just Big-O) performance.", "Given an array of size n used for storing daily stock closing prices, design an O(n) algorithm to find if there exists a pair of elements that sum to a given target, and explain the space-time trade-off vs the O(n\u00b2) brute-force approach.", "For a matrix (2D array) of size 10^6 representing storing daily stock closing prices, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 100 used in storing daily temperature readings for a month.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of storing attendance records for a class at scale 10^5.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 10^5 used in storing a lookup table of squares for fast access.", "Explain why array-based implementations generally have better cache locality than linked-list-based implementations for maintaining a leaderboard of top scorers (size n), and how that affects real-world (not just Big-O) performance.", "Design an algorithm to rotate an array of size 100 to the left by k positions in O(n) time and O(1) extra space, for a use case like storing a matrix for a tic-tac-toe game. Explain your approach.", "Design an approach to find the majority element (appearing more than n/2 times) in an array of size 10,000 used for storing inventory counts in a warehouse, in O(n) time and O(1) space (Boyer-Moore voting, conceptually).", "Explain how you would extend the prefix-sum technique to a 2D array (representing storing pixel values of an image (2D array)) to answer sub-matrix sum queries efficiently.", "Explain amortised time complexity for dynamic array 'append' in a structure used for storing a matrix for a tic-tac-toe game (array size ~1,000), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size 10,000 like implementing a simple to-do list with fixed slots \u2014 describe the trade-off.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size n (context: storing daily temperature readings for a month) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Given an array of size 10^5 used for storing pixel values of an image (2D array), design an O(n) algorithm to find if there exists a pair of elements that sum to a given target, and explain the space-time trade-off vs the O(n\u00b2) brute-force approach.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size n (context: maintaining a circular buffer of recent chat messages) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10^5 (context: maintaining a circular buffer of recent chat messages) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 10,000 used in storing daily stock closing prices.", "Design an algorithm to rotate an array of size n to the left by k positions in O(n) time and O(1) extra space, for a use case like storing RGB values of an image row. Explain your approach.", "For a matrix (2D array) of size 10^6 representing storing RGB values of an image row, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10,000 (context: recording scores in a multi-round quiz game) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain amortised time complexity for dynamic array 'append' in a structure used for storing daily temperature readings for a month (array size ~10^6), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "For a matrix (2D array) of size n representing buffering the last n sensor readings, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10^5 (context: storing a lookup table of squares for fast access) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "For representing a chessboard's cell values, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size 1,000.", "Design an algorithm to rotate an array of size n to the left by k positions in O(n) time and O(1) extra space, for a use case like storing daily temperature readings for a month. Explain your approach.", "Explain how a prefix-sum array converts repeated O(n) range-sum queries into O(1) queries after O(n) preprocessing, for a dataset of size n like representing a chessboard's cell values \u2014 describe the trade-off.", "Explain how you would extend the prefix-sum technique to a 2D array (representing storing inventory counts in a warehouse) to answer sub-matrix sum queries efficiently.", "Explain how you would extend the prefix-sum technique to a 2D array (representing storing daily stock closing prices) to answer sub-matrix sum queries efficiently.", "Given an array of size 100 used for buffering the last n sensor readings, design an O(n) algorithm to find if there exists a pair of elements that sum to a given target, and explain the space-time trade-off vs the O(n\u00b2) brute-force approach.", "Design an algorithm to rotate an array of size n to the left by k positions in O(n) time and O(1) extra space, for a use case like storing marks of 50 students in a class. Explain your approach.", "Explain amortised time complexity for dynamic array 'append' in a structure used for storing marks of 50 students in a class (array size ~10,000), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "For a matrix (2D array) of size 1,000 representing storing a lookup table of squares for fast access, explain how you would rotate it 90 degrees in-place, and analyse the time/space complexity.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of recording scores in a multi-round quiz game at scale n.", "Explain why array-based implementations generally have better cache locality than linked-list-based implementations for maintaining a leaderboard of top scorers (size 10,000), and how that affects real-world (not just Big-O) performance.", "Explain amortised time complexity for dynamic array 'append' in a structure used for implementing a simple to-do list with fixed slots (array size ~10^5), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Explain how you would extend the prefix-sum technique to a 2D array (representing buffering the last n sensor readings) to answer sub-matrix sum queries efficiently.", "For implementing a simple to-do list with fixed slots, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size 10^5.", "Design an approach to find the majority element (appearing more than n/2 times) in an array of size 10^6 used for storing daily temperature readings for a month, in O(n) time and O(1) space (Boyer-Moore voting, conceptually).", "For storing daily temperature readings for a month, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size n.", "For storing a matrix for a tic-tac-toe game, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size n.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 10,000 used in buffering the last n sensor readings.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 1,000 used in representing a chessboard's cell values.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size n (context: recording scores in a multi-round quiz game) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Design an algorithm to rotate an array of size 10^5 to the left by k positions in O(n) time and O(1) extra space, for a use case like maintaining a leaderboard of top scorers. Explain your approach.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of storing marks of 50 students in a class at scale 10^5.", "Design an algorithm to rotate an array of size 1,000 to the left by k positions in O(n) time and O(1) extra space, for a use case like representing a chessboard's cell values. Explain your approach.", "Explain amortised time complexity for dynamic array 'append' in a structure used for maintaining a leaderboard of top scorers (array size ~10,000), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of maintaining a leaderboard of top scorers at scale n.", "For storing attendance records for a class, design an O(n log n) approach using sorting plus two pointers to find a pair with a given sum, and compare it against the O(n) hashing approach for an array of size 1,000.", "Design an algorithm to rotate an array of size n to the left by k positions in O(n) time and O(1) extra space, for a use case like storing attendance records for a class. Explain your approach.", "Given an array of size 1,000 used for maintaining a leaderboard of top scorers, design an O(n) algorithm to find if there exists a pair of elements that sum to a given target, and explain the space-time trade-off vs the O(n\u00b2) brute-force approach.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 10^6 used in storing daily stock closing prices.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of storing pixel values of an image (2D array) at scale 10^6.", "Explain amortised time complexity for dynamic array 'append' in a structure used for storing daily temperature readings for a month (array size ~10,000), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 100 used in maintaining a circular buffer of recent chat messages.", "Explain why array-based implementations generally have better cache locality than linked-list-based implementations for recording scores in a multi-round quiz game (size 1,000), and how that affects real-world (not just Big-O) performance.", "Explain why in-place array rotation using the 'reversal algorithm' technique achieves O(1) extra space, contrasting it with a naive O(n) extra space approach, for an array of size 1,000 used in storing daily stock closing prices.", "Critically evaluate: 'A dynamic array is strictly better than a static array in every situation.' Discuss counter-examples involving memory overhead and cache locality, in the context of storing attendance records for a class at scale 10^6.", "Given an array of size 10^5 used for implementing a simple to-do list with fixed slots, design an O(n) algorithm to find if there exists a pair of elements that sum to a given target, and explain the space-time trade-off vs the O(n\u00b2) brute-force approach.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10,000 (context: storing a matrix for a tic-tac-toe game) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain why array-based implementations generally have better cache locality than linked-list-based implementations for maintaining a leaderboard of top scorers (size 10^5), and how that affects real-world (not just Big-O) performance.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 1,000 (context: storing RGB values of an image row) in O(n) time, without needing to check every subarray (O(n\u00b2)).", "Explain amortised time complexity for dynamic array 'append' in a structure used for storing marks of 50 students in a class (array size ~n), and prove informally why it averages to O(1) despite occasional O(n) resizes.", "Explain how the 'Kadane's Algorithm' idea can find the maximum sum subarray of size 10,000 (context: storing inventory counts in a warehouse) in O(n) time, without needing to check every subarray (O(n\u00b2))."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

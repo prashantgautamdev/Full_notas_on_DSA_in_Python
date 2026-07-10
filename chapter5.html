@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 5: Recursion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li class="current">Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 5</h1>
+  <div class="subtitle">Recursion</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Understand what <span class="mark">Recursion</span> is and identify Base Case vs Recursive Case.</li>
+    <li>Trace the <span class="mark-g">Call Stack</span> and recursion tree for simple functions.</li>
+    <li>Differentiate <span class="mark-g">Head vs Tail</span> recursion.</li>
+    <li>Apply <span class="mark">Memoization</span> to optimise exponential recursive solutions.</li>
+    <li>Understand <span class="mark">Backtracking</span> as an extension of recursion.</li>
+    <li>Convert between recursive and iterative solutions.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Recursion</b> — a technique where a function calls itself, directly or indirectly, to solve smaller instances of the same problem.</div>
+  <div class="box def"><b>Base Case</b> — the condition under which a recursive function stops calling itself and returns a direct answer — without a base case, recursion never terminates.</div>
+  <div class="box def"><b>Call Stack</b> — the internal stack the program uses to keep track of function calls — each recursive call pushes a new frame, and returning pops it.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Recursion Tree, Head vs Tail</h2>
+
+  <h3 class="subsec">Anatomy of a Recursive Function</h3>
+  <div class="box formula">
+    function(n):<br>
+    &nbsp;&nbsp;if base_case(n): return direct_answer<br>
+    &nbsp;&nbsp;else: return combine(n, function(smaller_n))
+  </div>
+  <h3 class="subsec">Recursion Tree — Fibonacci(4)</h3>
+  <svg width="100%" height="160" viewBox="0 0 400 160">
+    <circle cx="200" cy="20" r="16" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="200" y="25" text-anchor="middle" font-family="Patrick Hand" font-size="12">fib(4)</text>
+    <line x1="190" y1="34" x2="120" y2="66" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="210" y1="34" x2="280" y2="66" stroke="#1a3d8f" stroke-width="2"/>
+    <circle cx="120" cy="80" r="15" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="120" y="85" text-anchor="middle" font-family="Patrick Hand" font-size="11">fib(3)</text>
+    <circle cx="280" cy="80" r="15" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="280" y="85" text-anchor="middle" font-family="Patrick Hand" font-size="11">fib(2)</text>
+    <line x1="112" y1="94" x2="70" y2="126" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="128" y1="94" x2="170" y2="126" stroke="#1a3d8f" stroke-width="2"/>
+    <circle cx="70" cy="140" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="70" y="144" text-anchor="middle" font-family="Patrick Hand" font-size="10">fib(2)</text>
+    <circle cx="170" cy="140" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="170" y="144" text-anchor="middle" font-family="Patrick Hand" font-size="10">fib(1)</text>
+  </svg>
+  <p>Notice <span class="mark">fib(2)</span> is computed twice — this <b>overlapping subproblem</b> is exactly why naive recursive Fibonacci is O(2ⁿ), and why <span class="mark">Memoization</span> helps.</p>
+
+  <h3 class="subsec">Head vs Tail Recursion</h3>
+  <table>
+    <tr><th>Head Recursion</th><th>Tail Recursion</th></tr>
+    <tr><td>Recursive call happens first</td><td>Recursive call is the last statement</td></tr>
+    <tr><td>Processing happens after the call returns</td><td>No pending work after the call</td></tr>
+    <tr><td>Cannot be optimised by most compilers</td><td>Can be optimised to O(1) space (not in Python though!)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples</h2>
+
+  <div class="box example"><b>Nested Folders:</b> opening a folder that contains folders that contain folders — recursion naturally mirrors this.</div>
+  <div class="box example"><b>Russian Nesting Dolls:</b> open one, find a smaller one inside, repeat until you hit the smallest (base case).</div>
+  <div class="box example"><b>Family Tree:</b> "find my ancestor" naturally recurses up the tree until reaching the root.</div>
+  <div class="box example"><b>Tower of Hanoi:</b> move n-1 disks, move the largest, move n-1 disks again — a textbook recursive problem.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Every recursive function needs at least one <b>Base Case</b> — this is the #1 source of bugs.</li>
+    <li>Recursion uses the <b>Call Stack</b> implicitly — deep recursion can cause a Stack Overflow.</li>
+    <li><b>Memoization</b> (caching results) turns exponential recursive solutions into polynomial ones.</li>
+    <li><b>Backtracking</b> = recursion + "undo the choice" when a path doesn't work (used in maze solving, N-Queens, permutations).</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time/Space Complexity Cheat-Table</h2>
+  <table>
+    <tr><th>Problem</th><th>Naive Recursive</th><th>With Memoization</th></tr>
+    <tr><td>Factorial(n)</td><td>O(n) time, O(n) space (stack)</td><td>N/A (no overlap)</td></tr>
+    <tr><td>Fibonacci(n)</td><td>O(2ⁿ) time</td><td>O(n) time, O(n) space</td></tr>
+    <tr><td>Tower of Hanoi(n)</td><td>O(2ⁿ) time (inherent)</td><td>N/A</td></tr>
+    <tr><td>Subsets of n elements</td><td>O(2ⁿ) time (inherent)</td><td>N/A</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Factorial (simple recursion)</h3>
+  <div class="codebox"><span class="kw">def</span> factorial(n):
+    <span class="kw">if</span> n <= 1:          <span class="cm"># base case</span>
+        <span class="kw">return</span> 1
+    <span class="kw">return</span> n * factorial(n - 1)  <span class="cm"># recursive case</span></div>
+
+  <h3 class="subsec">Fibonacci — Naive vs Memoized</h3>
+  <div class="codebox"><span class="cm"># Naive: O(2^n)</span>
+<span class="kw">def</span> fib(n):
+    <span class="kw">if</span> n <= 1: <span class="kw">return</span> n
+    <span class="kw">return</span> fib(n-1) + fib(n-2)
+
+<span class="cm"># Memoized: O(n)</span>
+<span class="kw">def</span> fib_memo(n, memo={}):
+    <span class="kw">if</span> n <= 1: <span class="kw">return</span> n
+    <span class="kw">if</span> n <span class="kw">in</span> memo: <span class="kw">return</span> memo[n]
+    memo[n] = fib_memo(n-1, memo) + fib_memo(n-2, memo)
+    <span class="kw">return</span> memo[n]</div>
+
+  <h3 class="subsec">Tower of Hanoi</h3>
+  <div class="codebox"><span class="kw">def</span> hanoi(n, src, aux, dst):
+    <span class="kw">if</span> n == 0: <span class="kw">return</span>
+    hanoi(n-1, src, dst, aux)
+    print(<span class="st">f"Move disk {n} from {src} to {dst}"</span>)
+    hanoi(n-1, aux, src, dst)</div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">Always write the <b>base case first</b> when designing a recursive function — it defines when the recursion stops.</div>
+  <div class="box tip">If you see "overlapping subproblems" in the recursion tree, reach for <b>Memoization</b> (a dict cache) immediately.</div>
+  <div class="box tip">To trace a recursive function, draw the recursion tree on paper — it reveals both correctness and complexity.</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Forgetting the base case entirely, or writing one that's never reached — causes infinite recursion / Stack Overflow.</div>
+  <div class="box mistake">Using a mutable default argument (like <code>memo={}</code>) carelessly across multiple calls without understanding Python's default-argument behaviour.</div>
+  <div class="box mistake">Assuming recursion is always slower — for problems without overlapping subproblems, it's just as efficient as iteration.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Write a recursive function to compute the factorial of a number.</li>
+    <li>Write a recursive function to compute the nth Fibonacci number.</li>
+    <li>Write a memoized recursive function to compute the nth Fibonacci number in O(n).</li>
+    <li>Write a recursive function to reverse a string.</li>
+    <li>Write a recursive function to check if a string is a palindrome.</li>
+    <li>Write a recursive function to compute x raised to the power n.</li>
+    <li>Write a recursive function to compute the sum of digits of a number.</li>
+    <li>Write a recursive function to compute the GCD of two numbers (Euclidean algorithm).</li>
+    <li>Write a recursive function to print all elements of an array.</li>
+    <li>Write a recursive function to find the maximum element in an array.</li>
+    <li>Write a recursive solution for the Tower of Hanoi problem.</li>
+    <li>Write a recursive function to generate all subsets of a given set.</li>
+    <li>Write a recursive function to generate all permutations of a given string.</li>
+    <li>Write a recursive function to flatten a nested list.</li>
+    <li>Write a recursive binary search function.</li>
+    <li>Write a recursive function to count the number of ways to climb n stairs (1 or 2 steps at a time).</li>
+    <li>Write a recursive function to solve the N-Queens problem for a given board size.</li>
+    <li>Write a recursive backtracking function to solve a simple maze (find a path from start to end).</li>
+    <li>Write a recursive function to compute all valid combinations of balanced parentheses for n pairs.</li>
+    <li>Write a recursive function to merge two sorted lists (used inside Merge Sort).</li>
+    <li>Write a recursive Merge Sort implementation and state its time complexity.</li>
+    <li>Write a recursive Quick Sort implementation and state its average/worst time complexity.</li>
+    <li>Write a recursive function to compute the height of a binary tree.</li>
+    <li>Write a recursive function to check if a binary tree is balanced.</li>
+    <li>Write a recursive function to find all root-to-leaf paths in a binary tree.</li>
+    <li>Write a recursive function that converts a deeply nested list into a flat list without using built-in flatten functions.</li>
+    <li>Write a recursive function to solve the subset-sum problem (does any subset sum to a target value?).</li>
+    <li>Write an iterative version of factorial and compare its space complexity to the recursive version.</li>
+    <li>Write a recursive function to generate all valid IP address combinations from a string of digits.</li>
+    <li>Write a recursive function implementing the 'word break' problem — can a string be segmented into dictionary words?</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    <b>Recursion</b> solves a problem by breaking it into smaller versions of itself, until a <b>Base Case</b> is hit. It uses the <b>Call Stack</b> implicitly, so deep recursion risks Stack Overflow. When subproblems overlap (like Fibonacci), <b>Memoization</b> turns exponential time into polynomial time. <b>Backtracking</b> extends recursion by "undoing" failed choices — essential for maze-solving, permutations, and N-Queens.
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">T(n) = T(n-1) + O(1) → O(n) [linear recursion]<br>T(n) = 2·T(n-1) + O(1) → O(2ⁿ) [branching recursion, e.g. naive Fibonacci]</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 5 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Recursion</td><td>Function calls itself on smaller inputs</td></tr>
+    <tr><td>Base Case</td><td>Stopping condition — must always exist</td></tr>
+    <tr><td>Recursive Case</td><td>Breaks problem into smaller sub-problems</td></tr>
+    <tr><td>Call Stack</td><td>Tracks pending recursive calls; risk of Stack Overflow</td></tr>
+    <tr><td>Head Recursion</td><td>Recursive call happens first</td></tr>
+    <tr><td>Tail Recursion</td><td>Recursive call is the last statement</td></tr>
+    <tr><td>Memoization</td><td>Cache results to avoid recomputation (overlapping subproblems)</td></tr>
+    <tr><td>Backtracking</td><td>Recursion + undo choices that fail</td></tr>
+    <tr><td>Naive Fibonacci</td><td>O(2ⁿ) time — exponential due to overlap</td></tr>
+    <tr><td>Memoized Fibonacci</td><td>O(n) time, O(n) space</td></tr>
+  </table>
+  <div class="box formula">T(n) = T(n-1)+O(1) → O(n) | T(n)=2T(n-1)+O(1) → O(2ⁿ)</div>
+  <div class="box tip">Golden rule: <b>Overlapping subproblems? → Memoize. Trying &amp; undoing choices? → Backtrack.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Write a recursive function to compute the factorial of a number.", "Write a recursive function to compute the nth Fibonacci number.", "Write a memoized recursive function to compute the nth Fibonacci number in O(n).", "Write a recursive function to reverse a string.", "Write a recursive function to check if a string is a palindrome.", "Write a recursive function to compute x raised to the power n.", "Write a recursive function to compute the sum of digits of a number.", "Write a recursive function to compute the GCD of two numbers (Euclidean algorithm).", "Write a recursive function to print all elements of an array.", "Write a recursive function to find the maximum element in an array.", "Write a recursive solution for the Tower of Hanoi problem.", "Write a recursive function to generate all subsets of a given set.", "Write a recursive function to generate all permutations of a given string.", "Write a recursive function to flatten a nested list.", "Write a recursive binary search function.", "Write a recursive function to count the number of ways to climb n stairs (1 or 2 steps at a time).", "Write a recursive function to solve the N-Queens problem for a given board size.", "Write a recursive backtracking function to solve a simple maze (find a path from start to end).", "Write a recursive function to compute all valid combinations of balanced parentheses for n pairs.", "Write a recursive function to merge two sorted lists (used inside Merge Sort).", "Write a recursive Merge Sort implementation and state its time complexity.", "Write a recursive Quick Sort implementation and state its average/worst time complexity.", "Write a recursive function to compute the height of a binary tree.", "Write a recursive function to check if a binary tree is balanced.", "Write a recursive function to find all root-to-leaf paths in a binary tree.", "Write a recursive function that converts a deeply nested list into a flat list without using built-in flatten functions.", "Write a recursive function to solve the subset-sum problem (does any subset sum to a target value?).", "Write an iterative version of factorial and compare its space complexity to the recursive version.", "Write a recursive function to generate all valid IP address combinations from a string of digits.", "Write a recursive function implementing the 'word break' problem \u2014 can a string be segmented into dictionary words?"]}, "practice": {"easy": ["Fill in the blank: A recursive function that calls itself directly is called ______ recursion.", "Define the term 'Indirect Recursion' in your own words.", "What is the base case in a recursive function for reversing a string?", "Is recursion generally more or less memory-efficient than iteration? Why?", "Write one disadvantage of using recursion compared to iteration, for generating subsets.", "What is the base case in a recursive function for computing GCD (Euclidean algorithm)?", "Name one real-life example that resembles recursion, such as a family tree lookup (ancestors).", "What happens if a recursive function has no base case?", "What is the 'Call Stack' and how does it relate to recursion?", "Define the term 'Tail Recursion' in your own words.", "Define the term 'Direct Recursion' in your own words.", "State True or False: Backtracking is a form of recursion that 'undoes' choices that don't lead to a solution.", "Give one example problem (other than factorial) that is naturally solved using recursion, like solving a maze (backtracking).", "Write one advantage of using recursion for merging in Merge Sort.", "State True or False: Tail recursion can sometimes be optimised by compilers to use O(1) stack space.", "What is Stack Overflow, and when might it occur while computing computing power (x^n) for n = 5?", "Write one disadvantage of using recursion compared to iteration, for computing Fibonacci numbers.", "Give one example problem (other than factorial) that is naturally solved using recursion, like generating subsets.", "What is the base case in a recursive function for checking a palindrome?", "Write one disadvantage of using recursion compared to iteration, for merging in Merge Sort.", "Write one disadvantage of using recursion compared to iteration, for checking a palindrome.", "What is the recursive case in a function that computes factorial of 5?", "What is Stack Overflow, and when might it occur while computing solving a maze (backtracking) for n = 30?", "Give one example problem (other than factorial) that is naturally solved using recursion, like solving N-Queens.", "Write one advantage of using recursion for traversing a tree.", "What is Stack Overflow, and when might it occur while computing generating subsets for n = 40?", "For flattening nested lists, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "Write one advantage of using recursion for performing binary search.", "Name one real-life example that resembles recursion, such as drawing a fractal pattern.", "What is the recursive case in a function that computes factorial of 30?", "For computing factorial, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "Write one disadvantage of using recursion compared to iteration, for computing GCD (Euclidean algorithm).", "Write one advantage of using recursion for partitioning in Quick Sort.", "Write one advantage of using recursion for computing Fibonacci numbers.", "Write one disadvantage of using recursion compared to iteration, for flattening nested lists.", "Name one real-life example that resembles recursion, such as parsing a mathematical expression with nested brackets.", "Write one disadvantage of using recursion compared to iteration, for reversing a string.", "What is the base case in a recursive function for performing binary search?", "Write one disadvantage of using recursion compared to iteration, for generating permutations.", "Write one disadvantage of using recursion compared to iteration, for traversing a tree.", "What is the recursive case in a function that computes factorial of 10?", "Give one example problem (other than factorial) that is naturally solved using recursion, like partitioning in Quick Sort.", "Define the term 'Backtracking' in your own words.", "Define the term 'Recursion Tree' in your own words.", "What is the recursive case in a function that computes factorial of 20?", "What is Stack Overflow, and when might it occur while computing computing Fibonacci numbers for n = 40?", "Give one example problem (other than factorial) that is naturally solved using recursion, like computing power (x^n).", "Write one advantage of using recursion for flattening nested lists.", "For checking a palindrome, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is the base case in a recursive function for traversing a tree?", "Define the term 'Head Recursion' in your own words.", "Define the term 'Recursive Case' in your own words.", "Give one example problem (other than factorial) that is naturally solved using recursion, like merging in Merge Sort.", "What is the base case in a recursive function for computing factorial?", "State True or False: The call stack grows with each recursive call until a base case is hit.", "Define the term 'Memoization' in your own words.", "For reversing a string, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is the base case in a recursive function for partitioning in Quick Sort?", "For merging in Merge Sort, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "For traversing a tree, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "Define the term 'Recursion' in your own words.", "Name one real-life example that resembles recursion, such as a chatbot's recursive menu system.", "Define the term 'Tail Call Optimisation' in your own words.", "What is the base case in a recursive function for generating permutations?", "State True or False: Deep recursion without a base case leads to a Stack Overflow error.", "What is Stack Overflow, and when might it occur while computing computing Fibonacci numbers for n = 10?", "Write one advantage of using recursion for reversing a string.", "Give one example problem (other than factorial) that is naturally solved using recursion, like solving Tower of Hanoi.", "Write one advantage of using recursion for solving N-Queens.", "For computing GCD (Euclidean algorithm), would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "For computing power (x^n), would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "For solving Tower of Hanoi, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "State True or False: Head recursion performs the recursive call first, before any other processing.", "For computing Fibonacci numbers, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is Stack Overflow, and when might it occur while computing partitioning in Quick Sort for n = 5?", "What is Stack Overflow, and when might it occur while computing flattening nested lists for n = 20?", "Write one advantage of using recursion for computing GCD (Euclidean algorithm).", "Give one example problem (other than factorial) that is naturally solved using recursion, like flattening nested lists.", "What is Stack Overflow, and when might it occur while computing generating permutations for n = n?", "What is Stack Overflow, and when might it occur while computing solving a maze (backtracking) for n = 10?", "State True or False: Every recursive function must have a base case to terminate.", "Write one advantage of using recursion for computing factorial.", "State True or False: Memoization can convert an exponential-time recursive solution into a polynomial-time one.", "Write one advantage of using recursion for solving Tower of Hanoi.", "Name one real-life example that resembles recursion, such as exploring all paths in a grid.", "Name one real-life example that resembles recursion, such as a JSON object with nested objects.", "State True or False: Recursion always uses less memory than an equivalent iterative solution.", "Write one disadvantage of using recursion compared to iteration, for solving Tower of Hanoi.", "State True or False: A recursive Fibonacci function without memoization runs in O(n) time.", "Name one real-life example that resembles recursion, such as a Russian nesting doll (matryoshka).", "Name one real-life example that resembles recursion, such as computing compound interest recursively.", "Name one real-life example that resembles recursion, such as the Tower of Hanoi puzzle.", "Write one disadvantage of using recursion compared to iteration, for performing binary search.", "What is Stack Overflow, and when might it occur while computing flattening nested lists for n = n?", "Write one advantage of using recursion for checking a palindrome.", "What is the base case in a recursive function for solving N-Queens?", "What is Stack Overflow, and when might it occur while computing traversing a tree for n = 20?", "Define the term 'Base Case' in your own words.", "What is the base case in a recursive function for merging in Merge Sort?", "Write one advantage of using recursion for solving a maze (backtracking).", "Give one example problem (other than factorial) that is naturally solved using recursion, like generating permutations.", "For partitioning in Quick Sort, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "Write one disadvantage of using recursion compared to iteration, for solving a maze (backtracking).", "What is the recursive case in a function that computes factorial of 40?", "What is Stack Overflow, and when might it occur while computing checking a palindrome for n = n?", "Give one example problem (other than factorial) that is naturally solved using recursion, like computing factorial.", "Give one example problem (other than factorial) that is naturally solved using recursion, like traversing a tree.", "Define the term 'Stack Overflow' in your own words.", "What is the base case in a recursive function for solving Tower of Hanoi?", "Give one example problem (other than factorial) that is naturally solved using recursion, like performing binary search.", "Write one disadvantage of using recursion compared to iteration, for computing factorial.", "What is the recursive case in a function that computes factorial of n?", "What is Stack Overflow, and when might it occur while computing solving N-Queens for n = 10?", "What is Stack Overflow, and when might it occur while computing computing Fibonacci numbers for n = 20?", "What is Stack Overflow, and when might it occur while computing computing GCD (Euclidean algorithm) for n = n?", "Define the term 'Call Stack' in your own words.", "What is Stack Overflow, and when might it occur while computing computing GCD (Euclidean algorithm) for n = 40?", "Name one real-life example that resembles recursion, such as flattening a nested list/array.", "What is the base case in a recursive function for flattening nested lists?", "What is Stack Overflow, and when might it occur while computing solving Tower of Hanoi for n = 40?", "What is Stack Overflow, and when might it occur while computing computing power (x^n) for n = 20?", "Give one example problem (other than factorial) that is naturally solved using recursion, like computing GCD (Euclidean algorithm).", "What is Stack Overflow, and when might it occur while computing solving N-Queens for n = 30?", "Write one advantage of using recursion for computing power (x^n).", "Write one disadvantage of using recursion compared to iteration, for partitioning in Quick Sort.", "What is Stack Overflow, and when might it occur while computing performing binary search for n = 20?", "Give one example problem (other than factorial) that is naturally solved using recursion, like computing Fibonacci numbers.", "Write one advantage of using recursion for generating permutations.", "What is Stack Overflow, and when might it occur while computing traversing a tree for n = 30?", "Write one disadvantage of using recursion compared to iteration, for solving N-Queens.", "What is the base case in a recursive function for computing power (x^n)?", "For generating permutations, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "Give one example problem (other than factorial) that is naturally solved using recursion, like checking a palindrome.", "What is Stack Overflow, and when might it occur while computing flattening nested lists for n = 5?", "Write one advantage of using recursion for generating subsets.", "What is Stack Overflow, and when might it occur while computing computing factorial for n = n?", "What is Stack Overflow, and when might it occur while computing solving Tower of Hanoi for n = 20?", "For generating subsets, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is Stack Overflow, and when might it occur while computing computing Fibonacci numbers for n = n?", "What is Stack Overflow, and when might it occur while computing computing power (x^n) for n = 40?", "What is the base case in a recursive function for computing Fibonacci numbers?", "What is Stack Overflow, and when might it occur while computing partitioning in Quick Sort for n = 30?", "Give one example problem (other than factorial) that is naturally solved using recursion, like reversing a string.", "Name one real-life example that resembles recursion, such as a folder structure with nested subfolders.", "What is Stack Overflow, and when might it occur while computing performing binary search for n = 5?", "What is Stack Overflow, and when might it occur while computing generating permutations for n = 5?", "For performing binary search, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is the base case in a recursive function for generating subsets?", "What is Stack Overflow, and when might it occur while computing merging in Merge Sort for n = 10?", "What is Stack Overflow, and when might it occur while computing solving N-Queens for n = 20?", "For solving N-Queens, would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is Stack Overflow, and when might it occur while computing solving Tower of Hanoi for n = 30?", "What is Stack Overflow, and when might it occur while computing computing factorial for n = 10?", "Name one real-life example that resembles recursion, such as solving a maze by trying each path.", "What is Stack Overflow, and when might it occur while computing computing GCD (Euclidean algorithm) for n = 5?", "For solving a maze (backtracking), would you say the base case is when n = 0 or n = 1 (or similar)? Explain briefly.", "What is Stack Overflow, and when might it occur while computing computing power (x^n) for n = 10?", "What is Stack Overflow, and when might it occur while computing solving Tower of Hanoi for n = 10?", "What is Stack Overflow, and when might it occur while computing computing factorial for n = 30?", "What is Stack Overflow, and when might it occur while computing solving N-Queens for n = n?", "What is Stack Overflow, and when might it occur while computing merging in Merge Sort for n = 30?", "What is Stack Overflow, and when might it occur while computing computing power (x^n) for n = 30?", "What is Stack Overflow, and when might it occur while computing computing factorial for n = 5?", "Name one real-life example that resembles recursion, such as generating all possible passwords of length n.", "What is Stack Overflow, and when might it occur while computing checking a palindrome for n = 5?", "What is Stack Overflow, and when might it occur while computing traversing a tree for n = 10?", "What is Stack Overflow, and when might it occur while computing reversing a string for n = 30?", "What is Stack Overflow, and when might it occur while computing solving a maze (backtracking) for n = 20?", "What is Stack Overflow, and when might it occur while computing traversing a tree for n = n?", "What is Stack Overflow, and when might it occur while computing flattening nested lists for n = 40?", "What is Stack Overflow, and when might it occur while computing performing binary search for n = n?", "What is Stack Overflow, and when might it occur while computing performing binary search for n = 30?", "What is the base case in a recursive function for solving a maze (backtracking)?", "What is Stack Overflow, and when might it occur while computing generating permutations for n = 30?", "Write one disadvantage of using recursion compared to iteration, for computing power (x^n).", "What is Stack Overflow, and when might it occur while computing computing GCD (Euclidean algorithm) for n = 10?", "What is Stack Overflow, and when might it occur while computing performing binary search for n = 10?", "What is Stack Overflow, and when might it occur while computing generating permutations for n = 20?", "What is Stack Overflow, and when might it occur while computing checking a palindrome for n = 20?", "What is Stack Overflow, and when might it occur while computing merging in Merge Sort for n = n?", "What is Stack Overflow, and when might it occur while computing traversing a tree for n = 40?", "What is Stack Overflow, and when might it occur while computing partitioning in Quick Sort for n = 10?", "What is Stack Overflow, and when might it occur while computing reversing a string for n = n?", "What is Stack Overflow, and when might it occur while computing computing power (x^n) for n = n?", "What is Stack Overflow, and when might it occur while computing checking a palindrome for n = 30?", "What is Stack Overflow, and when might it occur while computing computing Fibonacci numbers for n = 30?", "What is Stack Overflow, and when might it occur while computing partitioning in Quick Sort for n = 40?", "What is Stack Overflow, and when might it occur while computing generating permutations for n = 10?", "What is Stack Overflow, and when might it occur while computing solving N-Queens for n = 5?", "What is Stack Overflow, and when might it occur while computing traversing a tree for n = 5?", "What is Stack Overflow, and when might it occur while computing generating subsets for n = 20?", "What is Stack Overflow, and when might it occur while computing checking a palindrome for n = 10?", "What is Stack Overflow, and when might it occur while computing reversing a string for n = 10?", "What is Stack Overflow, and when might it occur while computing checking a palindrome for n = 40?", "What is Stack Overflow, and when might it occur while computing computing Fibonacci numbers for n = 5?", "What is Stack Overflow, and when might it occur while computing solving N-Queens for n = 40?", "What is Stack Overflow, and when might it occur while computing solving Tower of Hanoi for n = 5?", "What is Stack Overflow, and when might it occur while computing merging in Merge Sort for n = 5?", "What is Stack Overflow, and when might it occur while computing reversing a string for n = 5?", "What is Stack Overflow, and when might it occur while computing solving Tower of Hanoi for n = n?"], "medium": ["Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to computing compound interest recursively.", "For a chatbot's recursive menu system, explain why recursion is a natural fit compared to writing an iterative loop.", "What is the space complexity of the call stack for merging in Merge Sort with input size 20?", "What is the time complexity of a naive recursive solution for generating permutations with input size 10?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving flattening nested lists for large 10.", "Trace through the recursive calls for computing GCD (Euclidean algorithm) with input size 20, and describe the recursion tree shape.", "Convert the recursive solution for solving Tower of Hanoi into an equivalent iterative solution, and compare space complexity.", "Why does a naive recursive Fibonacci implementation have exponential time complexity for n = n?", "Explain how Memoization would improve the recursive solution for solving N-Queens, applied to drawing a fractal pattern.", "Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to the Tower of Hanoi puzzle.", "Explain the difference between Head Recursion and Tail Recursion, using traversing a tree as an example.", "What is the space complexity of the call stack for reversing a string with input size 40?", "Explain the difference between Head Recursion and Tail Recursion, using solving Tower of Hanoi as an example.", "Explain how Memoization would improve the recursive solution for solving a maze (backtracking), applied to a Russian nesting doll (matryoshka).", "What is the time complexity of a naive recursive solution for computing power (x^n) with input size 5?", "Explain the difference between Head Recursion and Tail Recursion, using checking a palindrome as an example.", "Trace through the recursive calls for computing GCD (Euclidean algorithm) with input size 30, and describe the recursion tree shape.", "Why does a naive recursive Fibonacci implementation have exponential time complexity for n = 20?", "What is the space complexity of the call stack for computing factorial with input size 30?", "Why does a naive recursive Fibonacci implementation have exponential time complexity for n = 30?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing GCD (Euclidean algorithm) for large n.", "What is the time complexity of a naive recursive solution for merging in Merge Sort with input size 20?", "What is the space complexity of the call stack for reversing a string with input size 20?", "Explain how Backtracking differs from plain recursion, using the Tower of Hanoi puzzle as an example.", "What is the time complexity of a naive recursive solution for solving N-Queens with input size 40?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing power (x^n) for large 20.", "Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to parsing a mathematical expression with nested brackets.", "Explain how Memoization would improve the recursive solution for generating subsets, applied to a family tree lookup (ancestors).", "What is the time complexity of a naive recursive solution for computing power (x^n) with input size 10?", "Explain how Backtracking differs from plain recursion, using flattening a nested list/array as an example.", "Convert the recursive solution for computing GCD (Euclidean algorithm) into an equivalent iterative solution, and compare space complexity.", "What is the time complexity of a naive recursive solution for performing binary search with input size n?", "What is the time complexity of a naive recursive solution for solving a maze (backtracking) with input size 40?", "Explain how Backtracking differs from plain recursion, using a folder structure with nested subfolders as an example.", "Explain the difference between Head Recursion and Tail Recursion, using generating permutations as an example.", "Why does a naive recursive Fibonacci implementation have exponential time complexity for n = 10?", "Explain the difference between Head Recursion and Tail Recursion, using solving N-Queens as an example.", "For parsing a mathematical expression with nested brackets, explain why recursion is a natural fit compared to writing an iterative loop.", "Trace through the recursive calls for generating permutations with input size 40, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for solving N-Queens with input size 10?", "What is the time complexity of a naive recursive solution for computing power (x^n) with input size 30?", "Why does a naive recursive Fibonacci implementation have exponential time complexity for n = 5?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving performing binary search for large 5.", "Why does a naive recursive Fibonacci implementation have exponential time complexity for n = 40?", "What is the time complexity of a naive recursive solution for computing power (x^n) with input size 20?", "Explain how Memoization would improve the recursive solution for partitioning in Quick Sort, applied to a folder structure with nested subfolders.", "For solving a maze by trying each path, explain why recursion is a natural fit compared to writing an iterative loop.", "What is the space complexity of the call stack for solving a maze (backtracking) with input size 10?", "Explain how Memoization would improve the recursive solution for generating permutations, applied to a Russian nesting doll (matryoshka).", "Explain how Backtracking differs from plain recursion, using solving a maze by trying each path as an example.", "Explain how Backtracking differs from plain recursion, using parsing a mathematical expression with nested brackets as an example.", "Trace through the recursive calls for reversing a string with input size 20, and describe the recursion tree shape.", "Trace through the recursive calls for flattening nested lists with input size 30, and describe the recursion tree shape.", "Explain how Backtracking differs from plain recursion, using a chatbot's recursive menu system as an example.", "Trace through the recursive calls for solving Tower of Hanoi with input size 30, and describe the recursion tree shape.", "For a JSON object with nested objects, explain why recursion is a natural fit compared to writing an iterative loop.", "Convert the recursive solution for solving a maze (backtracking) into an equivalent iterative solution, and compare space complexity.", "Trace through the recursive calls for checking a palindrome with input size 30, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing factorial for large n.", "Explain how Memoization would improve the recursive solution for computing Fibonacci numbers, applied to a Russian nesting doll (matryoshka).", "What is the time complexity of a naive recursive solution for merging in Merge Sort with input size 30?", "What is the time complexity of a naive recursive solution for computing factorial with input size n?", "Convert the recursive solution for traversing a tree into an equivalent iterative solution, and compare space complexity.", "What is the space complexity of the call stack for merging in Merge Sort with input size 30?", "What is the space complexity of the call stack for generating subsets with input size n?", "Explain how Backtracking differs from plain recursion, using a JSON object with nested objects as an example.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving solving a maze (backtracking) for large 10.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving flattening nested lists for large 30.", "Trace through the recursive calls for computing factorial with input size n, and describe the recursion tree shape.", "Explain how Backtracking differs from plain recursion, using computing compound interest recursively as an example.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving solving Tower of Hanoi for large n.", "Explain how Backtracking differs from plain recursion, using a Russian nesting doll (matryoshka) as an example.", "Explain the difference between Head Recursion and Tail Recursion, using merging in Merge Sort as an example.", "Trace through the recursive calls for generating permutations with input size 5, and describe the recursion tree shape.", "For computing compound interest recursively, explain why recursion is a natural fit compared to writing an iterative loop.", "Convert the recursive solution for generating subsets into an equivalent iterative solution, and compare space complexity.", "What is the time complexity of a naive recursive solution for performing binary search with input size 20?", "What is the space complexity of the call stack for checking a palindrome with input size n?", "What is the time complexity of a naive recursive solution for solving N-Queens with input size 30?", "Explain how Memoization would improve the recursive solution for computing GCD (Euclidean algorithm), applied to a Russian nesting doll (matryoshka).", "Explain the difference between Head Recursion and Tail Recursion, using computing Fibonacci numbers as an example.", "Convert the recursive solution for partitioning in Quick Sort into an equivalent iterative solution, and compare space complexity.", "What is the time complexity of a naive recursive solution for generating permutations with input size 40?", "Trace through the recursive calls for computing power (x^n) with input size 30, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for computing GCD (Euclidean algorithm) with input size 10?", "What is the space complexity of the call stack for checking a palindrome with input size 40?", "Trace through the recursive calls for solving a maze (backtracking) with input size 20, and describe the recursion tree shape.", "Explain the difference between Head Recursion and Tail Recursion, using solving a maze (backtracking) as an example.", "For a Russian nesting doll (matryoshka), explain why recursion is a natural fit compared to writing an iterative loop.", "What is the time complexity of a naive recursive solution for reversing a string with input size 20?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving traversing a tree for large 40.", "Trace through the recursive calls for solving a maze (backtracking) with input size 10, and describe the recursion tree shape.", "For generating all possible passwords of length n, explain why recursion is a natural fit compared to writing an iterative loop.", "Trace through the recursive calls for reversing a string with input size 40, and describe the recursion tree shape.", "Trace through the recursive calls for traversing a tree with input size 10, and describe the recursion tree shape.", "Explain the difference between Head Recursion and Tail Recursion, using computing power (x^n) as an example.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving traversing a tree for large 10.", "Explain how Memoization would improve the recursive solution for reversing a string, applied to the Tower of Hanoi puzzle.", "What is the time complexity of a naive recursive solution for flattening nested lists with input size 30?", "What is the time complexity of a naive recursive solution for computing factorial with input size 10?", "Explain the difference between Head Recursion and Tail Recursion, using computing factorial as an example.", "Trace through the recursive calls for solving a maze (backtracking) with input size 30, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing Fibonacci numbers for large 10.", "Convert the recursive solution for flattening nested lists into an equivalent iterative solution, and compare space complexity.", "Explain the difference between Head Recursion and Tail Recursion, using flattening nested lists as an example.", "For a folder structure with nested subfolders, explain why recursion is a natural fit compared to writing an iterative loop.", "Explain how Backtracking differs from plain recursion, using exploring all paths in a grid as an example.", "Explain how Backtracking differs from plain recursion, using generating all possible passwords of length n as an example.", "Trace through the recursive calls for computing Fibonacci numbers with input size n, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for performing binary search, applied to a chatbot's recursive menu system.", "Explain the difference between Head Recursion and Tail Recursion, using computing GCD (Euclidean algorithm) as an example.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing Fibonacci numbers for large n.", "Trace through the recursive calls for computing power (x^n) with input size n, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for generating permutations with input size 5?", "Explain how Memoization would improve the recursive solution for partitioning in Quick Sort, applied to drawing a fractal pattern.", "Trace through the recursive calls for solving N-Queens with input size 30, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for traversing a tree, applied to exploring all paths in a grid.", "For flattening a nested list/array, explain why recursion is a natural fit compared to writing an iterative loop.", "Trace through the recursive calls for computing power (x^n) with input size 5, and describe the recursion tree shape.", "Convert the recursive solution for computing power (x^n) into an equivalent iterative solution, and compare space complexity.", "What is the space complexity of the call stack for checking a palindrome with input size 30?", "What is the time complexity of a naive recursive solution for computing Fibonacci numbers with input size n?", "Trace through the recursive calls for computing Fibonacci numbers with input size 30, and describe the recursion tree shape.", "For a family tree lookup (ancestors), explain why recursion is a natural fit compared to writing an iterative loop.", "Trace through the recursive calls for computing power (x^n) with input size 20, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for computing power (x^n), applied to the Tower of Hanoi puzzle.", "What is the space complexity of the call stack for partitioning in Quick Sort with input size n?", "What is the time complexity of a naive recursive solution for generating permutations with input size n?", "What is the time complexity of a naive recursive solution for solving Tower of Hanoi with input size 5?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving generating permutations for large 10.", "What is the time complexity of a naive recursive solution for computing factorial with input size 20?", "What is the time complexity of a naive recursive solution for flattening nested lists with input size 10?", "Trace through the recursive calls for performing binary search with input size 40, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving performing binary search for large n.", "Explain how Memoization would improve the recursive solution for solving a maze (backtracking), applied to drawing a fractal pattern.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving reversing a string for large 20.", "What is the space complexity of the call stack for computing factorial with input size n?", "What is the time complexity of a naive recursive solution for solving N-Queens with input size 5?", "What is the space complexity of the call stack for traversing a tree with input size 5?", "What is the time complexity of a naive recursive solution for generating subsets with input size 5?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing factorial for large 30.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving solving N-Queens for large 20.", "Trace through the recursive calls for partitioning in Quick Sort with input size 40, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for generating subsets with input size n?", "Explain the difference between Head Recursion and Tail Recursion, using generating subsets as an example.", "Explain how Memoization would improve the recursive solution for computing power (x^n), applied to drawing a fractal pattern.", "What is the space complexity of the call stack for flattening nested lists with input size n?", "What is the space complexity of the call stack for traversing a tree with input size 20?", "What is the space complexity of the call stack for computing Fibonacci numbers with input size n?", "Convert the recursive solution for computing factorial into an equivalent iterative solution, and compare space complexity.", "Convert the recursive solution for checking a palindrome into an equivalent iterative solution, and compare space complexity.", "Explain how Memoization would improve the recursive solution for generating subsets, applied to a chatbot's recursive menu system.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing factorial for large 10.", "What is the space complexity of the call stack for solving Tower of Hanoi with input size 5?", "What is the space complexity of the call stack for partitioning in Quick Sort with input size 10?", "Trace through the recursive calls for computing factorial with input size 40, and describe the recursion tree shape.", "Convert the recursive solution for generating permutations into an equivalent iterative solution, and compare space complexity.", "Convert the recursive solution for merging in Merge Sort into an equivalent iterative solution, and compare space complexity.", "Explain how Memoization would improve the recursive solution for merging in Merge Sort, applied to drawing a fractal pattern.", "What is the time complexity of a naive recursive solution for generating subsets with input size 10?", "Explain how Memoization would improve the recursive solution for computing GCD (Euclidean algorithm), applied to computing compound interest recursively.", "What is the time complexity of a naive recursive solution for computing GCD (Euclidean algorithm) with input size 30?", "Explain how Memoization would improve the recursive solution for computing Fibonacci numbers, applied to generating all possible passwords of length n.", "What is the time complexity of a naive recursive solution for computing Fibonacci numbers with input size 5?", "Explain how Memoization would improve the recursive solution for reversing a string, applied to a folder structure with nested subfolders.", "What is the space complexity of the call stack for solving N-Queens with input size 30?", "Explain how Memoization would improve the recursive solution for computing Fibonacci numbers, applied to exploring all paths in a grid.", "Explain how Backtracking differs from plain recursion, using drawing a fractal pattern as an example.", "For drawing a fractal pattern, explain why recursion is a natural fit compared to writing an iterative loop.", "Explain how Memoization would improve the recursive solution for generating subsets, applied to flattening a nested list/array.", "What is the space complexity of the call stack for computing GCD (Euclidean algorithm) with input size n?", "What is the space complexity of the call stack for generating permutations with input size 20?", "Trace through the recursive calls for computing GCD (Euclidean algorithm) with input size n, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for computing Fibonacci numbers, applied to solving a maze by trying each path.", "Explain how Memoization would improve the recursive solution for checking a palindrome, applied to exploring all paths in a grid.", "For exploring all paths in a grid, explain why recursion is a natural fit compared to writing an iterative loop.", "What is the space complexity of the call stack for computing factorial with input size 5?", "What is the space complexity of the call stack for traversing a tree with input size 30?", "What is the time complexity of a naive recursive solution for checking a palindrome with input size 5?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing GCD (Euclidean algorithm) for large 10.", "Explain the difference between Head Recursion and Tail Recursion, using performing binary search as an example.", "Explain the difference between Head Recursion and Tail Recursion, using reversing a string as an example.", "Explain how Memoization would improve the recursive solution for generating subsets, applied to drawing a fractal pattern.", "What is the space complexity of the call stack for generating subsets with input size 40?", "Explain how Memoization would improve the recursive solution for partitioning in Quick Sort, applied to a family tree lookup (ancestors).", "Trace through the recursive calls for traversing a tree with input size 40, and describe the recursion tree shape.", "Trace through the recursive calls for partitioning in Quick Sort with input size 30, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving generating permutations for large 5.", "What is the space complexity of the call stack for solving N-Queens with input size 20?", "What is the space complexity of the call stack for reversing a string with input size n?", "Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to exploring all paths in a grid.", "Trace through the recursive calls for performing binary search with input size 10, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving checking a palindrome for large 30.", "What is the time complexity of a naive recursive solution for computing factorial with input size 5?", "Trace through the recursive calls for merging in Merge Sort with input size 40, and describe the recursion tree shape.", "What is the space complexity of the call stack for generating subsets with input size 20?", "What is the space complexity of the call stack for flattening nested lists with input size 5?", "Trace through the recursive calls for partitioning in Quick Sort with input size 5, and describe the recursion tree shape.", "Trace through the recursive calls for solving N-Queens with input size 5, and describe the recursion tree shape.", "For the Tower of Hanoi puzzle, explain why recursion is a natural fit compared to writing an iterative loop.", "What is the time complexity of a naive recursive solution for solving a maze (backtracking) with input size 5?", "Trace through the recursive calls for solving Tower of Hanoi with input size 20, and describe the recursion tree shape.", "What is the space complexity of the call stack for solving N-Queens with input size n?", "What is the time complexity of a naive recursive solution for traversing a tree with input size 30?", "What is the space complexity of the call stack for computing factorial with input size 20?", "Convert the recursive solution for reversing a string into an equivalent iterative solution, and compare space complexity.", "Explain the difference between Head Recursion and Tail Recursion, using partitioning in Quick Sort as an example.", "Convert the recursive solution for computing Fibonacci numbers into an equivalent iterative solution, and compare space complexity.", "What is the time complexity of a naive recursive solution for reversing a string with input size 40?", "What is the space complexity of the call stack for solving Tower of Hanoi with input size 10?", "Trace through the recursive calls for traversing a tree with input size 20, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving generating subsets for large n.", "What is the space complexity of the call stack for checking a palindrome with input size 10?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving flattening nested lists for large 20.", "Explain how Memoization would improve the recursive solution for flattening nested lists, applied to a Russian nesting doll (matryoshka).", "What is the space complexity of the call stack for computing GCD (Euclidean algorithm) with input size 20?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving flattening nested lists for large 5.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving reversing a string for large 30.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving solving Tower of Hanoi for large 10.", "Trace through the recursive calls for checking a palindrome with input size 40, and describe the recursion tree shape.", "What is the space complexity of the call stack for computing power (x^n) with input size 40?", "What is the space complexity of the call stack for solving a maze (backtracking) with input size 20?", "What is the time complexity of a naive recursive solution for solving N-Queens with input size 20?", "Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to flattening a nested list/array.", "Convert the recursive solution for performing binary search into an equivalent iterative solution, and compare space complexity.", "Trace through the recursive calls for performing binary search with input size 30, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for traversing a tree with input size 20?", "What is the time complexity of a naive recursive solution for merging in Merge Sort with input size n?", "What is the time complexity of a naive recursive solution for flattening nested lists with input size 20?", "What is the space complexity of the call stack for partitioning in Quick Sort with input size 30?", "Explain how Memoization would improve the recursive solution for computing power (x^n), applied to solving a maze by trying each path.", "What is the time complexity of a naive recursive solution for computing Fibonacci numbers with input size 10?", "What is the time complexity of a naive recursive solution for solving a maze (backtracking) with input size n?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving generating permutations for large 20.", "Explain how Backtracking differs from plain recursion, using a family tree lookup (ancestors) as an example.", "Trace through the recursive calls for solving Tower of Hanoi with input size n, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for merging in Merge Sort, applied to a folder structure with nested subfolders.", "What is the time complexity of a naive recursive solution for solving Tower of Hanoi with input size 10?", "Trace through the recursive calls for computing Fibonacci numbers with input size 5, and describe the recursion tree shape.", "Trace through the recursive calls for solving N-Queens with input size n, and describe the recursion tree shape.", "What is the space complexity of the call stack for partitioning in Quick Sort with input size 20?", "Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to a chatbot's recursive menu system.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving solving N-Queens for large 40.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving generating subsets for large 40.", "What is the time complexity of a naive recursive solution for generating subsets with input size 20?", "Trace through the recursive calls for performing binary search with input size 20, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for checking a palindrome, applied to a folder structure with nested subfolders.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving partitioning in Quick Sort for large 5.", "What is the space complexity of the call stack for merging in Merge Sort with input size 5?", "Explain how Memoization would improve the recursive solution for computing factorial, applied to computing compound interest recursively.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving merging in Merge Sort for large n.", "What is the space complexity of the call stack for reversing a string with input size 30?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving traversing a tree for large 5.", "Explain how Memoization would improve the recursive solution for solving Tower of Hanoi, applied to a JSON object with nested objects.", "Trace through the recursive calls for computing factorial with input size 30, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for partitioning in Quick Sort, applied to generating all possible passwords of length n.", "Trace through the recursive calls for solving N-Queens with input size 20, and describe the recursion tree shape.", "What is the space complexity of the call stack for computing Fibonacci numbers with input size 30?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving solving N-Queens for large 10.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving merging in Merge Sort for large 5.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving merging in Merge Sort for large 40.", "Trace through the recursive calls for generating permutations with input size 10, and describe the recursion tree shape.", "What is the space complexity of the call stack for solving Tower of Hanoi with input size 30?", "What is the time complexity of a naive recursive solution for solving Tower of Hanoi with input size 40?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving checking a palindrome for large 40.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving computing Fibonacci numbers for large 30.", "Trace through the recursive calls for computing factorial with input size 10, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for checking a palindrome with input size n?", "Trace through the recursive calls for merging in Merge Sort with input size 20, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for checking a palindrome with input size 20?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving performing binary search for large 20.", "What is the space complexity of the call stack for solving Tower of Hanoi with input size n?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving traversing a tree for large 30.", "Explain how Memoization would improve the recursive solution for generating permutations, applied to solving a maze by trying each path.", "Trace through the recursive calls for generating subsets with input size 30, and describe the recursion tree shape.", "What is the space complexity of the call stack for computing GCD (Euclidean algorithm) with input size 5?", "Trace through the recursive calls for generating subsets with input size 20, and describe the recursion tree shape.", "Explain the trade-off between recursion depth and Stack Overflow risk when solving partitioning in Quick Sort for large 40.", "What is the time complexity of a naive recursive solution for partitioning in Quick Sort with input size 30?", "What is the space complexity of the call stack for performing binary search with input size 5?", "What is the space complexity of the call stack for solving Tower of Hanoi with input size 40?", "Trace through the recursive calls for flattening nested lists with input size n, and describe the recursion tree shape.", "Explain how Memoization would improve the recursive solution for partitioning in Quick Sort, applied to the Tower of Hanoi puzzle.", "Explain how Memoization would improve the recursive solution for traversing a tree, applied to generating all possible passwords of length n.", "What is the space complexity of the call stack for computing power (x^n) with input size n?", "Trace through the recursive calls for merging in Merge Sort with input size 10, and describe the recursion tree shape.", "What is the time complexity of a naive recursive solution for partitioning in Quick Sort with input size n?", "Explain the trade-off between recursion depth and Stack Overflow risk when solving checking a palindrome for large n.", "What is the time complexity of a naive recursive solution for generating permutations with input size 30?", "What is the space complexity of the call stack for computing power (x^n) with input size 20?", "What is the time complexity of a naive recursive solution for computing factorial with input size 30?", "Trace through the recursive calls for traversing a tree with input size n, and describe the recursion tree shape.", "Trace through the recursive calls for solving N-Queens with input size 40, and describe the recursion tree shape.", "What is the space complexity of the call stack for solving Tower of Hanoi with input size 20?", "What is the time complexity of a naive recursive solution for performing binary search with input size 40?", "What is the space complexity of the call stack for computing Fibonacci numbers with input size 20?", "Trace through the recursive calls for generating subsets with input size n, and describe the recursion tree shape.", "What is the space complexity of the call stack for computing power (x^n) with input size 5?", "What is the space complexity of the call stack for flattening nested lists with input size 40?", "Explain how Memoization would improve the recursive solution for traversing a tree, applied to drawing a fractal pattern."], "hard": ["Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using merging in Merge Sort as a case study.", "Design a backtracking solution for generating all possible passwords of length n, and analyse its worst-case time complexity for size 30.", "Explain how the recursion tree for solving a maze (backtracking) with input 20 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a backtracking solution for solving a maze by trying each path, and analyse its worst-case time complexity for size 40.", "Design a recursive + memoized solution to count the number of ways to reach the top of a staircase of 20 steps (1 or 2 steps at a time).", "Explain how converting a deep recursive solution (depth 30) to an explicit-stack iterative solution avoids Python's recursion limit.", "Design a memoized recursive solution for flattening nested lists with input size 40, and analyse its improved time complexity.", "Explain how the recursion tree for flattening nested lists with input n reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a backtracking solution for a folder structure with nested subfolders, and analyse its worst-case time complexity for size n.", "Design a recursive + memoized solution to count the number of ways to reach the top of a staircase of n steps (1 or 2 steps at a time).", "Explain how converting a deep recursive solution (depth n) to an explicit-stack iterative solution avoids Python's recursion limit.", "Design a recursive + memoized solution to count the number of ways to reach the top of a staircase of 10 steps (1 or 2 steps at a time).", "Design a memoized recursive solution for generating subsets with input size 10, and analyse its improved time complexity.", "Explain how converting a deep recursive solution (depth 20) to an explicit-stack iterative solution avoids Python's recursion limit.", "Design a recursive + memoized solution to count the number of ways to reach the top of a staircase of 5 steps (1 or 2 steps at a time).", "Design a memoized recursive solution for solving Tower of Hanoi with input size 20, and analyse its improved time complexity.", "Explain how recursion is used to solve the N-Queens problem for drawing a fractal pattern-like backtracking, and estimate its worst-case complexity for board size 30.", "Explain how Tail Call Optimisation could reduce the space complexity of flattening nested lists from O(n) to O(1), and why Python doesn't support it.", "Design a memoized recursive solution for solving N-Queens with input size 20, and analyse its improved time complexity.", "Explain how Tail Call Optimisation could reduce the space complexity of computing power (x^n) from O(n) to O(1), and why Python doesn't support it.", "Design a backtracking solution for a Russian nesting doll (matryoshka), and analyse its worst-case time complexity for size 40.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using checking a palindrome as a case study.", "Design a memoized recursive solution for computing Fibonacci numbers with input size 40, and analyse its improved time complexity.", "Design a backtracking solution for a family tree lookup (ancestors), and analyse its worst-case time complexity for size 10.", "Explain how recursion is used to solve the N-Queens problem for flattening a nested list/array-like backtracking, and estimate its worst-case complexity for board size 5.", "Design a backtracking solution for a chatbot's recursive menu system, and analyse its worst-case time complexity for size n.", "Design a backtracking solution for generating all possible passwords of length n, and analyse its worst-case time complexity for size 5.", "Design a memoized recursive solution for merging in Merge Sort with input size 5, and analyse its improved time complexity.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using flattening nested lists as a case study.", "Explain how the recursion tree for solving N-Queens with input 20 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a memoized recursive solution for traversing a tree with input size 40, and analyse its improved time complexity.", "Explain how Tail Call Optimisation could reduce the space complexity of computing factorial from O(n) to O(1), and why Python doesn't support it.", "Design a memoized recursive solution for reversing a string with input size n, and analyse its improved time complexity.", "Explain how converting a deep recursive solution (depth 40) to an explicit-stack iterative solution avoids Python's recursion limit.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using performing binary search as a case study.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using traversing a tree as a case study.", "Design a memoized recursive solution for traversing a tree with input size 5, and analyse its improved time complexity.", "Explain how Tail Call Optimisation could reduce the space complexity of traversing a tree from O(n) to O(1), and why Python doesn't support it.", "Explain how the recursion tree for computing factorial with input 5 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a memoized recursive solution for merging in Merge Sort with input size 30, and analyse its improved time complexity.", "Explain how recursion is used to solve the N-Queens problem for parsing a mathematical expression with nested brackets-like backtracking, and estimate its worst-case complexity for board size 10.", "Explain how recursion is used to solve the N-Queens problem for a JSON object with nested objects-like backtracking, and estimate its worst-case complexity for board size n.", "Explain how recursion is used to solve the N-Queens problem for generating all possible passwords of length n-like backtracking, and estimate its worst-case complexity for board size n.", "Explain how the recursion tree for partitioning in Quick Sort with input 5 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Explain how the recursion tree for merging in Merge Sort with input 20 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Explain how the recursion tree for checking a palindrome with input n reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a memoized recursive solution for merging in Merge Sort with input size 20, and analyse its improved time complexity.", "Design a backtracking solution for drawing a fractal pattern, and analyse its worst-case time complexity for size 20.", "Explain how recursion is used to solve the N-Queens problem for drawing a fractal pattern-like backtracking, and estimate its worst-case complexity for board size 10.", "Explain how Tail Call Optimisation could reduce the space complexity of computing GCD (Euclidean algorithm) from O(n) to O(1), and why Python doesn't support it.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using solving a maze (backtracking) as a case study.", "Explain how converting a deep recursive solution (depth 10) to an explicit-stack iterative solution avoids Python's recursion limit.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using generating subsets as a case study.", "Explain how the recursion tree for checking a palindrome with input 10 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Explain how the recursion tree for computing Fibonacci numbers with input 40 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using computing factorial as a case study.", "Explain how Tail Call Optimisation could reduce the space complexity of performing binary search from O(n) to O(1), and why Python doesn't support it.", "Explain how recursion is used to solve the N-Queens problem for a chatbot's recursive menu system-like backtracking, and estimate its worst-case complexity for board size 20.", "Design a memoized recursive solution for solving a maze (backtracking) with input size n, and analyse its improved time complexity.", "Explain how converting a deep recursive solution (depth 5) to an explicit-stack iterative solution avoids Python's recursion limit.", "Design a memoized recursive solution for performing binary search with input size 40, and analyse its improved time complexity.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using generating permutations as a case study.", "Explain how Tail Call Optimisation could reduce the space complexity of checking a palindrome from O(n) to O(1), and why Python doesn't support it.", "Explain how the recursion tree for computing power (x^n) with input 40 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a memoized recursive solution for generating permutations with input size 10, and analyse its improved time complexity.", "Explain how the recursion tree for solving a maze (backtracking) with input 10 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a backtracking solution for drawing a fractal pattern, and analyse its worst-case time complexity for size 10.", "Explain how the recursion tree for traversing a tree with input 40 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Explain how recursion is used to solve the N-Queens problem for solving a maze by trying each path-like backtracking, and estimate its worst-case complexity for board size 20.", "Design a memoized recursive solution for computing GCD (Euclidean algorithm) with input size 20, and analyse its improved time complexity.", "Explain how Tail Call Optimisation could reduce the space complexity of solving a maze (backtracking) from O(n) to O(1), and why Python doesn't support it.", "Design a backtracking solution for a JSON object with nested objects, and analyse its worst-case time complexity for size 20.", "Explain how the recursion tree for checking a palindrome with input 5 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using solving Tower of Hanoi as a case study.", "Explain how Tail Call Optimisation could reduce the space complexity of solving N-Queens from O(n) to O(1), and why Python doesn't support it.", "Design a memoized recursive solution for generating subsets with input size 20, and analyse its improved time complexity.", "Design a backtracking solution for the Tower of Hanoi puzzle, and analyse its worst-case time complexity for size 30.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using computing GCD (Euclidean algorithm) as a case study.", "Explain how recursion is used to solve the N-Queens problem for solving a maze by trying each path-like backtracking, and estimate its worst-case complexity for board size 40.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using computing power (x^n) as a case study.", "Design a memoized recursive solution for solving N-Queens with input size 5, and analyse its improved time complexity.", "Design a backtracking solution for computing compound interest recursively, and analyse its worst-case time complexity for size n.", "Explain how the recursion tree for reversing a string with input n reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a recursive + memoized solution to count the number of ways to reach the top of a staircase of 40 steps (1 or 2 steps at a time).", "Explain how recursion is used to solve the N-Queens problem for a family tree lookup (ancestors)-like backtracking, and estimate its worst-case complexity for board size 30.", "Explain how Tail Call Optimisation could reduce the space complexity of computing Fibonacci numbers from O(n) to O(1), and why Python doesn't support it.", "Explain how recursion is used to solve the N-Queens problem for parsing a mathematical expression with nested brackets-like backtracking, and estimate its worst-case complexity for board size n.", "Design a backtracking solution for computing compound interest recursively, and analyse its worst-case time complexity for size 40.", "Explain how Tail Call Optimisation could reduce the space complexity of merging in Merge Sort from O(n) to O(1), and why Python doesn't support it.", "Design a backtracking solution for solving a maze by trying each path, and analyse its worst-case time complexity for size 10.", "Design a memoized recursive solution for computing factorial with input size 40, and analyse its improved time complexity.", "Critically evaluate: 'Recursive solutions are always cleaner but slower than iterative ones.' Discuss using reversing a string as a case study.", "Explain how the recursion tree for computing Fibonacci numbers with input 10 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Explain how the recursion tree for checking a palindrome with input 30 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Design a backtracking solution for a JSON object with nested objects, and analyse its worst-case time complexity for size 10.", "Design a memoized recursive solution for merging in Merge Sort with input size n, and analyse its improved time complexity.", "Explain how the recursion tree for traversing a tree with input 30 reveals overlapping subproblems, and how Dynamic Programming exploits this.", "Explain how recursion is used to solve the N-Queens problem for a family tree lookup (ancestors)-like backtracking, and estimate its worst-case complexity for board size 20.", "Design a backtracking solution for exploring all paths in a grid, and analyse its worst-case time complexity for size n.", "Explain how Tail Call Optimisation could reduce the space complexity of solving Tower of Hanoi from O(n) to O(1), and why Python doesn't support it."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

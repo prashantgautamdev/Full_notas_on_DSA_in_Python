@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 7: Graphs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li class="current">Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 7</h1>
+  <div class="subtitle">Graphs</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Understand <span class="mark">Graph</span> terminology — vertex, edge, directed/undirected, weighted.</li>
+    <li>Represent graphs using <span class="mark-g">Adjacency List</span> and <span class="mark-g">Adjacency Matrix</span>.</li>
+    <li>Master <span class="mark">BFS</span> and <span class="mark">DFS</span> traversal.</li>
+    <li>Understand shortest-path algorithms: BFS (unweighted), Dijkstra (weighted).</li>
+    <li>Understand Topological Sort, Cycle Detection, and Minimum Spanning Trees.</li>
+    <li>Implement graph traversal in Python.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Graph</b> — a non-linear data structure consisting of a set of vertices (nodes) connected by edges — can be directed or undirected, weighted or unweighted.</div>
+  <div class="box def"><b>Adjacency List</b> — a graph representation where each vertex stores a list of its directly connected neighbours — space-efficient for sparse graphs.</div>
+  <div class="box def"><b>Adjacency Matrix</b> — a V×V matrix where cell [i][j] = 1 (or weight) if an edge exists between vertex i and j — O(1) edge lookup but O(V²) space.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Representation, BFS vs DFS</h2>
+
+  <h3 class="subsec">Graph Representation</h3>
+  <svg width="220" height="130">
+    <line x1="50" y1="30" x2="150" y2="30" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="50" y1="30" x2="50" y2="100" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="150" y1="30" x2="150" y2="100" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="50" y1="100" x2="150" y2="30" stroke="#1a3d8f" stroke-width="2"/>
+    <circle cx="50" cy="30" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="50" y="34" text-anchor="middle" font-family="Patrick Hand" font-size="11">A</text>
+    <circle cx="150" cy="30" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="150" y="34" text-anchor="middle" font-family="Patrick Hand" font-size="11">B</text>
+    <circle cx="50" cy="100" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="50" y="104" text-anchor="middle" font-family="Patrick Hand" font-size="11">C</text>
+    <circle cx="150" cy="100" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="150" y="104" text-anchor="middle" font-family="Patrick Hand" font-size="11">D</text>
+  </svg>
+  <table>
+    <tr><th>Adjacency List</th><th>Adjacency Matrix</th></tr>
+    <tr><td>A: [B, C]<br>B: [A, D]<br>C: [A]<br>D: [B]</td><td>
+      &nbsp;&nbsp;A&nbsp;B&nbsp;C&nbsp;D<br>A [0 1 1 0]<br>B [1 0 0 1]<br>C [1 0 0 0]<br>D [0 1 0 0]</td></tr>
+    <tr><td>Space: O(V+E) — great for sparse graphs</td><td>Space: O(V²) — great for dense graphs, O(1) edge check</td></tr>
+  </table>
+
+  <h3 class="subsec">BFS vs DFS</h3>
+  <table>
+    <tr><th>BFS (Breadth-First)</th><th>DFS (Depth-First)</th></tr>
+    <tr><td>Uses a Queue</td><td>Uses a Stack (or recursion)</td></tr>
+    <tr><td>Explores level by level</td><td>Explores as deep as possible first</td></tr>
+    <tr><td>Finds shortest path (unweighted)</td><td>Good for cycle detection, topological sort</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples</h2>
+
+  <div class="box example"><b>Social Network:</b> people = vertices, friendships = edges (undirected).</div>
+  <div class="box example"><b>Google Maps:</b> intersections = vertices, roads = weighted edges (distance/time).</div>
+  <div class="box example"><b>Course Prerequisites:</b> a Directed Acyclic Graph — solved via Topological Sort.</div>
+  <div class="box example"><b>Web Pages:</b> pages = vertices, hyperlinks = directed edges.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Use <b>Adjacency List</b> for sparse graphs (most real-world graphs); use <b>Adjacency Matrix</b> for dense graphs or O(1) edge lookups.</li>
+    <li><b>BFS</b> guarantees shortest path in an <i>unweighted</i> graph; for weighted graphs, use <b>Dijkstra's Algorithm</b>.</li>
+    <li><b>Topological Sort</b> only works on a <b>DAG</b> (Directed Acyclic Graph) — if there's a cycle, no valid ordering exists.</li>
+    <li>Always track <b>visited</b> nodes during BFS/DFS to avoid infinite loops in cyclic graphs.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time Complexity Cheat-Table</h2>
+  <table>
+    <tr><th>Algorithm</th><th>Time Complexity</th></tr>
+    <tr><td>BFS / DFS (Adjacency List)</td><td>O(V + E)</td></tr>
+    <tr><td>BFS / DFS (Adjacency Matrix)</td><td>O(V²)</td></tr>
+    <tr><td>Dijkstra's (Min-Heap + Adj List)</td><td>O((V + E) log V)</td></tr>
+    <tr><td>Bellman-Ford</td><td>O(V × E)</td></tr>
+    <tr><td>Topological Sort</td><td>O(V + E)</td></tr>
+    <tr><td>Kruskal's MST (with sorting)</td><td>O(E log E)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Graph as Adjacency List</h3>
+  <div class="codebox">graph = {
+    <span class="st">'A'</span>: [<span class="st">'B'</span>, <span class="st">'C'</span>],
+    <span class="st">'B'</span>: [<span class="st">'A'</span>, <span class="st">'D'</span>],
+    <span class="st">'C'</span>: [<span class="st">'A'</span>],
+    <span class="st">'D'</span>: [<span class="st">'B'</span>],
+}</div>
+
+  <h3 class="subsec">BFS Traversal</h3>
+  <div class="codebox"><span class="kw">from</span> collections <span class="kw">import</span> deque
+<span class="kw">def</span> bfs(graph, start):
+    visited = {start}
+    queue = deque([start])
+    order = []
+    <span class="kw">while</span> queue:
+        node = queue.popleft()
+        order.append(node)
+        <span class="kw">for</span> neighbour <span class="kw">in</span> graph[node]:
+            <span class="kw">if</span> neighbour <span class="kw">not</span> <span class="kw">in</span> visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+    <span class="kw">return</span> order</div>
+
+  <h3 class="subsec">DFS Traversal (Recursive)</h3>
+  <div class="codebox"><span class="kw">def</span> dfs(graph, node, visited=<span class="kw">None</span>):
+    <span class="kw">if</span> visited <span class="kw">is</span> <span class="kw">None</span>: visited = set()
+    visited.add(node)
+    <span class="kw">for</span> neighbour <span class="kw">in</span> graph[node]:
+        <span class="kw">if</span> neighbour <span class="kw">not</span> <span class="kw">in</span> visited:
+            dfs(graph, neighbour, visited)
+    <span class="kw">return</span> visited</div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">"Shortest path, unweighted graph" → <b>BFS</b>. "Shortest path, weighted graph" → <b>Dijkstra</b>.</div>
+  <div class="box tip">"Dependency ordering / prerequisites" → <b>Topological Sort</b> (only works on a DAG).</div>
+  <div class="box tip">Always initialise a <code>visited</code> set — forgetting it is the #1 cause of infinite loops in graph code.</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Forgetting to mark nodes as visited, causing infinite loops in cyclic graphs.</div>
+  <div class="box mistake">Using Dijkstra's Algorithm on a graph with negative edge weights — it gives incorrect results; use Bellman-Ford instead.</div>
+  <div class="box mistake">Confusing Adjacency Matrix O(V²) space with Adjacency List O(V+E) space, leading to poor choices for sparse graphs.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Implement a Graph using an Adjacency List in Python.</li>
+    <li>Write a BFS traversal function for a graph.</li>
+    <li>Write a DFS traversal function for a graph (recursive).</li>
+    <li>Write an iterative DFS traversal function using an explicit Stack.</li>
+    <li>Write a function to detect a cycle in an Undirected Graph.</li>
+    <li>Write a function to detect a cycle in a Directed Graph.</li>
+    <li>Write a function to check if a graph is connected.</li>
+    <li>Write a function to find all connected components of an Undirected Graph.</li>
+    <li>Write a function to perform Topological Sort using DFS.</li>
+    <li>Write a function to perform Topological Sort using Kahn's Algorithm (BFS-based).</li>
+    <li>Write a function to find the shortest path in an unweighted graph using BFS.</li>
+    <li>Implement Dijkstra's Algorithm using a Min-Heap.</li>
+    <li>Implement the Bellman-Ford Algorithm for graphs with negative edge weights.</li>
+    <li>Write a function to check if a graph is Bipartite using BFS/DFS colouring.</li>
+    <li>Write a function to count the number of islands in a 2D grid (graph via grid traversal).</li>
+    <li>Write a function to clone a graph (deep copy of all nodes and edges).</li>
+    <li>Implement Kruskal's Algorithm to find the Minimum Spanning Tree.</li>
+    <li>Implement Prim's Algorithm to find the Minimum Spanning Tree.</li>
+    <li>Write a function to find all Strongly Connected Components using Kosaraju's Algorithm.</li>
+    <li>Write a function to find the shortest path between all pairs of vertices (Floyd-Warshall).</li>
+    <li>Write a function to determine if a path exists between two nodes in a graph.</li>
+    <li>Write a function to find the number of provinces (friend circles) using Union-Find.</li>
+    <li>Implement a basic Union-Find (Disjoint Set) data structure with path compression.</li>
+    <li>Write a function to detect a negative weight cycle in a graph using Bellman-Ford.</li>
+    <li>Write a function to solve the 'course schedule' problem (can all courses be finished given prerequisites?).</li>
+    <li>Write a function to find the word ladder shortest transformation sequence using BFS.</li>
+    <li>Write a function to implement A* search for pathfinding with a heuristic.</li>
+    <li>Write a function to find all paths between two nodes in a graph using DFS backtracking.</li>
+    <li>Write a function to check if a Directed Graph has a Eulerian Path.</li>
+    <li>Write a function to find the minimum number of swaps/steps to convert one graph state to another (BFS on states).</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    A <b>Graph</b> models vertices connected by edges — directed/undirected, weighted/unweighted. Represent sparse graphs with an <b>Adjacency List</b> (O(V+E) space), dense graphs with an <b>Adjacency Matrix</b> (O(V²) space). <b>BFS</b> (Queue) finds shortest paths in unweighted graphs; <b>DFS</b> (Stack/recursion) is great for cycle detection and topological sort. For weighted shortest paths, use <b>Dijkstra's</b> (non-negative weights) or <b>Bellman-Ford</b> (handles negatives).
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">BFS/DFS: O(V + E) &nbsp;|&nbsp; Dijkstra (heap): O((V+E) log V) &nbsp;|&nbsp; Bellman-Ford: O(V × E)</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 7 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Graph</td><td>Vertices + Edges, directed/undirected, weighted/unweighted</td></tr>
+    <tr><td>Adjacency List</td><td>O(V+E) space, best for sparse graphs</td></tr>
+    <tr><td>Adjacency Matrix</td><td>O(V²) space, O(1) edge lookup, best for dense graphs</td></tr>
+    <tr><td>BFS</td><td>Queue-based, level by level, shortest path (unweighted)</td></tr>
+    <tr><td>DFS</td><td>Stack/recursion-based, cycle detection, topological sort</td></tr>
+    <tr><td>Dijkstra's</td><td>Shortest path, non-negative weights, O((V+E) log V)</td></tr>
+    <tr><td>Bellman-Ford</td><td>Shortest path, handles negative weights, O(V×E)</td></tr>
+    <tr><td>Topological Sort</td><td>Valid only on a DAG</td></tr>
+    <tr><td>MST (Kruskal/Prim)</td><td>Minimum total edge weight connecting all vertices</td></tr>
+    <tr><td>Union-Find</td><td>Efficient connectivity/cycle checks with path compression</td></tr>
+  </table>
+  <div class="box formula">BFS/DFS: O(V+E) | Dijkstra: O((V+E)logV) | Bellman-Ford: O(V·E)</div>
+  <div class="box tip">Golden rule: <b>Unweighted shortest path → BFS. Weighted (non-negative) → Dijkstra. Negative weights → Bellman-Ford.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Implement a Graph using an Adjacency List in Python.", "Write a BFS traversal function for a graph.", "Write a DFS traversal function for a graph (recursive).", "Write an iterative DFS traversal function using an explicit Stack.", "Write a function to detect a cycle in an Undirected Graph.", "Write a function to detect a cycle in a Directed Graph.", "Write a function to check if a graph is connected.", "Write a function to find all connected components of an Undirected Graph.", "Write a function to perform Topological Sort using DFS.", "Write a function to perform Topological Sort using Kahn's Algorithm (BFS-based).", "Write a function to find the shortest path in an unweighted graph using BFS.", "Implement Dijkstra's Algorithm using a Min-Heap.", "Implement the Bellman-Ford Algorithm for graphs with negative edge weights.", "Write a function to check if a graph is Bipartite using BFS/DFS colouring.", "Write a function to count the number of islands in a 2D grid (graph via grid traversal).", "Write a function to clone a graph (deep copy of all nodes and edges).", "Implement Kruskal's Algorithm to find the Minimum Spanning Tree.", "Implement Prim's Algorithm to find the Minimum Spanning Tree.", "Write a function to find all Strongly Connected Components using Kosaraju's Algorithm.", "Write a function to find the shortest path between all pairs of vertices (Floyd-Warshall).", "Write a function to determine if a path exists between two nodes in a graph.", "Write a function to find the number of provinces (friend circles) using Union-Find.", "Implement a basic Union-Find (Disjoint Set) data structure with path compression.", "Write a function to detect a negative weight cycle in a graph using Bellman-Ford.", "Write a function to solve the 'course schedule' problem (can all courses be finished given prerequisites?).", "Write a function to find the word ladder shortest transformation sequence using BFS.", "Write a function to implement A* search for pathfinding with a heuristic.", "Write a function to find all paths between two nodes in a graph using DFS backtracking.", "Write a function to check if a Directed Graph has a Eulerian Path.", "Write a function to find the minimum number of swaps/steps to convert one graph state to another (BFS on states)."]}, "practice": {"easy": ["Write one advantage of using an Adjacency List over an Adjacency Matrix.", "State True or False: In a Directed Graph, edges have a direction (one-way).", "State True or False: An Adjacency Matrix uses O(V\u00b2) space regardless of the number of edges.", "Fill in the blank: detecting a cycle on a graph modeling a social network's friend connections is commonly solved using ______.", "In a course prerequisite structure in a college, would you model it as a Directed or Undirected Graph? Why?", "Name one real-life example of a Graph, such as electrical circuit connections.", "What is the time complexity of finding shortest path (weighted, Dijkstra) using an Adjacency List, for a graph with 10^5 vertices?", "In a city's road/metro map, would you model it as a Directed or Undirected Graph? Why?", "State True or False: BFS explores a graph level by level using a Queue.", "Which traversal (BFS or DFS) would you use to find the shortest path in an unweighted graph?", "What is a 'cycle' in a graph?", "What data structure does BFS use internally? What does DFS use?", "State True or False: An Adjacency List is generally more space-efficient for sparse graphs.", "State True or False: DFS explores a graph as deep as possible before backtracking, using a Stack (or recursion).", "In a package manager's dependency graph, would you model it as a Directed or Undirected Graph? Why?", "In a social network's friend connections, would you model it as a Directed or Undirected Graph? Why?", "What is the time complexity of checking bipartiteness using an Adjacency List, for a graph with 1,000 vertices?", "Write one advantage of using an Adjacency Matrix over an Adjacency List.", "In a computer network's device connections, would you model it as a Directed or Undirected Graph? Why?", "What is the time complexity of BFS traversal using an Adjacency List, for a graph with 10 vertices?", "What is the 'degree' of a vertex in an Undirected Graph?", "Name one real-life example of a Graph, such as a computer network's device connections.", "Fill in the blank: adding an edge on a graph modeling dependency resolution in a build system is commonly solved using ______.", "Name one real-life example of a Graph, such as a recommendation engine's item similarity graph.", "Fill in the blank: adding a vertex on a graph modeling a computer network's device connections is commonly solved using ______.", "Name one real-life example of a Graph, such as GPS navigation and shortest route finding.", "Name one real-life example of a Graph, such as a course prerequisite structure in a college.", "Define the term 'Undirected Graph' in your own words.", "In flight routes between airports, would you model it as a Directed or Undirected Graph? Why?", "What is the difference between a Directed and an Undirected Graph?", "Fill in the blank: detecting a cycle on a graph modeling flight routes between airports is commonly solved using ______.", "In electrical circuit connections, would you model it as a Directed or Undirected Graph? Why?", "What is the time complexity of finding shortest path (weighted, Dijkstra) using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of finding shortest path (unweighted) using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of finding connected components using an Adjacency List, for a graph with 10 vertices?", "State True or False: A Minimum Spanning Tree connects all vertices with the minimum possible total edge weight.", "Fill in the blank: topological sorting on a graph modeling a website's hyperlink structure is commonly solved using ______.", "In a website's hyperlink structure, would you model it as a Directed or Undirected Graph? Why?", "Fill in the blank: topological sorting on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "Define the term 'Strongly Connected Component' in your own words.", "What is the time complexity of DFS traversal using an Adjacency List, for a graph with 10 vertices?", "Fill in the blank: finding connected components on a graph modeling flight routes between airports is commonly solved using ______.", "Fill in the blank: finding strongly connected components on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "Define the term 'Edge' in your own words.", "Define the term 'Weighted Graph' in your own words.", "Define the term 'Directed Graph' in your own words.", "Fill in the blank: finding shortest path (unweighted) on a graph modeling a website's hyperlink structure is commonly solved using ______.", "State True or False: A Tree is a special case of a Graph with no cycles and V-1 edges for V vertices.", "What is the time complexity of topological sorting using an Adjacency List, for a graph with 10^5 vertices?", "Define the term 'Topological Sort' in your own words.", "Name one real-life example of a Graph, such as a city's road/metro map.", "Name one real-life example of a Graph, such as a website's hyperlink structure.", "In a game map with rooms and passages, would you model it as a Directed or Undirected Graph? Why?", "Fill in the blank: BFS traversal on a graph modeling electrical circuit connections is commonly solved using ______.", "Define the term 'Degree of a Vertex' in your own words.", "Define the term 'Path' in your own words.", "State True or False: Dijkstra's Algorithm works correctly with negative edge weights.", "Name one real-life example of a Graph, such as a package manager's dependency graph.", "Define the term 'Cycle' in your own words.", "Fill in the blank: BFS traversal on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "What is the time complexity of detecting a cycle using an Adjacency List, for a graph with 10^5 vertices?", "Name one real-life example of a Graph, such as a social network's friend connections.", "Define the term 'Vertex/Node' in your own words.", "What is the time complexity of adding a vertex using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: finding shortest path (unweighted) on a graph modeling flight routes between airports is commonly solved using ______.", "Fill in the blank: finding connected components on a graph modeling a social network's friend connections is commonly solved using ______.", "Fill in the blank: finding connected components on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "Fill in the blank: DFS traversal on a graph modeling a website's hyperlink structure is commonly solved using ______.", "Define the term 'Graph' in your own words.", "What is the time complexity of BFS traversal using an Adjacency List, for a graph with V vertices, E edges?", "Fill in the blank: DFS traversal on a graph modeling a city's road/metro map is commonly solved using ______.", "Name one real-life example of a Graph, such as dependency resolution in a build system.", "Fill in the blank: checking bipartiteness on a graph modeling a social network's friend connections is commonly solved using ______.", "What is the time complexity of adding a vertex using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of checking bipartiteness using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of adding an edge using an Adjacency List, for a graph with 10 vertices?", "Fill in the blank: BFS traversal on a graph modeling a website's hyperlink structure is commonly solved using ______.", "Fill in the blank: DFS traversal on a graph modeling a course prerequisite structure in a college is commonly solved using ______.", "In dependency resolution in a build system, would you model it as a Directed or Undirected Graph? Why?", "What is the time complexity of DFS traversal using an Adjacency List, for a graph with 1,000 vertices?", "In GPS navigation and shortest route finding, would you model it as a Directed or Undirected Graph? Why?", "Define the term 'Disconnected Graph' in your own words.", "Name one real-life example of a Graph, such as a game map with rooms and passages.", "In a recommendation engine's item similarity graph, would you model it as a Directed or Undirected Graph? Why?", "Fill in the blank: finding strongly connected components on a graph modeling dependency resolution in a build system is commonly solved using ______.", "Fill in the blank: adding an edge on a graph modeling a website's hyperlink structure is commonly solved using ______.", "What is the time complexity of checking bipartiteness using an Adjacency List, for a graph with 10 vertices?", "Fill in the blank: topological sorting on a graph modeling a game map with rooms and passages is commonly solved using ______.", "State True or False: Topological Sort is only defined for Directed Acyclic Graphs (DAGs).", "What is the time complexity of topological sorting using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of detecting a cycle using an Adjacency List, for a graph with 100 vertices?", "What is the time complexity of finding minimum spanning tree using an Adjacency List, for a graph with 100 vertices?", "Fill in the blank: finding shortest path (unweighted) on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "Fill in the blank: topological sorting on a graph modeling a computer network's device connections is commonly solved using ______.", "What is the time complexity of checking connectivity using an Adjacency List, for a graph with V vertices, E edges?", "Fill in the blank: topological sorting on a graph modeling a social network's friend connections is commonly solved using ______.", "What is the time complexity of adding a vertex using an Adjacency List, for a graph with 100 vertices?", "Define the term 'Spanning Tree' in your own words.", "Fill in the blank: removing an edge on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "What is the time complexity of finding strongly connected components using an Adjacency List, for a graph with 10^5 vertices?", "What is the time complexity of BFS traversal using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: finding minimum spanning tree on a graph modeling dependency resolution in a build system is commonly solved using ______.", "Fill in the blank: finding shortest path (unweighted) on a graph modeling electrical circuit connections is commonly solved using ______.", "Name one real-life example of a Graph, such as flight routes between airports.", "What is the time complexity of finding connected components using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: adding a vertex on a graph modeling dependency resolution in a build system is commonly solved using ______.", "Fill in the blank: removing an edge on a graph modeling a city's road/metro map is commonly solved using ______.", "Fill in the blank: adding a vertex on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "What is the time complexity of finding shortest path (unweighted) using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: checking bipartiteness on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: DFS traversal on a graph modeling electrical circuit connections is commonly solved using ______.", "Fill in the blank: removing an edge on a graph modeling a course prerequisite structure in a college is commonly solved using ______.", "What is the time complexity of removing an edge using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: finding strongly connected components on a graph modeling flight routes between airports is commonly solved using ______.", "Define the term 'Adjacency Matrix' in your own words.", "What is the time complexity of detecting a cycle using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of checking connectivity using an Adjacency List, for a graph with 1,000 vertices?", "What is the time complexity of removing an edge using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: checking bipartiteness on a graph modeling a city's road/metro map is commonly solved using ______.", "Fill in the blank: finding shortest path (unweighted) on a graph modeling a computer network's device connections is commonly solved using ______.", "Fill in the blank: checking connectivity on a graph modeling a course prerequisite structure in a college is commonly solved using ______.", "Fill in the blank: finding minimum spanning tree on a graph modeling a city's road/metro map is commonly solved using ______.", "Fill in the blank: checking bipartiteness on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "Define the term 'Adjacency List' in your own words.", "Fill in the blank: finding connected components on a graph modeling a city's road/metro map is commonly solved using ______.", "What is the time complexity of finding strongly connected components using an Adjacency List, for a graph with 10 vertices?", "What is the time complexity of DFS traversal using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: adding an edge on a graph modeling electrical circuit connections is commonly solved using ______.", "What is the time complexity of adding an edge using an Adjacency List, for a graph with 100 vertices?", "What is the time complexity of adding a vertex using an Adjacency List, for a graph with 10 vertices?", "Fill in the blank: finding connected components on a graph modeling a computer network's device connections is commonly solved using ______.", "Fill in the blank: adding a vertex on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: detecting a cycle on a graph modeling electrical circuit connections is commonly solved using ______.", "What is the time complexity of removing an edge using an Adjacency List, for a graph with 10 vertices?", "What is the time complexity of finding shortest path (unweighted) using an Adjacency List, for a graph with 10 vertices?", "What is the time complexity of finding connected components using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of adding an edge using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of DFS traversal using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of checking connectivity using an Adjacency List, for a graph with 10 vertices?", "Fill in the blank: checking bipartiteness on a graph modeling electrical circuit connections is commonly solved using ______.", "What is the time complexity of checking bipartiteness using an Adjacency List, for a graph with 100 vertices?", "Define the term 'Connected Graph' in your own words.", "Fill in the blank: adding a vertex on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "Fill in the blank: finding strongly connected components on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "Fill in the blank: finding minimum spanning tree on a graph modeling a computer network's device connections is commonly solved using ______.", "Fill in the blank: finding minimum spanning tree on a graph modeling a game map with rooms and passages is commonly solved using ______.", "Fill in the blank: detecting a cycle on a graph modeling a game map with rooms and passages is commonly solved using ______.", "What is the time complexity of removing an edge using an Adjacency List, for a graph with V vertices, E edges?", "What is the time complexity of topological sorting using an Adjacency List, for a graph with 100 vertices?", "Fill in the blank: finding minimum spanning tree on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "Fill in the blank: checking connectivity on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: detecting a cycle on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "What is the time complexity of adding a vertex using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: detecting a cycle on a graph modeling a website's hyperlink structure is commonly solved using ______.", "What is the time complexity of finding strongly connected components using an Adjacency List, for a graph with 100 vertices?", "What is the time complexity of detecting a cycle using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: checking connectivity on a graph modeling a game map with rooms and passages is commonly solved using ______.", "What is the time complexity of topological sorting using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: checking connectivity on a graph modeling a computer network's device connections is commonly solved using ______.", "Fill in the blank: finding minimum spanning tree on a graph modeling electrical circuit connections is commonly solved using ______.", "Fill in the blank: finding minimum spanning tree on a graph modeling flight routes between airports is commonly solved using ______.", "What is the time complexity of finding shortest path (weighted, Dijkstra) using an Adjacency List, for a graph with 10 vertices?", "Fill in the blank: finding shortest path (weighted, Dijkstra) on a graph modeling dependency resolution in a build system is commonly solved using ______.", "What is the time complexity of removing an edge using an Adjacency List, for a graph with 100 vertices?", "Fill in the blank: topological sorting on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: finding shortest path (weighted, Dijkstra) on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "What is the time complexity of checking connectivity using an Adjacency List, for a graph with 100 vertices?", "What is the time complexity of finding shortest path (unweighted) using an Adjacency List, for a graph with 100 vertices?", "Fill in the blank: finding strongly connected components on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: finding shortest path (weighted, Dijkstra) on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: detecting a cycle on a graph modeling dependency resolution in a build system is commonly solved using ______.", "Fill in the blank: BFS traversal on a graph modeling a social network's friend connections is commonly solved using ______.", "Fill in the blank: checking bipartiteness on a graph modeling a game map with rooms and passages is commonly solved using ______.", "What is the time complexity of checking connectivity using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: finding shortest path (weighted, Dijkstra) on a graph modeling flight routes between airports is commonly solved using ______.", "Fill in the blank: topological sorting on a graph modeling a course prerequisite structure in a college is commonly solved using ______.", "What is the time complexity of finding strongly connected components using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: BFS traversal on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: detecting a cycle on a graph modeling a computer network's device connections is commonly solved using ______.", "Fill in the blank: checking connectivity on a graph modeling electrical circuit connections is commonly solved using ______.", "Fill in the blank: finding connected components on a graph modeling a game map with rooms and passages is commonly solved using ______.", "Fill in the blank: DFS traversal on a graph modeling flight routes between airports is commonly solved using ______.", "Fill in the blank: adding an edge on a graph modeling a game map with rooms and passages is commonly solved using ______.", "What is the time complexity of finding minimum spanning tree using an Adjacency List, for a graph with 1,000 vertices?", "What is the time complexity of finding connected components using an Adjacency List, for a graph with 10^5 vertices?", "What is the time complexity of finding shortest path (unweighted) using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: removing an edge on a graph modeling a recommendation engine's item similarity graph is commonly solved using ______.", "Fill in the blank: checking bipartiteness on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "Fill in the blank: finding shortest path (unweighted) on a graph modeling a course prerequisite structure in a college is commonly solved using ______.", "What is the time complexity of BFS traversal using an Adjacency List, for a graph with 100 vertices?", "What is the time complexity of finding minimum spanning tree using an Adjacency List, for a graph with 10^5 vertices?", "Fill in the blank: checking bipartiteness on a graph modeling dependency resolution in a build system is commonly solved using ______.", "What is the time complexity of adding an edge using an Adjacency List, for a graph with 1,000 vertices?", "Fill in the blank: adding an edge on a graph modeling a package manager's dependency graph is commonly solved using ______.", "Fill in the blank: finding strongly connected components on a graph modeling a website's hyperlink structure is commonly solved using ______.", "Fill in the blank: adding an edge on a graph modeling GPS navigation and shortest route finding is commonly solved using ______.", "Fill in the blank: adding a vertex on a graph modeling electrical circuit connections is commonly solved using ______.", "Fill in the blank: checking connectivity on a graph modeling a website's hyperlink structure is commonly solved using ______.", "What is the time complexity of DFS traversal using an Adjacency List, for a graph with 100 vertices?", "Fill in the blank: topological sorting on a graph modeling flight routes between airports is commonly solved using ______."], "medium": ["Explain how Topological Sort works on a DAG representing a city's road/metro map (e.g. course prerequisites), for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling electrical circuit connections, with V vertices, E edges.", "Explain the time complexity of DFS traversal for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a computer network's device connections.", "Explain how BFS finds the shortest path in an unweighted graph modeling a game map with rooms and passages, with 100 vertices.", "Explain why DFS is well-suited for cycle detection in a graph representing a social network's friend connections.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a course prerequisite structure in a college.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for GPS navigation and shortest route finding.", "For flight routes between airports, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how Topological Sort works on a DAG representing a computer network's device connections (e.g. course prerequisites), for V vertices, E edges.", "Explain how a Minimum Spanning Tree would be useful for dependency resolution in a build system, and name one algorithm to find it.", "For a website's hyperlink structure, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain why DFS is well-suited for cycle detection in a graph representing a website's hyperlink structure.", "Explain why DFS is well-suited for cycle detection in a graph representing a recommendation engine's item similarity graph.", "Compare the time complexity of BFS and DFS for a graph with 10 vertices.", "Explain how a Minimum Spanning Tree would be useful for GPS navigation and shortest route finding, and name one algorithm to find it.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a social network's friend connections.", "Compare the time complexity of BFS and DFS for a graph with 10^5 vertices.", "Compare the time complexity of BFS and DFS for a graph with 100 vertices.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a package manager's dependency graph.", "For GPS navigation and shortest route finding, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "For a computer network's device connections, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how Topological Sort works on a DAG representing electrical circuit connections (e.g. course prerequisites), for 1,000 vertices.", "Explain the time complexity of adding a vertex for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a website's hyperlink structure, with 10^5 vertices.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a game map with rooms and passages.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a website's hyperlink structure.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a computer network's device connections.", "Compare the time complexity of BFS and DFS for a graph with 1,000 vertices.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a city's road/metro map.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a website's hyperlink structure, for V vertices, E edges.", "Explain why DFS is well-suited for cycle detection in a graph representing a computer network's device connections.", "Explain how a Minimum Spanning Tree would be useful for a website's hyperlink structure, and name one algorithm to find it.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a course prerequisite structure in a college, for 10^5 vertices.", "Compare the time complexity of BFS and DFS for a graph with V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a city's road/metro map, for 100 vertices.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for dependency resolution in a build system.", "Explain the time complexity of finding strongly connected components for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how a Minimum Spanning Tree would be useful for a course prerequisite structure in a college, and name one algorithm to find it.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling flight routes between airports, for 10^5 vertices.", "Explain why DFS is well-suited for cycle detection in a graph representing flight routes between airports.", "Explain the time complexity of BFS traversal for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "For electrical circuit connections, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how Topological Sort works on a DAG representing a package manager's dependency graph (e.g. course prerequisites), for 1,000 vertices.", "Explain the time complexity of detecting a cycle for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a recommendation engine's item similarity graph.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling GPS navigation and shortest route finding, for V vertices, E edges.", "For a city's road/metro map, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain why DFS is well-suited for cycle detection in a graph representing a game map with rooms and passages.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a city's road/metro map.", "Explain the time complexity of detecting a cycle for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding connected components for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a recommendation engine's item similarity graph (e.g. course prerequisites), for 10^5 vertices.", "Explain the time complexity of BFS traversal for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a social network's friend connections, with 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a package manager's dependency graph, with 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling flight routes between airports, with V vertices, E edges.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a game map with rooms and passages.", "Explain how BFS finds the shortest path in an unweighted graph modeling dependency resolution in a build system, with 10^5 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling GPS navigation and shortest route finding, for 1,000 vertices.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a social network's friend connections.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for flight routes between airports.", "Explain how Topological Sort works on a DAG representing dependency resolution in a build system (e.g. course prerequisites), for 10 vertices.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for a package manager's dependency graph.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using electrical circuit connections.", "Explain how a Minimum Spanning Tree would be useful for a recommendation engine's item similarity graph, and name one algorithm to find it.", "Explain how BFS finds the shortest path in an unweighted graph modeling dependency resolution in a build system, with 100 vertices.", "Explain how Topological Sort works on a DAG representing a game map with rooms and passages (e.g. course prerequisites), for V vertices, E edges.", "Explain why DFS is well-suited for cycle detection in a graph representing a city's road/metro map.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a game map with rooms and passages, for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing electrical circuit connections (e.g. course prerequisites), for V vertices, E edges.", "Explain how BFS finds the shortest path in an unweighted graph modeling GPS navigation and shortest route finding, with 10 vertices.", "For a recommendation engine's item similarity graph, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain why DFS is well-suited for cycle detection in a graph representing electrical circuit connections.", "Explain how you would detect a cycle in a Directed Graph vs an Undirected Graph, for electrical circuit connections.", "Explain how a Minimum Spanning Tree would be useful for a package manager's dependency graph, and name one algorithm to find it.", "Explain how Topological Sort works on a DAG representing a computer network's device connections (e.g. course prerequisites), for 100 vertices.", "Explain how Topological Sort works on a DAG representing a course prerequisite structure in a college (e.g. course prerequisites), for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing a city's road/metro map (e.g. course prerequisites), for V vertices, E edges.", "Explain the time complexity of adding an edge for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a course prerequisite structure in a college, for 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling dependency resolution in a build system, for V vertices, E edges.", "For a course prerequisite structure in a college, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how Topological Sort works on a DAG representing flight routes between airports (e.g. course prerequisites), for V vertices, E edges.", "Explain how BFS finds the shortest path in an unweighted graph modeling dependency resolution in a build system, with V vertices, E edges.", "Explain how Topological Sort works on a DAG representing a city's road/metro map (e.g. course prerequisites), for 10 vertices.", "Explain the time complexity of topological sorting for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling flight routes between airports, for 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a computer network's device connections, for 1,000 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a game map with rooms and passages, for 100 vertices.", "Explain how Topological Sort works on a DAG representing a computer network's device connections (e.g. course prerequisites), for 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a course prerequisite structure in a college, with 1,000 vertices.", "Explain why DFS is well-suited for cycle detection in a graph representing dependency resolution in a build system.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a social network's friend connections, for V vertices, E edges.", "Explain how BFS finds the shortest path in an unweighted graph modeling a computer network's device connections, with 10 vertices.", "Explain the time complexity of finding minimum spanning tree for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "For a social network's friend connections, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain the time complexity of adding a vertex for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding shortest path (unweighted) for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a course prerequisite structure in a college, with 100 vertices.", "Explain how Topological Sort works on a DAG representing flight routes between airports (e.g. course prerequisites), for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a game map with rooms and passages (e.g. course prerequisites), for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a recommendation engine's item similarity graph (e.g. course prerequisites), for V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a package manager's dependency graph, for V vertices, E edges.", "Explain how a Minimum Spanning Tree would be useful for a city's road/metro map, and name one algorithm to find it.", "Explain how Topological Sort works on a DAG representing electrical circuit connections (e.g. course prerequisites), for 100 vertices.", "Explain the time complexity of topological sorting for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a city's road/metro map, for 1,000 vertices.", "Explain the time complexity of topological sorting for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how a Minimum Spanning Tree would be useful for a social network's friend connections, and name one algorithm to find it.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling electrical circuit connections, for 1,000 vertices.", "Explain the time complexity of detecting a cycle for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding strongly connected components for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a social network's friend connections, for 100 vertices.", "For dependency resolution in a build system, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a website's hyperlink structure, for 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a website's hyperlink structure, with 100 vertices.", "Explain the time complexity of BFS traversal for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain why DFS is well-suited for cycle detection in a graph representing a course prerequisite structure in a college.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling flight routes between airports, for V vertices, E edges.", "Explain how Topological Sort works on a DAG representing a city's road/metro map (e.g. course prerequisites), for 1,000 vertices.", "Explain the time complexity of adding a vertex for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how a Minimum Spanning Tree would be useful for a computer network's device connections, and name one algorithm to find it.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using dependency resolution in a build system.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a recommendation engine's item similarity graph.", "Explain how BFS finds the shortest path in an unweighted graph modeling a website's hyperlink structure, with 10 vertices.", "For a game map with rooms and passages, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how BFS finds the shortest path in an unweighted graph modeling a website's hyperlink structure, with 1,000 vertices.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using flight routes between airports.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using GPS navigation and shortest route finding.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling electrical circuit connections, for 10^5 vertices.", "Explain why DFS is well-suited for cycle detection in a graph representing a package manager's dependency graph.", "Explain how BFS finds the shortest path in an unweighted graph modeling a city's road/metro map, with 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling electrical circuit connections, for 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a course prerequisite structure in a college, for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing a package manager's dependency graph (e.g. course prerequisites), for 10^5 vertices.", "Explain why DFS is well-suited for cycle detection in a graph representing GPS navigation and shortest route finding.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a website's hyperlink structure.", "Explain how Topological Sort works on a DAG representing a course prerequisite structure in a college (e.g. course prerequisites), for V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling dependency resolution in a build system, for 10 vertices.", "Explain the time complexity of adding an edge for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a computer network's device connections, with 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a package manager's dependency graph, for 10 vertices.", "Explain the time complexity of DFS traversal for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing dependency resolution in a build system (e.g. course prerequisites), for 100 vertices.", "Explain the time complexity of checking connectivity for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a social network's friend connections, for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing a social network's friend connections (e.g. course prerequisites), for 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a game map with rooms and passages, for 10 vertices.", "Explain the time complexity of removing an edge for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a computer network's device connections, for 100 vertices.", "Explain how a Minimum Spanning Tree would be useful for flight routes between airports, and name one algorithm to find it.", "Explain how Topological Sort works on a DAG representing a game map with rooms and passages (e.g. course prerequisites), for 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling flight routes between airports, for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing electrical circuit connections (e.g. course prerequisites), for 10 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a social network's friend connections, with 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a social network's friend connections, with 100 vertices.", "Explain how Topological Sort works on a DAG representing a course prerequisite structure in a college (e.g. course prerequisites), for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a website's hyperlink structure (e.g. course prerequisites), for 100 vertices.", "For a package manager's dependency graph, would an Adjacency List or Adjacency Matrix be more efficient? Justify with space complexity reasoning.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a website's hyperlink structure, for 10^5 vertices.", "Explain the time complexity of finding strongly connected components for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling electrical circuit connections, for 100 vertices.", "Explain the time complexity of finding connected components for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a game map with rooms and passages, with V vertices, E edges.", "Explain how BFS finds the shortest path in an unweighted graph modeling a city's road/metro map, with 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a social network's friend connections, for 10^5 vertices.", "Explain how a Minimum Spanning Tree would be useful for a game map with rooms and passages, and name one algorithm to find it.", "Explain how Topological Sort works on a DAG representing dependency resolution in a build system (e.g. course prerequisites), for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a computer network's device connections, with 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a social network's friend connections, with V vertices, E edges.", "Explain the time complexity of finding minimum spanning tree for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling dependency resolution in a build system, for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a package manager's dependency graph (e.g. course prerequisites), for V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a recommendation engine's item similarity graph, for 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a city's road/metro map, with 1,000 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a recommendation engine's item similarity graph, for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling dependency resolution in a build system, with 1,000 vertices.", "Explain how Topological Sort works on a DAG representing a game map with rooms and passages (e.g. course prerequisites), for 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a city's road/metro map, with 10^5 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling GPS navigation and shortest route finding, for 100 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling electrical circuit connections, with 100 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a recommendation engine's item similarity graph, with 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a computer network's device connections, for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling GPS navigation and shortest route finding, with 1,000 vertices.", "Explain the time complexity of adding an edge for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding shortest path (unweighted) for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling GPS navigation and shortest route finding, for 10 vertices.", "Explain how a Minimum Spanning Tree would be useful for electrical circuit connections, and name one algorithm to find it.", "Explain the time complexity of checking bipartiteness for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a recommendation engine's item similarity graph (e.g. course prerequisites), for 100 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling electrical circuit connections, with 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a social network's friend connections (e.g. course prerequisites), for V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a recommendation engine's item similarity graph, for 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a computer network's device connections, for V vertices, E edges.", "Explain the time complexity of removing an edge for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a city's road/metro map, for 10 vertices.", "Explain how Topological Sort works on a DAG representing a social network's friend connections (e.g. course prerequisites), for 10 vertices.", "Explain how Topological Sort works on a DAG representing a computer network's device connections (e.g. course prerequisites), for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a package manager's dependency graph (e.g. course prerequisites), for 100 vertices.", "Explain how Topological Sort works on a DAG representing a website's hyperlink structure (e.g. course prerequisites), for 1,000 vertices.", "Explain the time complexity of topological sorting for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of adding a vertex for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of DFS traversal for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a social network's friend connections (e.g. course prerequisites), for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a recommendation engine's item similarity graph, with 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling GPS navigation and shortest route finding, with 10^5 vertices.", "Explain the time complexity of removing an edge for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a package manager's dependency graph, with V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a course prerequisite structure in a college, for V vertices, E edges.", "Explain the difference between a Strongly Connected Component and a simple Connected Component, using a course prerequisite structure in a college.", "Explain the time complexity of finding minimum spanning tree for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling electrical circuit connections, with 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a course prerequisite structure in a college, with 10^5 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a social network's friend connections, for 10 vertices.", "Explain how Topological Sort works on a DAG representing a website's hyperlink structure (e.g. course prerequisites), for 10 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling electrical circuit connections, with 10 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a computer network's device connections, with V vertices, E edges.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a website's hyperlink structure, for 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling electrical circuit connections, for V vertices, E edges.", "Explain how BFS finds the shortest path in an unweighted graph modeling a package manager's dependency graph, with 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a computer network's device connections, for 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a package manager's dependency graph, for 100 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a computer network's device connections, with 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a game map with rooms and passages, with 1,000 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling dependency resolution in a build system, for 100 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a package manager's dependency graph, with 10 vertices.", "Explain the time complexity of adding a vertex for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a recommendation engine's item similarity graph (e.g. course prerequisites), for 10 vertices.", "Explain the time complexity of finding shortest path (weighted, Dijkstra) for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding connected components for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a package manager's dependency graph (e.g. course prerequisites), for 10 vertices.", "Explain the time complexity of detecting a cycle for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a social network's friend connections, with 10 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a city's road/metro map, with V vertices, E edges.", "Explain how Topological Sort works on a DAG representing a game map with rooms and passages (e.g. course prerequisites), for 10 vertices.", "Explain the time complexity of removing an edge for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of adding an edge for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing dependency resolution in a build system (e.g. course prerequisites), for V vertices, E edges.", "Explain the time complexity of checking connectivity for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling flight routes between airports, with 10^5 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a website's hyperlink structure, for 100 vertices.", "Explain how Topological Sort works on a DAG representing a social network's friend connections (e.g. course prerequisites), for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing flight routes between airports (e.g. course prerequisites), for 10 vertices.", "Explain the time complexity of DFS traversal for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a recommendation engine's item similarity graph (e.g. course prerequisites), for 1,000 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a recommendation engine's item similarity graph, for V vertices, E edges.", "Explain how Topological Sort works on a DAG representing GPS navigation and shortest route finding (e.g. course prerequisites), for 100 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling flight routes between airports, with 100 vertices.", "Explain how Topological Sort works on a DAG representing flight routes between airports (e.g. course prerequisites), for 1,000 vertices.", "Explain the time complexity of finding shortest path (unweighted) for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding minimum spanning tree for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding shortest path (unweighted) for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of checking bipartiteness for a graph with 100 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a course prerequisite structure in a college, with 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a game map with rooms and passages, for V vertices, E edges.", "Explain how Topological Sort works on a DAG representing flight routes between airports (e.g. course prerequisites), for 100 vertices.", "Explain the time complexity of checking connectivity for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding connected components for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling flight routes between airports, for 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a recommendation engine's item similarity graph, for 10 vertices.", "Explain the time complexity of removing an edge for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding shortest path (weighted, Dijkstra) for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding shortest path (unweighted) for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of checking connectivity for a graph with 10 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a course prerequisite structure in a college, for 10 vertices.", "Explain the time complexity of BFS traversal for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a package manager's dependency graph, with 10^5 vertices.", "Explain the time complexity of finding connected components for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of topological sorting for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing a course prerequisite structure in a college (e.g. course prerequisites), for 10 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a package manager's dependency graph, for 10^5 vertices.", "Explain the time complexity of finding strongly connected components for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a game map with rooms and passages, with 10 vertices.", "Explain how Topological Sort works on a DAG representing GPS navigation and shortest route finding (e.g. course prerequisites), for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing a website's hyperlink structure (e.g. course prerequisites), for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling GPS navigation and shortest route finding, with 100 vertices.", "Explain how Topological Sort works on a DAG representing a city's road/metro map (e.g. course prerequisites), for 100 vertices.", "Explain how Topological Sort works on a DAG representing dependency resolution in a build system (e.g. course prerequisites), for 1,000 vertices.", "Explain how Topological Sort works on a DAG representing GPS navigation and shortest route finding (e.g. course prerequisites), for 10^5 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling a recommendation engine's item similarity graph, with 10^5 vertices.", "Explain how Topological Sort works on a DAG representing electrical circuit connections (e.g. course prerequisites), for 10^5 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a city's road/metro map, for 10^5 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a city's road/metro map, for V vertices, E edges.", "Explain the time complexity of checking connectivity for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding strongly connected components for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling GPS navigation and shortest route finding, for 10^5 vertices.", "Explain how Topological Sort works on a DAG representing a course prerequisite structure in a college (e.g. course prerequisites), for 100 vertices.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling a game map with rooms and passages, for 1,000 vertices.", "Explain the time complexity of checking bipartiteness for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain how Dijkstra's Algorithm finds the shortest path in a weighted graph modeling dependency resolution in a build system, for 1,000 vertices.", "Explain the time complexity of adding an edge for a graph with 1,000 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of finding minimum spanning tree for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling flight routes between airports, with 1,000 vertices.", "Explain how BFS finds the shortest path in an unweighted graph modeling dependency resolution in a build system, with 10 vertices.", "Explain the time complexity of DFS traversal for a graph with 10^5 vertices, using both Adjacency List and Adjacency Matrix representations.", "Explain the time complexity of BFS traversal for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how Topological Sort works on a DAG representing GPS navigation and shortest route finding (e.g. course prerequisites), for 10 vertices.", "Explain the time complexity of finding shortest path (weighted, Dijkstra) for a graph with V vertices, E edges, using both Adjacency List and Adjacency Matrix representations.", "Explain how BFS finds the shortest path in an unweighted graph modeling a course prerequisite structure in a college, with V vertices, E edges."], "hard": ["Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using electrical circuit connections with V vertices, E edges as a case study.", "Design Dijkstra's Algorithm using a Min-Heap for a weighted graph with 10 vertices modeling GPS navigation and shortest route finding, and analyse its time complexity.", "Design an approach to check whether a graph with 1,000 vertices is Bipartite, using BFS/DFS colouring, for a course prerequisite structure in a college.", "Design an approach to check whether a graph with 100 vertices is Bipartite, using BFS/DFS colouring, for a recommendation engine's item similarity graph.", "Design an algorithm to detect a cycle in a Directed Graph with 10 vertices using DFS colouring (white/grey/black), for electrical circuit connections.", "Design an algorithm to find all Strongly Connected Components in a Directed Graph with 100 vertices, referencing Tarjan's or Kosaraju's Algorithm conceptually.", "Design an algorithm to detect a cycle in a Directed Graph with 100 vertices using DFS colouring (white/grey/black), for dependency resolution in a build system.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for GPS navigation and shortest route finding with 10^5 vertices.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a website's hyperlink structure at V vertices, E edges.", "Design an algorithm to find all Strongly Connected Components in a Directed Graph with V vertices, E edges, referencing Tarjan's or Kosaraju's Algorithm conceptually.", "Design an approach to check whether a graph with 10 vertices is Bipartite, using BFS/DFS colouring, for flight routes between airports.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 100 vertices modeling a computer network's device connections, where Dijkstra's would fail.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a city's road/metro map at 1,000 vertices.", "Explain how Kruskal's or Prim's Algorithm finds a Minimum Spanning Tree for a graph with V vertices, E edges representing dependency resolution in a build system, and compare their approaches.", "Design an approach to check whether a graph with 10 vertices is Bipartite, using BFS/DFS colouring, for a course prerequisite structure in a college.", "Design an approach to check whether a graph with 1,000 vertices is Bipartite, using BFS/DFS colouring, for a recommendation engine's item similarity graph.", "Design an algorithm to detect a cycle in a Directed Graph with 10^5 vertices using DFS colouring (white/grey/black), for dependency resolution in a build system.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a social network's friend connections with V vertices, E edges as a case study.", "Design an algorithm to detect a cycle in a Directed Graph with V vertices, E edges using DFS colouring (white/grey/black), for a computer network's device connections.", "Design an algorithm to find all Strongly Connected Components in a Directed Graph with 10^5 vertices, referencing Tarjan's or Kosaraju's Algorithm conceptually.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a game map with rooms and passages at 100 vertices.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in a recommendation engine's item similarity graph with 10^5 vertices, using a heuristic.", "Design an approach to check whether a graph with 10^5 vertices is Bipartite, using BFS/DFS colouring, for a course prerequisite structure in a college.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a recommendation engine's item similarity graph at 10 vertices.", "Design an algorithm to find all Strongly Connected Components in a Directed Graph with 10 vertices, referencing Tarjan's or Kosaraju's Algorithm conceptually.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in dependency resolution in a build system with 10^5 vertices, using a heuristic.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a city's road/metro map with 1,000 vertices as a case study.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a package manager's dependency graph at V vertices, E edges.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a game map with rooms and passages at 10^5 vertices.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 100 vertices modeling a game map with rooms and passages, where Dijkstra's would fail.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 100 vertices modeling electrical circuit connections, where Dijkstra's would fail.", "Design an approach to check whether a graph with 10^5 vertices is Bipartite, using BFS/DFS colouring, for a social network's friend connections.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for a recommendation engine's item similarity graph with 100 vertices.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a recommendation engine's item similarity graph with 10^5 vertices as a case study.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a city's road/metro map with 10^5 vertices as a case study.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in a website's hyperlink structure with 10 vertices, using a heuristic.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a city's road/metro map at 100 vertices.", "Design an algorithm to detect a cycle in a Directed Graph with 1,000 vertices using DFS colouring (white/grey/black), for a social network's friend connections.", "Explain how Kruskal's or Prim's Algorithm finds a Minimum Spanning Tree for a graph with 1,000 vertices representing electrical circuit connections, and compare their approaches.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for a recommendation engine's item similarity graph with 10^5 vertices.", "Design Dijkstra's Algorithm using a Min-Heap for a weighted graph with 10^5 vertices modeling a computer network's device connections, and analyse its time complexity.", "Design an algorithm to detect a cycle in a Directed Graph with 10^5 vertices using DFS colouring (white/grey/black), for flight routes between airports.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a city's road/metro map at 10^5 vertices.", "Design an approach to check whether a graph with 10 vertices is Bipartite, using BFS/DFS colouring, for GPS navigation and shortest route finding.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a website's hyperlink structure with 1,000 vertices as a case study.", "Design an approach to check whether a graph with 10 vertices is Bipartite, using BFS/DFS colouring, for dependency resolution in a build system.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of flight routes between airports at 1,000 vertices.", "Design an algorithm to find all Strongly Connected Components in a Directed Graph with 1,000 vertices, referencing Tarjan's or Kosaraju's Algorithm conceptually.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with V vertices, E edges modeling a website's hyperlink structure, where Dijkstra's would fail.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 100 vertices modeling a course prerequisite structure in a college, where Dijkstra's would fail.", "Design an approach to check whether a graph with V vertices, E edges is Bipartite, using BFS/DFS colouring, for a computer network's device connections.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for a package manager's dependency graph with 100 vertices.", "Design an algorithm to detect a cycle in a Directed Graph with 1,000 vertices using DFS colouring (white/grey/black), for a website's hyperlink structure.", "Explain how Kruskal's or Prim's Algorithm finds a Minimum Spanning Tree for a graph with 10 vertices representing a social network's friend connections, and compare their approaches.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a game map with rooms and passages with 10^5 vertices as a case study.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in a game map with rooms and passages with V vertices, E edges, using a heuristic.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 100 vertices modeling GPS navigation and shortest route finding, where Dijkstra's would fail.", "Design an algorithm to detect a cycle in a Directed Graph with 10^5 vertices using DFS colouring (white/grey/black), for a social network's friend connections.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using flight routes between airports with 100 vertices as a case study.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a social network's friend connections with 10 vertices as a case study.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a city's road/metro map with V vertices, E edges as a case study.", "Design an algorithm to detect a cycle in a Directed Graph with V vertices, E edges using DFS colouring (white/grey/black), for flight routes between airports.", "Design an approach to check whether a graph with 1,000 vertices is Bipartite, using BFS/DFS colouring, for electrical circuit connections.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for GPS navigation and shortest route finding with 1,000 vertices.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 1,000 vertices modeling flight routes between airports, where Dijkstra's would fail.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using dependency resolution in a build system with 100 vertices as a case study.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a website's hyperlink structure at 100 vertices.", "Explain how Kruskal's or Prim's Algorithm finds a Minimum Spanning Tree for a graph with 1,000 vertices representing a package manager's dependency graph, and compare their approaches.", "Design an algorithm to detect a cycle in a Directed Graph with 100 vertices using DFS colouring (white/grey/black), for a course prerequisite structure in a college.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in a game map with rooms and passages with 100 vertices, using a heuristic.", "Design Dijkstra's Algorithm using a Min-Heap for a weighted graph with 10 vertices modeling a game map with rooms and passages, and analyse its time complexity.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 10 vertices modeling a website's hyperlink structure, where Dijkstra's would fail.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in a social network's friend connections with 10 vertices, using a heuristic.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a social network's friend connections with 100 vertices as a case study.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for dependency resolution in a build system with V vertices, E edges.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a package manager's dependency graph with 100 vertices as a case study.", "Explain how Kruskal's or Prim's Algorithm finds a Minimum Spanning Tree for a graph with V vertices, E edges representing electrical circuit connections, and compare their approaches.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a computer network's device connections at 10^5 vertices.", "Explain how Kruskal's or Prim's Algorithm finds a Minimum Spanning Tree for a graph with 100 vertices representing a city's road/metro map, and compare their approaches.", "Design Dijkstra's Algorithm using a Min-Heap for a weighted graph with 10 vertices modeling flight routes between airports, and analyse its time complexity.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in dependency resolution in a build system with 1,000 vertices, using a heuristic.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 1,000 vertices modeling a computer network's device connections, where Dijkstra's would fail.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in a social network's friend connections with 1,000 vertices, using a heuristic.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a social network's friend connections at 10 vertices.", "Design an algorithm to detect a cycle in a Directed Graph with 1,000 vertices using DFS colouring (white/grey/black), for flight routes between airports.", "Design an approach to check whether a graph with V vertices, E edges is Bipartite, using BFS/DFS colouring, for electrical circuit connections.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for a computer network's device connections with 1,000 vertices.", "Explain how the Bellman-Ford Algorithm handles negative edge weights for a graph with 10^5 vertices modeling a recommendation engine's item similarity graph, where Dijkstra's would fail.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in flight routes between airports with 10 vertices, using a heuristic.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a recommendation engine's item similarity graph with 10 vertices as a case study.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a computer network's device connections with 100 vertices as a case study.", "Explain how Topological Sort (via DFS or Kahn's Algorithm) resolves dependency ordering for a game map with rooms and passages with 1,000 vertices.", "Design an approach to check whether a graph with 100 vertices is Bipartite, using BFS/DFS colouring, for a computer network's device connections.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a website's hyperlink structure at 10^5 vertices.", "Critically evaluate: 'BFS is always better than DFS.' Discuss trade-offs using a course prerequisite structure in a college with 100 vertices as a case study.", "Explain how the A* search algorithm improves on Dijkstra's for pathfinding in GPS navigation and shortest route finding with 10 vertices, using a heuristic.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a social network's friend connections at 1,000 vertices.", "Design an approach to check whether a graph with 1,000 vertices is Bipartite, using BFS/DFS colouring, for dependency resolution in a build system.", "Explain the time/space trade-offs of Adjacency Matrix vs Adjacency List for a dense vs sparse graph, in the context of a course prerequisite structure in a college at 100 vertices.", "Design Dijkstra's Algorithm using a Min-Heap for a weighted graph with 1,000 vertices modeling GPS navigation and shortest route finding, and analyse its time complexity."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

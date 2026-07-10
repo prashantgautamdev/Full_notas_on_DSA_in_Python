@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 10: Hashing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li class="current">Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 10</h1>
+  <div class="subtitle">Hashing</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Understand what a <span class="mark">Hash Function</span> and <span class="mark">Hash Table</span> are.</li>
+    <li>Understand <span class="mark-g">Collisions</span> and resolution via Chaining vs Open Addressing.</li>
+    <li>Analyse average-case O(1) vs worst-case O(n) complexity and why it matters.</li>
+    <li>Understand <span class="mark">Load Factor</span> and Rehashing.</li>
+    <li>Solve classic hashing problems: duplicates, frequency counting, anagram grouping.</li>
+    <li>Use Python dictionaries and sets effectively as hash-based structures.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Hash Function</b> — a function that converts a key (of any size) into a fixed-size integer (hash code), used to determine the index/bucket in a Hash Table.</div>
+  <div class="box def"><b>Hash Table</b> — a data structure that maps keys to values using a hash function for near-instant (average O(1)) lookup, insert, and delete.</div>
+  <div class="box def"><b>Collision</b> — when two different keys produce the same hash code (or the same table index) — must be resolved so both keys can coexist.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Hash Functions, Collisions, Load Factor</h2>
+
+  <h3 class="subsec">How Hashing Works</h3>
+  <div class="box formula">index = hash(key) % table_size</div>
+  <div class="diagram">
+    <div class="node">key</div><span class="arrow">→</span>
+    <div class="node">hash()</div><span class="arrow">→</span>
+    <div class="cell">index 3</div>
+  </div>
+  <p>A good <span class="mark">hash function</span> spreads keys evenly, so most lookups need just one step — giving average <b>O(1)</b> time.</p>
+
+  <h3 class="subsec">Collision Resolution</h3>
+  <table>
+    <tr><th>Chaining</th><th>Open Addressing</th></tr>
+    <tr><td>Each bucket holds a Linked List of entries</td><td>On collision, probe for the next free slot</td></tr>
+    <tr><td>Simple, handles high load factor gracefully</td><td>Better cache locality, but clustering risk</td></tr>
+    <tr><td>Extra memory for list pointers</td><td>Needs careful deletion handling (tombstones)</td></tr>
+  </table>
+
+  <h3 class="subsec">Load Factor &amp; Rehashing</h3>
+  <div class="box formula">load_factor = number_of_elements / table_size</div>
+  <p>When the load factor crosses a threshold (commonly 0.7), the table <span class="mark">rehashes</span> — doubles in size and reinserts everything. This is O(n) but happens rarely, so insert is still <b>O(1) amortised</b>.</p>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples &amp; Key Points</h2>
+
+  <div class="box example"><b>Phone Book App:</b> name → number, instant O(1) lookup instead of scanning every contact.</div>
+  <div class="box example"><b>Spell Checker:</b> a Hash Set of valid words gives instant "is this word real?" checks.</div>
+  <div class="box example"><b>Caching:</b> URL → cached response, avoiding repeated expensive computation/network calls.</div>
+  <div class="box example"><b>Duplicate Detection:</b> add each item to a Hash Set; if it's already there, you've found a duplicate — O(n) total instead of O(n²).</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Hash Table operations are <b>O(1) average case</b>, but can degrade to <b>O(n) worst case</b> with a poor hash function or many collisions.</li>
+    <li>Python's <code>dict</code> and <code>set</code> are both Hash Tables under the hood — keys must be <b>hashable</b> (immutable).</li>
+    <li>Unlike a BST, a Hash Table gives <b>no ordering guarantee</b> — if you need sorted iteration, a Tree is better.</li>
+    <li>A <b>Bloom Filter</b> is a space-efficient alternative when a small false-positive rate is acceptable.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Using Python's Built-in dict / set</h3>
+  <div class="codebox"><span class="cm"># O(1) average insert, lookup, delete</span>
+cache = {}
+cache[<span class="st">'url1'</span>] = <span class="st">'response data'</span>
+<span class="kw">if</span> <span class="st">'url1'</span> <span class="kw">in</span> cache:      <span class="cm"># O(1) average</span>
+    print(cache[<span class="st">'url1'</span>])</div>
+
+  <h3 class="subsec">Simple Hash Table with Chaining</h3>
+  <div class="codebox"><span class="kw">class</span> HashTable:
+    <span class="kw">def</span> __init__(self, size=10):
+        self.size = size
+        self.table = [[] <span class="kw">for</span> _ <span class="kw">in</span> range(size)]
+
+    <span class="kw">def</span> _hash(self, key):
+        <span class="kw">return</span> hash(key) % self.size
+
+    <span class="kw">def</span> insert(self, key, value):
+        idx = self._hash(key)
+        <span class="kw">for</span> pair <span class="kw">in</span> self.table[idx]:
+            <span class="kw">if</span> pair[0] == key:
+                pair[1] = value; <span class="kw">return</span>
+        self.table[idx].append([key, value])
+
+    <span class="kw">def</span> get(self, key):
+        idx = self._hash(key)
+        <span class="kw">for</span> k, v <span class="kw">in</span> self.table[idx]:
+            <span class="kw">if</span> k == key: <span class="kw">return</span> v
+        <span class="kw">raise</span> KeyError(key)</div>
+
+  <h3 class="subsec">Detect Duplicates using a Hash Set</h3>
+  <div class="codebox"><span class="kw">def</span> has_duplicate(arr):
+    seen = set()
+    <span class="kw">for</span> x <span class="kw">in</span> arr:
+        <span class="kw">if</span> x <span class="kw">in</span> seen: <span class="kw">return</span> <span class="kw">True</span>   <span class="cm"># O(1) average check</span>
+        seen.add(x)
+    <span class="kw">return</span> <span class="kw">False</span>   <span class="cm"># overall O(n)</span></div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">"Need O(1) lookup, don't care about order" → <b>Hash Table/Set</b> immediately.</div>
+  <div class="box tip">"Count frequency of items" → use a <code>dict</code> or <code>collections.Counter</code> — instant O(n) frequency map.</div>
+  <div class="box tip">"Two Sum" style problems almost always optimise from O(n²) to O(n) using a Hash Set/Map.</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Assuming Hash Table operations are always O(1) — worst case (many collisions / bad hash function) is O(n).</div>
+  <div class="box mistake">Trying to use a mutable type (like a list) as a dictionary key in Python — raises a TypeError since it's unhashable.</div>
+  <div class="box mistake">Relying on dictionary iteration order for logic that assumes sorting — use a sorted structure if order matters.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Implement a basic Hash Table with insert, get, and delete using chaining.</li>
+    <li>Write a function to check if an array contains duplicates using a Hash Set.</li>
+    <li>Write a function to count the frequency of each element in an array using a dictionary.</li>
+    <li>Write a function to find two numbers in an array that sum to a target (Two Sum) using a Hash Map.</li>
+    <li>Write a function to group anagrams together from a list of strings using a Hash Map.</li>
+    <li>Write a function to find the first non-repeating character in a string using a Hash Map.</li>
+    <li>Write a function to check if two strings are anagrams of each other using a frequency Hash Map.</li>
+    <li>Write a function to find the longest substring without repeating characters using a Hash Set/Map.</li>
+    <li>Write a function to find the intersection of two arrays using Hash Sets.</li>
+    <li>Write a function to find all pairs with a given difference using a Hash Set.</li>
+    <li>Write a function to implement an LRU Cache using a Hash Map + Doubly Linked List.</li>
+    <li>Write a function to check if a subarray with sum zero exists using a Hash Set (prefix sum).</li>
+    <li>Write a function to find the longest consecutive sequence in an unsorted array using a Hash Set.</li>
+    <li>Write a function to design a simple cache with get/put operations (Hash Map based).</li>
+    <li>Write a function to find all subarrays with a given sum using prefix sums and a Hash Map.</li>
+    <li>Write a function to count distinct elements in every window of size k using a Hash Map.</li>
+    <li>Write a function to check if two arrays are equal as multisets (same elements, same counts) using a Hash Map.</li>
+    <li>Write a function to find the majority element in an array using a Hash Map.</li>
+    <li>Write a function to implement a basic Bloom Filter using multiple hash functions.</li>
+    <li>Write a function to design a HashSet from scratch without using Python's built-in set.</li>
+    <li>Write a function to find the top k frequent elements in an array using a Hash Map + Heap.</li>
+    <li>Write a function to detect if a linked list has a cycle using a Hash Set (alternative to Floyd's algorithm).</li>
+    <li>Write a function to find all duplicate subtrees in a Binary Tree using serialization + a Hash Map.</li>
+    <li>Write a function to design a Twitter-like feed system using Hash Maps for user posts (simplified).</li>
+    <li>Write a function to implement Consistent Hashing conceptually for distributing keys across servers.</li>
+    <li>Write a function to find the shortest subarray containing all unique elements of the array using a Hash Map.</li>
+    <li>Write a function to check if a Sudoku board is valid using Hash Sets for rows, columns, and boxes.</li>
+    <li>Write a function to find the number of subarrays with exactly k distinct integers using a Hash Map.</li>
+    <li>Write a function to implement a rate limiter using a Hash Map of timestamps.</li>
+    <li>Write a function to design a simple key-value store supporting get/put/delete in O(1) average time.</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    A <b>Hash Table</b> maps keys to values via a <b>Hash Function</b>, giving average O(1) insert/lookup/delete. <b>Collisions</b> are resolved via <b>Chaining</b> (linked lists per bucket) or <b>Open Addressing</b> (probing for a free slot). The <b>Load Factor</b> triggers <b>Rehashing</b> to keep performance near O(1). Hash-based structures (dict, set) are the go-to tool for frequency counting, duplicate detection, and O(1) lookups — but sacrifice ordering, unlike Trees.
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">index = hash(key) % table_size &nbsp;|&nbsp; load_factor = n / table_size</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 10 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Hash Function</td><td>Converts a key into a fixed-size index</td></tr>
+    <tr><td>Hash Table</td><td>Average O(1) insert/lookup/delete</td></tr>
+    <tr><td>Collision</td><td>Two keys mapping to the same index</td></tr>
+    <tr><td>Chaining</td><td>Linked list per bucket to handle collisions</td></tr>
+    <tr><td>Open Addressing</td><td>Probe for next free slot on collision</td></tr>
+    <tr><td>Load Factor</td><td>n / table_size — triggers rehashing</td></tr>
+    <tr><td>Rehashing</td><td>Resize + reinsert all — O(n) but rare, amortised O(1)</td></tr>
+    <tr><td>Python dict/set</td><td>Hash Table under the hood, keys must be hashable</td></tr>
+    <tr><td>Two Sum pattern</td><td>O(n²) brute force → O(n) with Hash Map</td></tr>
+    <tr><td>Bloom Filter</td><td>Space-efficient, allows small false-positive rate</td></tr>
+  </table>
+  <div class="box formula">index = hash(key) % table_size</div>
+  <div class="box tip">Golden rule: <b>Need O(1) lookup/duplicate-check, don't care about order → Hash Table/Set.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Implement a basic Hash Table with insert, get, and delete using chaining.", "Write a function to check if an array contains duplicates using a Hash Set.", "Write a function to count the frequency of each element in an array using a dictionary.", "Write a function to find two numbers in an array that sum to a target (Two Sum) using a Hash Map.", "Write a function to group anagrams together from a list of strings using a Hash Map.", "Write a function to find the first non-repeating character in a string using a Hash Map.", "Write a function to check if two strings are anagrams of each other using a frequency Hash Map.", "Write a function to find the longest substring without repeating characters using a Hash Set/Map.", "Write a function to find the intersection of two arrays using Hash Sets.", "Write a function to find all pairs with a given difference using a Hash Set.", "Write a function to implement an LRU Cache using a Hash Map + Doubly Linked List.", "Write a function to check if a subarray with sum zero exists using a Hash Set (prefix sum).", "Write a function to find the longest consecutive sequence in an unsorted array using a Hash Set.", "Write a function to design a simple cache with get/put operations (Hash Map based).", "Write a function to find all subarrays with a given sum using prefix sums and a Hash Map.", "Write a function to count distinct elements in every window of size k using a Hash Map.", "Write a function to check if two arrays are equal as multisets (same elements, same counts) using a Hash Map.", "Write a function to find the majority element in an array using a Hash Map.", "Write a function to implement a basic Bloom Filter using multiple hash functions.", "Write a function to design a HashSet from scratch without using Python's built-in set.", "Write a function to find the top k frequent elements in an array using a Hash Map + Heap.", "Write a function to detect if a linked list has a cycle using a Hash Set (alternative to Floyd's algorithm).", "Write a function to find all duplicate subtrees in a Binary Tree using serialization + a Hash Map.", "Write a function to design a Twitter-like feed system using Hash Maps for user posts (simplified).", "Write a function to implement Consistent Hashing conceptually for distributing keys across servers.", "Write a function to find the shortest subarray containing all unique elements of the array using a Hash Map.", "Write a function to check if a Sudoku board is valid using Hash Sets for rows, columns, and boxes.", "Write a function to find the number of subarrays with exactly k distinct integers using a Hash Map.", "Write a function to implement a rate limiter using a Hash Map of timestamps.", "Write a function to design a simple key-value store supporting get/put/delete in O(1) average time."]}, "practice": {"easy": ["What does the 'load factor' of a Hash Table measure?", "Name one real-life example of hashing being used, such as a compiler's symbol table.", "Define the term 'Hash Table' in your own words.", "What is the difference between Chaining and Open Addressing for collision resolution?", "Write one disadvantage of using a Hash Table for a database index for fast record lookup.", "What is the average-case time complexity of updating a value for a key in a Hash Table of size 1,000?", "Why must dictionary keys in Python be immutable (hashable)?", "Fill in the blank: resolving a collision (chaining) in a Hash Table has an average time complexity of ______.", "What Python data structure is implemented internally using hashing?", "Fill in the blank: search/lookup in a Hash Table has an average time complexity of ______.", "Define the term 'Double Hashing' in your own words.", "Fill in the blank: deletion in a Hash Table has an average time complexity of ______.", "Name one real-life example of hashing being used, such as caching API responses by request URL.", "State True or False: Collisions in a Hash Table can be resolved using chaining or open addressing.", "Name one real-life example of hashing being used, such as storing a shopping cart mapping product ID to quantity.", "Write one advantage of a Hash Table over a Binary Search Tree for checking for a key's existence.", "State True or False: Python's dictionary is implemented using a Hash Table internally.", "What is the average-case time complexity of resolving a collision (open addressing) in a Hash Table of size 10^5?", "Write one disadvantage of using a Hash Table for grouping anagrams together.", "State True or False: Two different keys can never produce the same hash code in a well-designed hash function.", "State True or False: Hash Table lookup, insert, and delete are O(1) in the average case.", "For an image cache mapping file hash to image data with 10^5 entries, would a Hash Table be a good fit? Why?", "Define the term 'Collision' in your own words.", "What is a 'collision' in the context of a Hash Table?", "Name one real-life example of hashing being used, such as a social media app's user-ID lookup.", "State True or False: Rehashing increases the table size and redistributes all elements when the load factor gets too high.", "Write one advantage of a Hash Table over a Binary Search Tree for rehashing on load factor increase.", "Write one disadvantage of using a Hash Table for an image cache mapping file hash to image data.", "Name one real-life example of hashing being used, such as a database index for fast record lookup.", "Name one real-life example of hashing being used, such as grouping anagrams together.", "Define the term 'Quadratic Probing' in your own words.", "Write one disadvantage of using a Hash Table for a social media app's user-ID lookup.", "Define the term 'Rehashing' in your own words.", "Write one advantage of a Hash Table over a Binary Search Tree for iterating over all key-value pairs.", "For a social media app's user-ID lookup with 10,000 entries, would a Hash Table be a good fit? Why?", "Fill in the blank: resolving a collision (open addressing) in a Hash Table has an average time complexity of ______.", "For detecting duplicate entries in a large dataset with 100 entries, would a Hash Table be a good fit? Why?", "Write one disadvantage of using a Hash Table for a login system checking username availability.", "What is the average-case time complexity of iterating over all key-value pairs in a Hash Table of size 10^6?", "Write one disadvantage of using a Hash Table for counting word frequency in a document.", "Fill in the blank: computing a hash code in a Hash Table has an average time complexity of ______.", "Write one advantage of a Hash Table over a Binary Search Tree for deletion.", "Define the term 'Hash Function' in your own words.", "Write one advantage of a Hash Table over a Binary Search Tree for search/lookup.", "For caching API responses by request URL with n entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of insertion in a Hash Table of size n?", "What is the average-case time complexity of insertion in a Hash Table of size 10,000?", "Write one disadvantage of using a Hash Table for caching API responses by request URL.", "Define the term 'Perfect Hash Function' in your own words.", "Fill in the blank: iterating over all key-value pairs in a Hash Table has an average time complexity of ______.", "What is the average-case time complexity of search/lookup in a Hash Table of size 10,000?", "For detecting duplicate entries in a large dataset with 10,000 entries, would a Hash Table be a good fit? Why?", "Define the term 'Open Addressing' in your own words.", "Write one advantage of a Hash Table over a Binary Search Tree for updating a value for a key.", "Write one disadvantage of using a Hash Table for a compiler's symbol table.", "Write one disadvantage of using a Hash Table for a spell-checker's dictionary of valid words.", "Fill in the blank: insertion in a Hash Table has an average time complexity of ______.", "Define the term 'Hash Code' in your own words.", "Name one real-life example of hashing being used, such as a phone book mapping names to numbers.", "For a spell-checker's dictionary of valid words with 10^5 entries, would a Hash Table be a good fit? Why?", "State True or False: A Hash Table guarantees O(1) worst-case lookup time.", "Define the term 'Bucket' in your own words.", "What is the average-case time complexity of rehashing on load factor increase in a Hash Table of size 10^6?", "For grouping anagrams together with 100 entries, would a Hash Table be a good fit? Why?", "Name one real-life example of hashing being used, such as a login system checking username availability.", "Write one disadvantage of using a Hash Table for storing a shopping cart mapping product ID to quantity.", "Define the term 'Chaining' in your own words.", "Write one advantage of a Hash Table over a Binary Search Tree for computing a hash code.", "Define the term 'Load Factor' in your own words.", "What is the average-case time complexity of computing a hash code in a Hash Table of size 10,000?", "Define the term 'Linear Probing' in your own words.", "State True or False: A good hash function distributes keys uniformly across the hash table.", "Name one real-life example of hashing being used, such as a spell-checker's dictionary of valid words.", "Fill in the blank: updating a value for a key in a Hash Table has an average time complexity of ______.", "What is the average-case time complexity of checking for a key's existence in a Hash Table of size 10,000?", "What is the average-case time complexity of resolving a collision (chaining) in a Hash Table of size 1,000?", "Write one disadvantage of using a Hash Table for detecting duplicate entries in a large dataset.", "What is the average-case time complexity of insertion in a Hash Table of size 10^6?", "For an image cache mapping file hash to image data with 10^6 entries, would a Hash Table be a good fit? Why?", "Name one real-life example of hashing being used, such as an image cache mapping file hash to image data.", "For a compiler's symbol table with 1,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (open addressing) in a Hash Table of size 100?", "What is the average-case time complexity of computing a hash code in a Hash Table of size 1,000?", "What is the average-case time complexity of iterating over all key-value pairs in a Hash Table of size 100?", "For grouping anagrams together with n entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (open addressing) in a Hash Table of size n?", "For caching API responses by request URL with 10^5 entries, would a Hash Table be a good fit? Why?", "State True or False: The load factor is the ratio of number of stored elements to the table size.", "What is the average-case time complexity of iterating over all key-value pairs in a Hash Table of size 1,000?", "Fill in the blank: checking for a key's existence in a Hash Table has an average time complexity of ______.", "What is the average-case time complexity of deletion in a Hash Table of size 10,000?", "What is the average-case time complexity of checking for a key's existence in a Hash Table of size 1,000?", "Name one real-life example of hashing being used, such as counting word frequency in a document.", "For a login system checking username availability with 10,000 entries, would a Hash Table be a good fit? Why?", "For a login system checking username availability with 10^6 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of computing a hash code in a Hash Table of size 10^5?", "For a database index for fast record lookup with n entries, would a Hash Table be a good fit? Why?", "For a compiler's symbol table with 100 entries, would a Hash Table be a good fit? Why?", "For a social media app's user-ID lookup with 10^6 entries, would a Hash Table be a good fit? Why?", "For a compiler's symbol table with 10,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of search/lookup in a Hash Table of size 10^6?", "For a spell-checker's dictionary of valid words with 10,000 entries, would a Hash Table be a good fit? Why?", "State True or False: Linear probing can suffer from 'clustering', reducing performance as the table fills up.", "For grouping anagrams together with 10,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of rehashing on load factor increase in a Hash Table of size 10,000?", "What is the average-case time complexity of updating a value for a key in a Hash Table of size 10,000?", "What is the average-case time complexity of computing a hash code in a Hash Table of size 10^6?", "Write one advantage of a Hash Table over a Binary Search Tree for resolving a collision (chaining).", "For a login system checking username availability with n entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (chaining) in a Hash Table of size n?", "What is the average-case time complexity of resolving a collision (open addressing) in a Hash Table of size 1,000?", "What is the average-case time complexity of updating a value for a key in a Hash Table of size n?", "What is the average-case time complexity of resolving a collision (chaining) in a Hash Table of size 100?", "For a social media app's user-ID lookup with 10^5 entries, would a Hash Table be a good fit? Why?", "Name one real-life example of hashing being used, such as detecting duplicate entries in a large dataset.", "What is the average-case time complexity of iterating over all key-value pairs in a Hash Table of size 10^5?", "What is the average-case time complexity of search/lookup in a Hash Table of size 1,000?", "For an image cache mapping file hash to image data with 1,000 entries, would a Hash Table be a good fit? Why?", "Fill in the blank: rehashing on load factor increase in a Hash Table has an average time complexity of ______.", "What is the average-case time complexity of updating a value for a key in a Hash Table of size 10^6?", "What is the average-case time complexity of deletion in a Hash Table of size 1,000?", "What is the average-case time complexity of updating a value for a key in a Hash Table of size 100?", "For a spell-checker's dictionary of valid words with 1,000 entries, would a Hash Table be a good fit? Why?", "For a database index for fast record lookup with 10^5 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of computing a hash code in a Hash Table of size n?", "For a phone book mapping names to numbers with n entries, would a Hash Table be a good fit? Why?", "Write one disadvantage of using a Hash Table for a phone book mapping names to numbers.", "For a compiler's symbol table with 10^5 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of deletion in a Hash Table of size n?", "For a database index for fast record lookup with 1,000 entries, would a Hash Table be a good fit? Why?", "For detecting duplicate entries in a large dataset with 10^5 entries, would a Hash Table be a good fit? Why?", "For a phone book mapping names to numbers with 100 entries, would a Hash Table be a good fit? Why?", "For an image cache mapping file hash to image data with 100 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of rehashing on load factor increase in a Hash Table of size 100?", "For a spell-checker's dictionary of valid words with 100 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of checking for a key's existence in a Hash Table of size 100?", "Write one advantage of a Hash Table over a Binary Search Tree for resolving a collision (open addressing).", "For counting word frequency in a document with 1,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of search/lookup in a Hash Table of size n?", "What is the average-case time complexity of rehashing on load factor increase in a Hash Table of size n?", "For grouping anagrams together with 1,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of checking for a key's existence in a Hash Table of size 10^5?", "What is the average-case time complexity of deletion in a Hash Table of size 10^5?", "Write one advantage of a Hash Table over a Binary Search Tree for insertion.", "For grouping anagrams together with 10^6 entries, would a Hash Table be a good fit? Why?", "For counting word frequency in a document with 100 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (chaining) in a Hash Table of size 10^6?", "For a social media app's user-ID lookup with n entries, would a Hash Table be a good fit? Why?", "For a database index for fast record lookup with 10,000 entries, would a Hash Table be a good fit? Why?", "For a database index for fast record lookup with 100 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of deletion in a Hash Table of size 100?", "For counting word frequency in a document with 10,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of insertion in a Hash Table of size 1,000?", "What is the average-case time complexity of insertion in a Hash Table of size 10^5?", "For storing a shopping cart mapping product ID to quantity with n entries, would a Hash Table be a good fit? Why?", "For detecting duplicate entries in a large dataset with 1,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (open addressing) in a Hash Table of size 10^6?", "For storing a shopping cart mapping product ID to quantity with 100 entries, would a Hash Table be a good fit? Why?", "For storing a shopping cart mapping product ID to quantity with 10^6 entries, would a Hash Table be a good fit? Why?", "For a spell-checker's dictionary of valid words with n entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (chaining) in a Hash Table of size 10,000?", "For a spell-checker's dictionary of valid words with 10^6 entries, would a Hash Table be a good fit? Why?", "For grouping anagrams together with 10^5 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of checking for a key's existence in a Hash Table of size 10^6?", "For caching API responses by request URL with 1,000 entries, would a Hash Table be a good fit? Why?", "For counting word frequency in a document with 10^5 entries, would a Hash Table be a good fit? Why?", "For a login system checking username availability with 1,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of iterating over all key-value pairs in a Hash Table of size n?", "For an image cache mapping file hash to image data with n entries, would a Hash Table be a good fit? Why?", "For caching API responses by request URL with 10^6 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (open addressing) in a Hash Table of size 10,000?", "For a compiler's symbol table with n entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of resolving a collision (chaining) in a Hash Table of size 10^5?", "What is the average-case time complexity of deletion in a Hash Table of size 10^6?", "What is the average-case time complexity of iterating over all key-value pairs in a Hash Table of size 10,000?", "For storing a shopping cart mapping product ID to quantity with 1,000 entries, would a Hash Table be a good fit? Why?", "For a social media app's user-ID lookup with 1,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of checking for a key's existence in a Hash Table of size n?", "For a phone book mapping names to numbers with 10,000 entries, would a Hash Table be a good fit? Why?", "For caching API responses by request URL with 10,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of search/lookup in a Hash Table of size 10^5?", "What is the average-case time complexity of updating a value for a key in a Hash Table of size 10^5?", "What is the average-case time complexity of rehashing on load factor increase in a Hash Table of size 10^5?", "For a phone book mapping names to numbers with 1,000 entries, would a Hash Table be a good fit? Why?", "For storing a shopping cart mapping product ID to quantity with 10^5 entries, would a Hash Table be a good fit? Why?", "For storing a shopping cart mapping product ID to quantity with 10,000 entries, would a Hash Table be a good fit? Why?", "For an image cache mapping file hash to image data with 10,000 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of rehashing on load factor increase in a Hash Table of size 1,000?", "For counting word frequency in a document with n entries, would a Hash Table be a good fit? Why?", "For a phone book mapping names to numbers with 10^5 entries, would a Hash Table be a good fit? Why?", "For a database index for fast record lookup with 10^6 entries, would a Hash Table be a good fit? Why?", "For detecting duplicate entries in a large dataset with 10^6 entries, would a Hash Table be a good fit? Why?", "For a login system checking username availability with 10^5 entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of search/lookup in a Hash Table of size 100?", "For a compiler's symbol table with 10^6 entries, would a Hash Table be a good fit? Why?", "For detecting duplicate entries in a large dataset with n entries, would a Hash Table be a good fit? Why?", "What is the average-case time complexity of computing a hash code in a Hash Table of size 100?", "For a phone book mapping names to numbers with 10^6 entries, would a Hash Table be a good fit? Why?", "For caching API responses by request URL with 100 entries, would a Hash Table be a good fit? Why?", "For a login system checking username availability with 100 entries, would a Hash Table be a good fit? Why?"], "medium": ["Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a login system checking username availability with 10,000 entries.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using grouping anagrams together as context.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in detecting duplicate entries in a large dataset with 100 entries.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using a spell-checker's dictionary of valid words as context.", "Explain how Linear Probing resolves collisions, and why it can suffer from clustering, for a table storing 1,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for an image cache mapping file hash to image data with 10,000 entries.", "Explain how Linear Probing resolves collisions, and why it can suffer from clustering, for a table storing 100 entries.", "For a database index for fast record lookup with n entries, compare using a Hash Table vs a Binary Search Tree for updating a value for a key.", "Explain why Python requires dictionary keys to be hashable (immutable), using caching API responses by request URL as an example.", "Explain how you would design a hash function for an image cache mapping file hash to image data to minimise collisions for 10^5 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in detecting duplicate entries in a large dataset with 10,000 entries.", "Explain how you would design a hash function for a phone book mapping names to numbers to minimise collisions for 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for caching API responses by request URL with 10,000 entries.", "Explain how you would design a hash function for a phone book mapping names to numbers to minimise collisions for n entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a phone book mapping names to numbers with 10,000 entries.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using a social media app's user-ID lookup as context.", "For detecting duplicate entries in a large dataset with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for a login system checking username availability.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for a spell-checker's dictionary of valid words.", "Explain the average-case and worst-case time complexity of insertion in a Hash Table of size n, and why the worst case can occur.", "Explain why Python requires dictionary keys to be hashable (immutable), using a compiler's symbol table as an example.", "Explain why Python requires dictionary keys to be hashable (immutable), using a social media app's user-ID lookup as an example.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using a compiler's symbol table as context.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a phone book mapping names to numbers with 10^6 entries.", "Explain how you would design a hash function for counting word frequency in a document to minimise collisions for 10,000 entries.", "For storing a shopping cart mapping product ID to quantity with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for deletion.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a spell-checker's dictionary of valid words with 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a database index for fast record lookup with 10,000 entries.", "For counting word frequency in a document with n entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in detecting duplicate entries in a large dataset with 10^6 entries.", "For a database index for fast record lookup with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain the trade-off between load factor and performance \u2014 why do Hash Tables resize before becoming completely full, for 100 entries?", "Explain why Python requires dictionary keys to be hashable (immutable), using an image cache mapping file hash to image data as an example.", "Explain the average-case and worst-case time complexity of resolving a collision (chaining) in a Hash Table of size n, and why the worst case can occur.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a spell-checker's dictionary of valid words with n entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a database index for fast record lookup with 10^5 entries.", "Explain the average-case and worst-case time complexity of resolving a collision (chaining) in a Hash Table of size 10^6, and why the worst case can occur.", "For a database index for fast record lookup with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "For a database index for fast record lookup with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain the average-case and worst-case time complexity of search/lookup in a Hash Table of size 100, and why the worst case can occur.", "For a spell-checker's dictionary of valid words with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "Explain how Linear Probing resolves collisions, and why it can suffer from clustering, for a table storing n entries.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for storing a shopping cart mapping product ID to quantity.", "Explain the trade-off between load factor and performance \u2014 why do Hash Tables resize before becoming completely full, for 10^5 entries?", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in counting word frequency in a document with 10^5 entries.", "Explain the average-case and worst-case time complexity of updating a value for a key in a Hash Table of size 10^6, and why the worst case can occur.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for a social media app's user-ID lookup.", "Explain the trade-off between load factor and performance \u2014 why do Hash Tables resize before becoming completely full, for 10^6 entries?", "Explain how you would design a hash function for an image cache mapping file hash to image data to minimise collisions for 100 entries.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for detecting duplicate entries in a large dataset.", "Explain how Chaining resolves collisions in a Hash Table used for a phone book mapping names to numbers with n entries.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using a login system checking username availability as context.", "For a social media app's user-ID lookup with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain how you would design a hash function for storing a shopping cart mapping product ID to quantity to minimise collisions for 10,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in storing a shopping cart mapping product ID to quantity with 100 entries.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for a database index for fast record lookup.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for caching API responses by request URL.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in caching API responses by request URL with 100 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a compiler's symbol table with n entries.", "For a spell-checker's dictionary of valid words with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "For a database index for fast record lookup with n entries, compare using a Hash Table vs a Binary Search Tree for rehashing on load factor increase.", "Explain the trade-off between load factor and performance \u2014 why do Hash Tables resize before becoming completely full, for 10,000 entries?", "Explain how you would design a hash function for storing a shopping cart mapping product ID to quantity to minimise collisions for 1,000 entries.", "Explain why Python requires dictionary keys to be hashable (immutable), using a spell-checker's dictionary of valid words as an example.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a compiler's symbol table with 1,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in counting word frequency in a document with 1,000 entries.", "Explain the average-case and worst-case time complexity of search/lookup in a Hash Table of size 1,000, and why the worst case can occur.", "Explain why Python requires dictionary keys to be hashable (immutable), using storing a shopping cart mapping product ID to quantity as an example.", "Explain the average-case and worst-case time complexity of checking for a key's existence in a Hash Table of size 1,000, and why the worst case can occur.", "For a login system checking username availability with n entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using detecting duplicate entries in a large dataset as context.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using storing a shopping cart mapping product ID to quantity as context.", "Explain the average-case and worst-case time complexity of insertion in a Hash Table of size 10,000, and why the worst case can occur.", "Explain why Python requires dictionary keys to be hashable (immutable), using a login system checking username availability as an example.", "For detecting duplicate entries in a large dataset with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "Explain how Chaining resolves collisions in a Hash Table used for storing a shopping cart mapping product ID to quantity with 10^6 entries.", "Explain why Python requires dictionary keys to be hashable (immutable), using detecting duplicate entries in a large dataset as an example.", "Explain how Linear Probing resolves collisions, and why it can suffer from clustering, for a table storing 10,000 entries.", "Explain the average-case and worst-case time complexity of deletion in a Hash Table of size 10,000, and why the worst case can occur.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for a phone book mapping names to numbers.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for a compiler's symbol table.", "Explain how Chaining resolves collisions in a Hash Table used for a compiler's symbol table with 10,000 entries.", "Explain the trade-off between load factor and performance \u2014 why do Hash Tables resize before becoming completely full, for n entries?", "Explain how you would design a hash function for detecting duplicate entries in a large dataset to minimise collisions for 1,000 entries.", "Explain the average-case and worst-case time complexity of computing a hash code in a Hash Table of size 1,000, and why the worst case can occur.", "Explain how you would design a hash function for a login system checking username availability to minimise collisions for 10,000 entries.", "Explain the average-case and worst-case time complexity of rehashing on load factor increase in a Hash Table of size 100, and why the worst case can occur.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using an image cache mapping file hash to image data as context.", "Explain how you would design a hash function for a login system checking username availability to minimise collisions for 1,000 entries.", "Explain the average-case and worst-case time complexity of updating a value for a key in a Hash Table of size n, and why the worst case can occur.", "Explain how Linear Probing resolves collisions, and why it can suffer from clustering, for a table storing 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a database index for fast record lookup with 100 entries.", "Explain how you would design a hash function for a spell-checker's dictionary of valid words to minimise collisions for n entries.", "Explain the average-case and worst-case time complexity of search/lookup in a Hash Table of size 10^6, and why the worst case can occur.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in caching API responses by request URL with 1,000 entries.", "For a database index for fast record lookup with n entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using a phone book mapping names to numbers as context.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using counting word frequency in a document as context.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in detecting duplicate entries in a large dataset with n entries.", "Explain why Python requires dictionary keys to be hashable (immutable), using a phone book mapping names to numbers as an example.", "Explain how Linear Probing resolves collisions, and why it can suffer from clustering, for a table storing 10^6 entries.", "Explain how you would design a hash function for a compiler's symbol table to minimise collisions for n entries.", "Explain the average-case and worst-case time complexity of computing a hash code in a Hash Table of size 100, and why the worst case can occur.", "Explain how you would design a hash function for a compiler's symbol table to minimise collisions for 10^6 entries.", "Explain how you would design a hash function for an image cache mapping file hash to image data to minimise collisions for n entries.", "Explain the average-case and worst-case time complexity of resolving a collision (open addressing) in a Hash Table of size 10,000, and why the worst case can occur.", "Explain how you would design a hash function for a spell-checker's dictionary of valid words to minimise collisions for 10,000 entries.", "For a compiler's symbol table with n entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "Explain how Chaining resolves collisions in a Hash Table used for a social media app's user-ID lookup with 10,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for an image cache mapping file hash to image data with 10^5 entries.", "Explain how you would design a hash function for grouping anagrams together to minimise collisions for 10^5 entries.", "Explain the trade-off between load factor and performance \u2014 why do Hash Tables resize before becoming completely full, for 1,000 entries?", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a compiler's symbol table with 10,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a login system checking username availability with 100 entries.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for counting word frequency in a document.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a login system checking username availability with n entries.", "Explain the average-case and worst-case time complexity of resolving a collision (chaining) in a Hash Table of size 10^5, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of resolving a collision (open addressing) in a Hash Table of size 100, and why the worst case can occur.", "Explain how Chaining resolves collisions in a Hash Table used for a social media app's user-ID lookup with 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a login system checking username availability with 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a phone book mapping names to numbers with 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for detecting duplicate entries in a large dataset with 10^6 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a spell-checker's dictionary of valid words with 100 entries.", "Explain why Python requires dictionary keys to be hashable (immutable), using a database index for fast record lookup as an example.", "For a phone book mapping names to numbers with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "For a social media app's user-ID lookup with 100 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (open addressing).", "For a database index for fast record lookup with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for deletion.", "Explain how you would design a hash function for caching API responses by request URL to minimise collisions for 10,000 entries.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for grouping anagrams together.", "For a database index for fast record lookup with 100 entries, compare using a Hash Table vs a Binary Search Tree for computing a hash code.", "Explain how you would design a hash function for a spell-checker's dictionary of valid words to minimise collisions for 1,000 entries.", "Explain the average-case and worst-case time complexity of deletion in a Hash Table of size 10^6, and why the worst case can occur.", "Explain why Python requires dictionary keys to be hashable (immutable), using grouping anagrams together as an example.", "Explain how you would design a hash function for caching API responses by request URL to minimise collisions for 1,000 entries.", "For a social media app's user-ID lookup with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for checking for a key's existence.", "Explain how you would design a hash function for grouping anagrams together to minimise collisions for n entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in counting word frequency in a document with 100 entries.", "Explain how you would design a hash function for a social media app's user-ID lookup to minimise collisions for 1,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a login system checking username availability with 100 entries.", "For a login system checking username availability with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for checking for a key's existence.", "Explain how Chaining resolves collisions in a Hash Table used for grouping anagrams together with n entries.", "Explain how you would design a hash function for grouping anagrams together to minimise collisions for 1,000 entries.", "Explain the average-case and worst-case time complexity of iterating over all key-value pairs in a Hash Table of size n, and why the worst case can occur.", "Explain how Chaining resolves collisions in a Hash Table used for a phone book mapping names to numbers with 1,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a social media app's user-ID lookup with n entries.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using a database index for fast record lookup as context.", "For a login system checking username availability with 100 entries, compare using a Hash Table vs a Binary Search Tree for computing a hash code.", "Explain the average-case and worst-case time complexity of search/lookup in a Hash Table of size 10,000, and why the worst case can occur.", "Explain how Chaining resolves collisions in a Hash Table used for a spell-checker's dictionary of valid words with n entries.", "Explain how you would design a hash function for counting word frequency in a document to minimise collisions for 1,000 entries.", "For an image cache mapping file hash to image data with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a phone book mapping names to numbers with n entries.", "Explain how Chaining resolves collisions in a Hash Table used for a phone book mapping names to numbers with 10,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in counting word frequency in a document with 10,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for counting word frequency in a document with 10,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a spell-checker's dictionary of valid words with 10,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in grouping anagrams together with 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for storing a shopping cart mapping product ID to quantity with 10,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for counting word frequency in a document with 1,000 entries.", "For a login system checking username availability with n entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a social media app's user-ID lookup with 100 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a compiler's symbol table with 10^5 entries.", "Explain how you would design a hash function for a social media app's user-ID lookup to minimise collisions for n entries.", "Explain the average-case and worst-case time complexity of iterating over all key-value pairs in a Hash Table of size 10^6, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of resolving a collision (chaining) in a Hash Table of size 1,000, and why the worst case can occur.", "Explain how you would design a hash function for caching API responses by request URL to minimise collisions for 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a login system checking username availability with 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a login system checking username availability with 10,000 entries.", "For detecting duplicate entries in a large dataset with n entries, compare using a Hash Table vs a Binary Search Tree for deletion.", "Explain the average-case and worst-case time complexity of computing a hash code in a Hash Table of size 10^5, and why the worst case can occur.", "Explain how Chaining resolves collisions in a Hash Table used for a spell-checker's dictionary of valid words with 10,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in grouping anagrams together with n entries.", "Explain the average-case and worst-case time complexity of computing a hash code in a Hash Table of size 10,000, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of rehashing on load factor increase in a Hash Table of size 1,000, and why the worst case can occur.", "Explain how Chaining resolves collisions in a Hash Table used for an image cache mapping file hash to image data with n entries.", "Explain how Chaining resolves collisions in a Hash Table used for caching API responses by request URL with 100 entries.", "Explain how you would design a hash function for a compiler's symbol table to minimise collisions for 10^5 entries.", "Explain the average-case and worst-case time complexity of updating a value for a key in a Hash Table of size 100, and why the worst case can occur.", "Explain why a poor hash function can degrade Hash Table performance from O(1) to O(n), using caching API responses by request URL as context.", "For a social media app's user-ID lookup with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for computing a hash code.", "For detecting duplicate entries in a large dataset with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for checking for a key's existence.", "Explain how you would design a hash function for grouping anagrams together to minimise collisions for 100 entries.", "For counting word frequency in a document with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain how you would design a hash function for an image cache mapping file hash to image data to minimise collisions for 10^6 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in counting word frequency in a document with n entries.", "Explain the average-case and worst-case time complexity of insertion in a Hash Table of size 100, and why the worst case can occur.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in grouping anagrams together with 1,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in detecting duplicate entries in a large dataset with 1,000 entries.", "For an image cache mapping file hash to image data with n entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "For caching API responses by request URL with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "For a login system checking username availability with n entries, compare using a Hash Table vs a Binary Search Tree for updating a value for a key.", "Explain how Chaining resolves collisions in a Hash Table used for grouping anagrams together with 100 entries.", "For caching API responses by request URL with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for rehashing on load factor increase.", "For a phone book mapping names to numbers with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a compiler's symbol table with 10^6 entries.", "For a database index for fast record lookup with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (open addressing).", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a database index for fast record lookup with 100 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a phone book mapping names to numbers with 1,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for grouping anagrams together with 10^5 entries.", "Explain how you would design a hash function for detecting duplicate entries in a large dataset to minimise collisions for n entries.", "Explain how you would design a hash function for a social media app's user-ID lookup to minimise collisions for 10^5 entries.", "For a database index for fast record lookup with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in storing a shopping cart mapping product ID to quantity with 1,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in caching API responses by request URL with 10^5 entries.", "Explain how you would design a hash function for storing a shopping cart mapping product ID to quantity to minimise collisions for 100 entries.", "Explain how you would design a hash function for a spell-checker's dictionary of valid words to minimise collisions for 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a login system checking username availability with n entries.", "For a database index for fast record lookup with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "For counting word frequency in a document with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "For counting word frequency in a document with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in grouping anagrams together with 100 entries.", "Explain the average-case and worst-case time complexity of resolving a collision (chaining) in a Hash Table of size 10,000, and why the worst case can occur.", "For storing a shopping cart mapping product ID to quantity with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "For a compiler's symbol table with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in an image cache mapping file hash to image data with 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for grouping anagrams together with 10,000 entries.", "For a database index for fast record lookup with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "Explain the average-case and worst-case time complexity of resolving a collision (open addressing) in a Hash Table of size 1,000, and why the worst case can occur.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in caching API responses by request URL with 10^6 entries.", "For a compiler's symbol table with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "For a phone book mapping names to numbers with 100 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a database index for fast record lookup with 10^6 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a phone book mapping names to numbers with 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for caching API responses by request URL with 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for caching API responses by request URL with n entries.", "Explain how you would design a hash function for counting word frequency in a document to minimise collisions for 100 entries.", "Explain the average-case and worst-case time complexity of iterating over all key-value pairs in a Hash Table of size 100, and why the worst case can occur.", "For a phone book mapping names to numbers with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for deletion.", "Explain the average-case and worst-case time complexity of insertion in a Hash Table of size 10^5, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of rehashing on load factor increase in a Hash Table of size 10,000, and why the worst case can occur.", "Explain how you would design a hash function for an image cache mapping file hash to image data to minimise collisions for 1,000 entries.", "Explain the difference between Linear Probing, Quadratic Probing, and Double Hashing for an image cache mapping file hash to image data.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a database index for fast record lookup with n entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a database index for fast record lookup with 10,000 entries.", "Explain how Chaining resolves collisions in a Hash Table used for detecting duplicate entries in a large dataset with n entries.", "For a spell-checker's dictionary of valid words with n entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain how you would design a hash function for caching API responses by request URL to minimise collisions for n entries.", "Explain the average-case and worst-case time complexity of resolving a collision (chaining) in a Hash Table of size 100, and why the worst case can occur.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in an image cache mapping file hash to image data with 100 entries.", "Explain how you would design a hash function for counting word frequency in a document to minimise collisions for 10^5 entries.", "For a phone book mapping names to numbers with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for updating a value for a key.", "Explain how you would design a hash function for storing a shopping cart mapping product ID to quantity to minimise collisions for n entries.", "For an image cache mapping file hash to image data with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for deletion.", "Explain the average-case and worst-case time complexity of resolving a collision (open addressing) in a Hash Table of size 10^5, and why the worst case can occur.", "Explain how Chaining resolves collisions in a Hash Table used for an image cache mapping file hash to image data with 1,000 entries.", "For an image cache mapping file hash to image data with 100 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain the average-case and worst-case time complexity of checking for a key's existence in a Hash Table of size 10,000, and why the worst case can occur.", "For an image cache mapping file hash to image data with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for rehashing on load factor increase.", "For storing a shopping cart mapping product ID to quantity with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "Explain how you would design a hash function for caching API responses by request URL to minimise collisions for 100 entries.", "Explain the average-case and worst-case time complexity of resolving a collision (open addressing) in a Hash Table of size 10^6, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of iterating over all key-value pairs in a Hash Table of size 1,000, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of checking for a key's existence in a Hash Table of size 10^5, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of iterating over all key-value pairs in a Hash Table of size 10^5, and why the worst case can occur.", "Explain how you would design a hash function for a phone book mapping names to numbers to minimise collisions for 100 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a login system checking username availability with 1,000 entries.", "Explain the average-case and worst-case time complexity of resolving a collision (open addressing) in a Hash Table of size n, and why the worst case can occur.", "For caching API responses by request URL with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "Explain how you would design a hash function for counting word frequency in a document to minimise collisions for n entries.", "Explain how you would design a hash function for grouping anagrams together to minimise collisions for 10^6 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a social media app's user-ID lookup with 1,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a social media app's user-ID lookup with n entries.", "For caching API responses by request URL with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for computing a hash code.", "Explain how you would design a hash function for counting word frequency in a document to minimise collisions for 10^6 entries.", "Explain why Python requires dictionary keys to be hashable (immutable), using counting word frequency in a document as an example.", "For a login system checking username availability with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain how you would design a hash function for detecting duplicate entries in a large dataset to minimise collisions for 10^5 entries.", "Explain how Chaining resolves collisions in a Hash Table used for detecting duplicate entries in a large dataset with 10^5 entries.", "Explain how you would design a hash function for detecting duplicate entries in a large dataset to minimise collisions for 100 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in storing a shopping cart mapping product ID to quantity with n entries.", "For an image cache mapping file hash to image data with 10,000 entries, compare using a Hash Table vs a Binary Search Tree for rehashing on load factor increase.", "For an image cache mapping file hash to image data with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "For a spell-checker's dictionary of valid words with n entries, compare using a Hash Table vs a Binary Search Tree for updating a value for a key.", "For a compiler's symbol table with n entries, compare using a Hash Table vs a Binary Search Tree for updating a value for a key.", "Explain how you would design a hash function for a database index for fast record lookup to minimise collisions for 10,000 entries.", "For a login system checking username availability with n entries, compare using a Hash Table vs a Binary Search Tree for rehashing on load factor increase.", "Explain how Chaining resolves collisions in a Hash Table used for a database index for fast record lookup with 10^5 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in storing a shopping cart mapping product ID to quantity with 10,000 entries.", "Explain how you would design a hash function for a compiler's symbol table to minimise collisions for 10,000 entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a phone book mapping names to numbers with 100 entries.", "For counting word frequency in a document with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for rehashing on load factor increase.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in grouping anagrams together with 10,000 entries.", "Explain the average-case and worst-case time complexity of updating a value for a key in a Hash Table of size 10^5, and why the worst case can occur.", "For a compiler's symbol table with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "Explain how you would design a hash function for a login system checking username availability to minimise collisions for 10^6 entries.", "Explain the average-case and worst-case time complexity of computing a hash code in a Hash Table of size n, and why the worst case can occur.", "Explain the average-case and worst-case time complexity of iterating over all key-value pairs in a Hash Table of size 10,000, and why the worst case can occur.", "For caching API responses by request URL with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "For detecting duplicate entries in a large dataset with 100 entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "Explain how you would design a hash function for a spell-checker's dictionary of valid words to minimise collisions for 100 entries.", "Explain how Chaining resolves collisions in a Hash Table used for a compiler's symbol table with 10^6 entries.", "For a phone book mapping names to numbers with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for iterating over all key-value pairs.", "Explain how Chaining resolves collisions in a Hash Table used for a database index for fast record lookup with n entries.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a social media app's user-ID lookup with 1,000 entries.", "For caching API responses by request URL with 10^5 entries, compare using a Hash Table vs a Binary Search Tree for insertion.", "Explain what happens during Rehashing when the load factor exceeds a threshold, for a Hash Table used in a social media app's user-ID lookup with 10^5 entries.", "For a database index for fast record lookup with 10^6 entries, compare using a Hash Table vs a Binary Search Tree for updating a value for a key.", "For a compiler's symbol table with n entries, compare using a Hash Table vs a Binary Search Tree for resolving a collision (chaining).", "For a social media app's user-ID lookup with 1,000 entries, compare using a Hash Table vs a Binary Search Tree for search/lookup.", "Explain how Chaining resolves collisions in a Hash Table used for counting word frequency in a document with n entries."], "hard": ["Explain how a Hash Table's amortised O(1) insert holds despite occasional O(n) rehashing operations, for a table growing to 10^6 entries.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a compiler's symbol table at n entries.", "Design an LRU Cache using a Hash Map + Doubly Linked List for an image cache mapping file hash to image data, supporting O(1) get and put for 100 cached entries.", "Explain how Consistent Hashing helps distribute a spell-checker's dictionary of valid words data of size 10^5 across multiple servers with minimal redisribution when servers are added/removed.", "Design an approach to detect duplicate entries in storing a shopping cart mapping product ID to quantity with n items using a Hash Set, and analyse time/space complexity.", "Design an LRU Cache using a Hash Map + Doubly Linked List for caching API responses by request URL, supporting O(1) get and put for 100 cached entries.", "Design a Hash Table from scratch supporting iterating over all key-value pairs in average O(1) time for caching API responses by request URL with 1,000 entries, choosing between chaining and open addressing and justifying your choice.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a phone book mapping names to numbers with 100 entries.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for caching API responses by request URL with 100 entries.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for counting word frequency in a document with 10^5 entries.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a database index for fast record lookup with 1,000 entries.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a compiler's symbol table with 100 entries.", "Explain how a Hash Table's amortised O(1) insert holds despite occasional O(n) rehashing operations, for a table growing to n entries.", "Design an approach to detect duplicate entries in detecting duplicate entries in a large dataset with n items using a Hash Set, and analyse time/space complexity.", "Design a Hash Table from scratch supporting deletion in average O(1) time for a login system checking username availability with 1,000 entries, choosing between chaining and open addressing and justifying your choice.", "Explain how Consistent Hashing helps distribute an image cache mapping file hash to image data data of size 10^6 across multiple servers with minimal redisribution when servers are added/removed.", "Design an approach to detect duplicate entries in storing a shopping cart mapping product ID to quantity with 10^6 items using a Hash Set, and analyse time/space complexity.", "Explain how a Hash Table's amortised O(1) insert holds despite occasional O(n) rehashing operations, for a table growing to 100 entries.", "Design a hash function for grouping anagrams together with 10,000 entries that minimises clustering under open addressing.", "Explain how a Hash Table's amortised O(1) insert holds despite occasional O(n) rehashing operations, for a table growing to 10^5 entries.", "Design a Hash Table from scratch supporting search/lookup in average O(1) time for a compiler's symbol table with 100 entries, choosing between chaining and open addressing and justifying your choice.", "Explain how Consistent Hashing helps distribute a login system checking username availability data of size 10^6 across multiple servers with minimal redisribution when servers are added/removed.", "Design an LRU Cache using a Hash Map + Doubly Linked List for a phone book mapping names to numbers, supporting O(1) get and put for 10^6 cached entries.", "Explain how Consistent Hashing helps distribute grouping anagrams together data of size 10,000 across multiple servers with minimal redisribution when servers are added/removed.", "Design an LRU Cache using a Hash Map + Doubly Linked List for a spell-checker's dictionary of valid words, supporting O(1) get and put for 10^5 cached entries.", "Explain how Consistent Hashing helps distribute a database index for fast record lookup data of size 10,000 across multiple servers with minimal redisribution when servers are added/removed.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for counting word frequency in a document with n entries.", "Explain how Consistent Hashing helps distribute caching API responses by request URL data of size 10^5 across multiple servers with minimal redisribution when servers are added/removed.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a social media app's user-ID lookup with n entries.", "Design a hash function for grouping anagrams together with 10^5 entries that minimises clustering under open addressing.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a social media app's user-ID lookup with 10^6 entries.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using grouping anagrams together at 100 entries.", "Explain how Consistent Hashing helps distribute a spell-checker's dictionary of valid words data of size n across multiple servers with minimal redisribution when servers are added/removed.", "Design a Hash Table from scratch supporting rehashing on load factor increase in average O(1) time for a login system checking username availability with 10^6 entries, choosing between chaining and open addressing and justifying your choice.", "Design a hash function for a social media app's user-ID lookup with 10^6 entries that minimises clustering under open addressing.", "Design a Hash Table from scratch supporting updating a value for a key in average O(1) time for counting word frequency in a document with 10^5 entries, choosing between chaining and open addressing and justifying your choice.", "Design a hash function for an image cache mapping file hash to image data with 10^6 entries that minimises clustering under open addressing.", "Design an approach to detect duplicate entries in counting word frequency in a document with 10^5 items using a Hash Set, and analyse time/space complexity.", "Design an approach to detect duplicate entries in an image cache mapping file hash to image data with 100 items using a Hash Set, and analyse time/space complexity.", "Design an LRU Cache using a Hash Map + Doubly Linked List for a login system checking username availability, supporting O(1) get and put for 10,000 cached entries.", "Design a Hash Table from scratch supporting rehashing on load factor increase in average O(1) time for a compiler's symbol table with 100 entries, choosing between chaining and open addressing and justifying your choice.", "Explain how a Hash Table's amortised O(1) insert holds despite occasional O(n) rehashing operations, for a table growing to 10,000 entries.", "Design a Hash Table from scratch supporting computing a hash code in average O(1) time for caching API responses by request URL with n entries, choosing between chaining and open addressing and justifying your choice.", "Design a Hash Table from scratch supporting search/lookup in average O(1) time for caching API responses by request URL with 1,000 entries, choosing between chaining and open addressing and justifying your choice.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a phone book mapping names to numbers with 10^6 entries.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for a compiler's symbol table with 1,000 entries.", "Design an LRU Cache using a Hash Map + Doubly Linked List for detecting duplicate entries in a large dataset, supporting O(1) get and put for 10,000 cached entries.", "Design a Hash Table from scratch supporting computing a hash code in average O(1) time for a spell-checker's dictionary of valid words with 10^5 entries, choosing between chaining and open addressing and justifying your choice.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a database index for fast record lookup at 1,000 entries.", "Design an approach to detect duplicate entries in a database index for fast record lookup with 10^6 items using a Hash Set, and analyse time/space complexity.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for storing a shopping cart mapping product ID to quantity with n entries.", "Design a Hash Table from scratch supporting updating a value for a key in average O(1) time for storing a shopping cart mapping product ID to quantity with 10^5 entries, choosing between chaining and open addressing and justifying your choice.", "Design an approach to detect duplicate entries in storing a shopping cart mapping product ID to quantity with 10^5 items using a Hash Set, and analyse time/space complexity.", "Design an approach to detect duplicate entries in a database index for fast record lookup with 100 items using a Hash Set, and analyse time/space complexity.", "Explain how Consistent Hashing helps distribute a social media app's user-ID lookup data of size 10^5 across multiple servers with minimal redisribution when servers are added/removed.", "Design an LRU Cache using a Hash Map + Doubly Linked List for a phone book mapping names to numbers, supporting O(1) get and put for 1,000 cached entries.", "Explain how Consistent Hashing helps distribute a phone book mapping names to numbers data of size 10,000 across multiple servers with minimal redisribution when servers are added/removed.", "Design an approach to detect duplicate entries in an image cache mapping file hash to image data with 10^5 items using a Hash Set, and analyse time/space complexity.", "Explain how Consistent Hashing helps distribute a login system checking username availability data of size 10,000 across multiple servers with minimal redisribution when servers are added/removed.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using detecting duplicate entries in a large dataset at 10^5 entries.", "Design a hash function for grouping anagrams together with 100 entries that minimises clustering under open addressing.", "Explain how a Hash Table's amortised O(1) insert holds despite occasional O(n) rehashing operations, for a table growing to 1,000 entries.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using storing a shopping cart mapping product ID to quantity at 1,000 entries.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a login system checking username availability at n entries.", "Design a Hash Table from scratch supporting resolving a collision (chaining) in average O(1) time for detecting duplicate entries in a large dataset with 1,000 entries, choosing between chaining and open addressing and justifying your choice.", "Design a hash function for a spell-checker's dictionary of valid words with n entries that minimises clustering under open addressing.", "Explain how Consistent Hashing helps distribute a phone book mapping names to numbers data of size 1,000 across multiple servers with minimal redisribution when servers are added/removed.", "Design an LRU Cache using a Hash Map + Doubly Linked List for detecting duplicate entries in a large dataset, supporting O(1) get and put for 100 cached entries.", "Design a Hash Table from scratch supporting resolving a collision (open addressing) in average O(1) time for caching API responses by request URL with 1,000 entries, choosing between chaining and open addressing and justifying your choice.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a login system checking username availability at 10^6 entries.", "Design a Hash Table from scratch supporting insertion in average O(1) time for a spell-checker's dictionary of valid words with 100 entries, choosing between chaining and open addressing and justifying your choice.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for storing a shopping cart mapping product ID to quantity with 100 entries.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a spell-checker's dictionary of valid words at 10,000 entries.", "Design a hash function for storing a shopping cart mapping product ID to quantity with 10,000 entries that minimises clustering under open addressing.", "Design an LRU Cache using a Hash Map + Doubly Linked List for storing a shopping cart mapping product ID to quantity, supporting O(1) get and put for 100 cached entries.", "Design an approach to detect duplicate entries in storing a shopping cart mapping product ID to quantity with 1,000 items using a Hash Set, and analyse time/space complexity.", "Design a hash function for detecting duplicate entries in a large dataset with n entries that minimises clustering under open addressing.", "Design a hash function for caching API responses by request URL with 10^6 entries that minimises clustering under open addressing.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a social media app's user-ID lookup at 10^5 entries.", "Design a Hash Table from scratch supporting rehashing on load factor increase in average O(1) time for detecting duplicate entries in a large dataset with 10,000 entries, choosing between chaining and open addressing and justifying your choice.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using counting word frequency in a document at 1,000 entries.", "Design a Hash Table from scratch supporting checking for a key's existence in average O(1) time for an image cache mapping file hash to image data with 10^5 entries, choosing between chaining and open addressing and justifying your choice.", "Design an approach to detect duplicate entries in a compiler's symbol table with 100 items using a Hash Set, and analyse time/space complexity.", "Design an approach to detect duplicate entries in a phone book mapping names to numbers with n items using a Hash Set, and analyse time/space complexity.", "Design a Hash Table from scratch supporting iterating over all key-value pairs in average O(1) time for a database index for fast record lookup with 1,000 entries, choosing between chaining and open addressing and justifying your choice.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a spell-checker's dictionary of valid words at 1,000 entries.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using an image cache mapping file hash to image data at 10^5 entries.", "Explain how Consistent Hashing helps distribute detecting duplicate entries in a large dataset data of size n across multiple servers with minimal redisribution when servers are added/removed.", "Design an approach to detect duplicate entries in detecting duplicate entries in a large dataset with 10^6 items using a Hash Set, and analyse time/space complexity.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using storing a shopping cart mapping product ID to quantity at 10^6 entries.", "Explain how a Bloom Filter trades a small false-positive rate for massive space savings compared to a Hash Set, for detecting duplicate entries in a large dataset with n entries.", "Design an LRU Cache using a Hash Map + Doubly Linked List for a social media app's user-ID lookup, supporting O(1) get and put for 1,000 cached entries.", "Design a hash function for detecting duplicate entries in a large dataset with 10^5 entries that minimises clustering under open addressing.", "Design a hash function for a database index for fast record lookup with 10^6 entries that minimises clustering under open addressing.", "Design an approach to detect duplicate entries in a database index for fast record lookup with 1,000 items using a Hash Set, and analyse time/space complexity.", "Design an approach to detect duplicate entries in a login system checking username availability with 10,000 items using a Hash Set, and analyse time/space complexity.", "Design an approach to detect duplicate entries in detecting duplicate entries in a large dataset with 100 items using a Hash Set, and analyse time/space complexity.", "Design an approach to detect duplicate entries in a phone book mapping names to numbers with 10^6 items using a Hash Set, and analyse time/space complexity.", "Critically evaluate: 'A Hash Table is always better than a Binary Search Tree.' Discuss counter-examples (e.g. ordered iteration) using a phone book mapping names to numbers at 10^6 entries.", "Design a hash function for grouping anagrams together with 10^6 entries that minimises clustering under open addressing."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

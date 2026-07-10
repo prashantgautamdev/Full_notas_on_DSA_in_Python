@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Handwritten Notes — Notebook Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#fbf9f2; --ink:#1a3d8f; --ink2:#12296b; --red:#c0392b; --green:#1e7d32; }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:#d9dee6; font-family:'Kalam', cursive; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; padding:40px 12px 80px;
+  }
+  .cover{
+    width:100%; max-width:760px; background:var(--paper); border-radius:8px;
+    padding:36px 30px; box-shadow:0 10px 30px rgba(0,0,0,.25);
+    text-align:center; margin-bottom:26px;
+  }
+  h1{ font-family:'Caveat', cursive; font-size:52px; color:var(--ink2); margin:0 0 6px; }
+  .sub{ font-family:'Patrick Hand', cursive; font-size:18px; color:var(--red); margin-bottom:6px; }
+  .meta{ font-family:'Patrick Hand', cursive; font-size:14px; color:#777; }
+  .grid{
+    width:100%; max-width:760px; display:grid; grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:560px){ .grid{ grid-template-columns:1fr; } }
+  a.card{
+    display:block; background:var(--paper); border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px; padding:16px 18px; text-decoration:none; color:var(--ink2);
+    box-shadow:0 4px 12px rgba(0,0,0,.15); transition:transform .15s;
+  }
+  a.card:hover{ transform:translateY(-3px); }
+  a.card .num{
+    display:inline-block; background:var(--ink); color:#fff; font-family:'Patrick Hand';
+    font-size:14px; border-radius:50%; width:26px; height:26px; text-align:center; line-height:26px;
+    margin-right:8px;
+  }
+  a.card .title{ font-family:'Architects Daughter','Patrick Hand',cursive; font-size:19px; }
+  a.card .desc{ font-family:'Patrick Hand', cursive; font-size:13px; color:#666; margin-top:4px; }
+  a.final{
+    max-width:760px; width:100%; display:block; margin-top:18px; background:#fffde7;
+    border:3px solid var(--ink2); border-radius:8px; padding:16px 20px; text-decoration:none;
+    color:var(--ink2); text-align:center; box-shadow:6px 6px 0 #f6c945;
+    font-family:'Caveat', cursive; font-size:26px;
+  }
+  footer{ font-family:'Patrick Hand',cursive; font-size:13px; color:#888; margin-top:24px; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>📘 DSA Handwritten Notes</h1>
+  <div class="sub">A complete, exam-ready & interview-ready notebook</div>
+  <div class="meta">10 Chapters · 30 Coding Qs + 600 Practice Qs per chapter · Diagrams · Python code · Quick revision sheets</div>
+</div>
+
+<div class="grid">
+  <a class="card" href="chapter1.html"><span class="num">1</span><span class="title">Introduction to DSA</span><div class="desc">DS vs Algorithm, ADT, Big-O/Ω/Θ, complexity basics</div></a>
+  <a class="card" href="chapter2.html"><span class="num">2</span><span class="title">Arrays</span><div class="desc">Memory layout, static/dynamic arrays, 2D arrays</div></a>
+  <a class="card" href="chapter3.html"><span class="num">3</span><span class="title">Linked Lists</span><div class="desc">Singly/Doubly/Circular, slow-fast pointers</div></a>
+  <a class="card" href="chapter4.html"><span class="num">4</span><span class="title">Stacks & Queues</span><div class="desc">LIFO/FIFO, circular queue, deque</div></a>
+  <a class="card" href="chapter5.html"><span class="num">5</span><span class="title">Recursion</span><div class="desc">Base case, call stack, memoization, backtracking</div></a>
+  <a class="card" href="chapter6.html"><span class="num">6</span><span class="title">Trees</span><div class="desc">BST, traversals, balanced vs skewed</div></a>
+  <a class="card" href="chapter7.html"><span class="num">7</span><span class="title">Graphs</span><div class="desc">BFS/DFS, Dijkstra, topological sort</div></a>
+  <a class="card" href="chapter8.html"><span class="num">8</span><span class="title">Sorting Algorithms</span><div class="desc">Merge/Quick/Heap Sort, complexity table</div></a>
+  <a class="card" href="chapter9.html"><span class="num">9</span><span class="title">Searching Algorithms</span><div class="desc">Linear/Binary Search, rotated array search</div></a>
+  <a class="card" href="chapter10.html"><span class="num">10</span><span class="title">Hashing</span><div class="desc">Hash tables, collisions, load factor</div></a>
+</div>
+
+<a class="final" href="final_revision.html">⚡ Final Revision Notebook — All Chapters, Key Points Only</a>
+
+<footer>Made with ❤️ as handwritten-style notebook notes</footer>
+
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 6: Trees</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li class="current">Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 6</h1>
+  <div class="subtitle">Trees</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Understand <span class="mark">Tree</span> terminology — root, leaf, parent, child, height, depth.</li>
+    <li>Differentiate <span class="mark-g">Binary Tree, BST, and Balanced Trees (AVL)</span>.</li>
+    <li>Master the 4 traversal orders: <span class="mark">in-order, pre-order, post-order, level-order</span>.</li>
+    <li>Analyse time complexity in balanced vs skewed (worst-case) trees.</li>
+    <li>Solve classic problems: height, LCA, diameter, balance-checking.</li>
+    <li>Implement BST operations in Python.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Tree</b> — a hierarchical, non-linear data structure made of nodes connected by edges, with one root node and no cycles.</div>
+  <div class="box def"><b>Binary Search Tree (BST)</b> — a Binary Tree where, for every node, all values in the left subtree are smaller and all values in the right subtree are larger.</div>
+  <div class="box def"><b>Height of a Tree</b> — the number of edges on the longest path from the root to a leaf node.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Terminology, BST, Traversals</h2>
+
+  <h3 class="subsec">Tree Terminology</h3>
+  <svg width="220" height="130">
+    <line x1="110" y1="15" x2="55" y2="60" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="110" y1="15" x2="165" y2="60" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="55" y1="70" x2="30" y2="105" stroke="#1a3d8f" stroke-width="2"/>
+    <line x1="55" y1="70" x2="80" y2="105" stroke="#1a3d8f" stroke-width="2"/>
+    <circle cx="110" cy="15" r="15" fill="#dbe6ff" stroke="#12296b" stroke-width="2.5"/><text x="110" y="20" text-anchor="middle" font-family="Patrick Hand" font-size="11">Root</text>
+    <circle cx="55" cy="70" r="14" fill="#fff" stroke="#12296b" stroke-width="2"/><text x="55" y="74" text-anchor="middle" font-family="Patrick Hand" font-size="10">Node</text>
+    <circle cx="165" cy="70" r="14" fill="#c8f7c5" stroke="#1e7d32" stroke-width="2"/><text x="165" y="74" text-anchor="middle" font-family="Patrick Hand" font-size="9">Leaf</text>
+    <circle cx="30" cy="115" r="12" fill="#c8f7c5" stroke="#1e7d32" stroke-width="2"/><text x="30" y="119" text-anchor="middle" font-family="Patrick Hand" font-size="8">Leaf</text>
+    <circle cx="80" cy="115" r="12" fill="#c8f7c5" stroke="#1e7d32" stroke-width="2"/><text x="80" y="119" text-anchor="middle" font-family="Patrick Hand" font-size="8">Leaf</text>
+  </svg>
+  <p><span class="mark">Root</span> = topmost node. <span class="mark">Leaf</span> = node with no children. <span class="mark">Height</span> = longest root-to-leaf path (here, 2 edges).</p>
+
+  <h3 class="subsec">Binary Search Tree (BST) Property</h3>
+  <div class="box formula">For every node: left subtree values &lt; node value &lt; right subtree values</div>
+
+  <h3 class="subsec">Traversal Orders</h3>
+  <table>
+    <tr><th>Traversal</th><th>Order</th><th>Use Case</th></tr>
+    <tr><td>In-order</td><td>Left → Root → Right</td><td>Get sorted order from a BST</td></tr>
+    <tr><td>Pre-order</td><td>Root → Left → Right</td><td>Copy/serialize a tree</td></tr>
+    <tr><td>Post-order</td><td>Left → Right → Root</td><td>Delete a tree safely</td></tr>
+    <tr><td>Level-order</td><td>Level by level (uses Queue)</td><td>Shortest-path-like / BFS problems</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples</h2>
+
+  <div class="box example"><b>Org Chart:</b> CEO at the root, managers as children, employees as leaves.</div>
+  <div class="box example"><b>File System:</b> drives → folders → subfolders → files, a natural tree.</div>
+  <div class="box example"><b>Database Index (B-Tree):</b> allows fast lookups on disk-based data at massive scale.</div>
+  <div class="box example"><b>Autocomplete (Trie):</b> each path from root spells out a prefix of stored words.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>A <b>balanced</b> BST gives O(log n) search/insert/delete; a <b>skewed</b> (degenerate) BST degrades to O(n) — basically a Linked List!</li>
+    <li>In-order traversal of a BST always yields elements in <b>sorted order</b> — a very handy property.</li>
+    <li><b>AVL Trees</b> and <b>Red-Black Trees</b> self-balance to guarantee O(log n) even in the worst case.</li>
+    <li>Trees are the base for many advanced structures: Heaps, Tries, Segment Trees, B-Trees.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time Complexity Cheat-Table (BST)</h2>
+  <table>
+    <tr><th>Operation</th><th>Balanced BST</th><th>Skewed (Worst) BST</th></tr>
+    <tr><td>Search</td><td>O(log n)</td><td>O(n)</td></tr>
+    <tr><td>Insert</td><td>O(log n)</td><td>O(n)</td></tr>
+    <tr><td>Delete</td><td>O(log n)</td><td>O(n)</td></tr>
+    <tr><td>Traversal (any order)</td><td>O(n)</td><td>O(n)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Tree Node &amp; BST Insert</h3>
+  <div class="codebox"><span class="kw">class</span> Node:
+    <span class="kw">def</span> __init__(self, val):
+        self.val = val
+        self.left = self.right = <span class="kw">None</span>
+
+<span class="kw">def</span> insert(root, val):
+    <span class="kw">if</span> root <span class="kw">is</span> <span class="kw">None</span>:
+        <span class="kw">return</span> Node(val)
+    <span class="kw">if</span> val < root.val:
+        root.left = insert(root.left, val)
+    <span class="kw">else</span>:
+        root.right = insert(root.right, val)
+    <span class="kw">return</span> root</div>
+
+  <h3 class="subsec">In-order Traversal</h3>
+  <div class="codebox"><span class="kw">def</span> inorder(root, result=<span class="kw">None</span>):
+    <span class="kw">if</span> result <span class="kw">is</span> <span class="kw">None</span>: result = []
+    <span class="kw">if</span> root:
+        inorder(root.left, result)
+        result.append(root.val)
+        inorder(root.right, result)
+    <span class="kw">return</span> result   <span class="cm"># sorted order!</span></div>
+
+  <h3 class="subsec">Height of Tree</h3>
+  <div class="codebox"><span class="kw">def</span> height(root):
+    <span class="kw">if</span> root <span class="kw">is</span> <span class="kw">None</span>:
+        <span class="kw">return</span> -1
+    <span class="kw">return</span> 1 + max(height(root.left), height(root.right))</div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">"Sorted output needed" → think <b>in-order traversal</b> of a BST immediately.</div>
+  <div class="box tip">Most Tree problems (height, diameter, balance-check) are solved with <b>post-order</b> style recursion — process children first, then combine.</div>
+  <div class="box tip">Always ask: "is this tree guaranteed balanced?" — if not, worst-case complexity becomes O(n), not O(log n).</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Assuming BST operations are always O(log n) — they're only O(log n) if the tree is balanced!</div>
+  <div class="box mistake">Confusing 'height' (edges to deepest leaf) with 'number of nodes' when computing complexity.</div>
+  <div class="box mistake">Forgetting the null/None check as the base case in recursive tree functions, causing crashes on empty subtrees.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Implement a Binary Search Tree with insert and search operations.</li>
+    <li>Write a function for in-order traversal of a Binary Tree (recursive).</li>
+    <li>Write a function for pre-order traversal of a Binary Tree (recursive).</li>
+    <li>Write a function for post-order traversal of a Binary Tree (recursive).</li>
+    <li>Write a function for level-order traversal (BFS) of a Binary Tree using a Queue.</li>
+    <li>Write a function to find the height of a Binary Tree.</li>
+    <li>Write a function to count the total number of nodes in a Binary Tree.</li>
+    <li>Write a function to count the number of leaf nodes in a Binary Tree.</li>
+    <li>Write a function to find the minimum value in a Binary Search Tree.</li>
+    <li>Write a function to find the maximum value in a Binary Search Tree.</li>
+    <li>Write a function to delete a node from a Binary Search Tree.</li>
+    <li>Write a function to check if two Binary Trees are identical.</li>
+    <li>Write a function to mirror/invert a Binary Tree.</li>
+    <li>Write a function to check if a Binary Tree is height-balanced.</li>
+    <li>Write a function to find the Lowest Common Ancestor of two nodes in a BST.</li>
+    <li>Write a function to find the Lowest Common Ancestor of two nodes in a general Binary Tree.</li>
+    <li>Write a function to find the diameter of a Binary Tree.</li>
+    <li>Write a function to validate whether a given Binary Tree is a valid BST.</li>
+    <li>Write a function to convert a sorted array into a height-balanced BST.</li>
+    <li>Write a function to find all root-to-leaf paths in a Binary Tree.</li>
+    <li>Write a function to serialize and deserialize a Binary Tree.</li>
+    <li>Write an iterative in-order traversal using an explicit Stack (no recursion).</li>
+    <li>Write a function to find the kth smallest element in a BST.</li>
+    <li>Write a function to find the zig-zag (spiral) level-order traversal of a Binary Tree.</li>
+    <li>Write a function to construct a Binary Tree from given in-order and pre-order traversal arrays.</li>
+    <li>Write a function to find the vertical order traversal of a Binary Tree.</li>
+    <li>Implement a basic Trie with insert and search (prefix lookup) operations.</li>
+    <li>Write a function to right-side-view a Binary Tree (rightmost node at every level).</li>
+    <li>Write a function to check if a Binary Tree is symmetric (mirror of itself).</li>
+    <li>Write a function to find the sum of all left leaves in a Binary Tree.</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    A <b>Tree</b> is a hierarchical, non-linear structure with one root and no cycles. A <b>BST</b> keeps left &lt; node &lt; right, giving O(log n) operations — <i>if balanced</i>. In-order traversal yields sorted output. <b>AVL/Red-Black Trees</b> self-balance to guarantee worst-case O(log n). Trees underpin Heaps, Tries, and database B-Trees.
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">Balanced BST height ≈ log₂(n) &nbsp;|&nbsp; Skewed BST height = n − 1</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 6 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Tree</td><td>Hierarchical, non-linear, one root, no cycles</td></tr>
+    <tr><td>Binary Tree</td><td>Each node has at most 2 children</td></tr>
+    <tr><td>BST</td><td>Left < Node < Right</td></tr>
+    <tr><td>Balanced BST</td><td>Search/Insert/Delete = O(log n)</td></tr>
+    <tr><td>Skewed BST</td><td>Degrades to O(n) — like a Linked List</td></tr>
+    <tr><td>In-order</td><td>Left → Root → Right (sorted output for BST)</td></tr>
+    <tr><td>Pre-order</td><td>Root → Left → Right (used to copy/serialize)</td></tr>
+    <tr><td>Post-order</td><td>Left → Right → Root (used to delete safely)</td></tr>
+    <tr><td>Level-order</td><td>BFS using a Queue, level by level</td></tr>
+    <tr><td>AVL Tree</td><td>Self-balancing BST, guarantees O(log n)</td></tr>
+  </table>
+  <div class="box formula">Balanced height ≈ log₂(n) | Skewed height = n−1</div>
+  <div class="box tip">Golden rule: <b>Need sorted order? → In-order traversal. Need O(log n) guarantee? → Use a self-balancing tree (AVL/Red-Black).</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Implement a Binary Search Tree with insert and search operations.", "Write a function for in-order traversal of a Binary Tree (recursive).", "Write a function for pre-order traversal of a Binary Tree (recursive).", "Write a function for post-order traversal of a Binary Tree (recursive).", "Write a function for level-order traversal (BFS) of a Binary Tree using a Queue.", "Write a function to find the height of a Binary Tree.", "Write a function to count the total number of nodes in a Binary Tree.", "Write a function to count the number of leaf nodes in a Binary Tree.", "Write a function to find the minimum value in a Binary Search Tree.", "Write a function to find the maximum value in a Binary Search Tree.", "Write a function to delete a node from a Binary Search Tree.", "Write a function to check if two Binary Trees are identical.", "Write a function to mirror/invert a Binary Tree.", "Write a function to check if a Binary Tree is height-balanced.", "Write a function to find the Lowest Common Ancestor of two nodes in a BST.", "Write a function to find the Lowest Common Ancestor of two nodes in a general Binary Tree.", "Write a function to find the diameter of a Binary Tree.", "Write a function to validate whether a given Binary Tree is a valid BST.", "Write a function to convert a sorted array into a height-balanced BST.", "Write a function to find all root-to-leaf paths in a Binary Tree.", "Write a function to serialize and deserialize a Binary Tree.", "Write an iterative in-order traversal using an explicit Stack (no recursion).", "Write a function to find the kth smallest element in a BST.", "Write a function to find the zig-zag (spiral) level-order traversal of a Binary Tree.", "Write a function to construct a Binary Tree from given in-order and pre-order traversal arrays.", "Write a function to find the vertical order traversal of a Binary Tree.", "Implement a basic Trie with insert and search (prefix lookup) operations.", "Write a function to right-side-view a Binary Tree (rightmost node at every level).", "Write a function to check if a Binary Tree is symmetric (mirror of itself).", "Write a function to find the sum of all left leaves in a Binary Tree."]}, "practice": {"easy": ["What is the height of a Tree with only a root node?", "Define the term 'Complete Binary Tree' in your own words.", "Write one advantage of a Binary Search Tree over a sorted Array for inserting a node.", "Which traversal order visits nodes of a BST in sorted order?", "Write one advantage of a Binary Search Tree over a sorted Array for searching for a value.", "In an XML configuration file, would you use a Tree to model the hierarchy? Why?", "Define the term 'Subtree' in your own words.", "What data structure is typically used to implement Level-Order Traversal (BFS) of a Tree?", "What is the maximum number of children a node can have in a Binary Tree?", "Write one advantage of a Binary Search Tree over a sorted Array for serializing the tree.", "Name one real-life example of a tree structure, such as a tournament bracket.", "In an autocomplete/predictive-text system (Trie), would you use a Tree to model the hierarchy? Why?", "Fill in the blank: level-order traversal (BFS) in a balanced BST with 10,000 nodes takes ______ time.", "What is the difference between a Tree's 'Root' and a 'Leaf' node?", "Write one disadvantage of an unbalanced BST.", "Fill in the blank: counting total nodes in a balanced BST with 1,000 nodes takes ______ time.", "Name one real-life example of a tree structure, such as a chess game's move tree.", "Define the term 'Trie' in your own words.", "Name one real-life example of a tree structure, such as a website's navigation menu structure.", "Fill in the blank: counting leaf nodes in a balanced BST with 1,000 nodes takes ______ time.", "In a chess game's move tree, would you use a Tree to model the hierarchy? Why?", "Write one advantage of a Binary Search Tree over a sorted Array for post-order traversal.", "What are the three common Depth-First traversal orders of a Binary Tree?", "Fill in the blank: inserting a node in a balanced BST with 10,000 nodes takes ______ time.", "Fill in the blank: searching for a value in a balanced BST with 10,000 nodes takes ______ time.", "Write one advantage of a Binary Search Tree over a sorted Array for checking if the tree is balanced.", "Write one advantage of a Binary Search Tree over a sorted Array for finding the diameter.", "What is the time complexity of searching for a value in a Binary Search Tree with 10,000 nodes (balanced case)?", "Fill in the blank: checking if two trees are identical in a balanced BST with 10 nodes takes ______ time.", "Name one real-life example of a tree structure, such as an autocomplete/predictive-text system (Trie).", "State True or False: Every node in a Binary Tree has at most two children.", "State True or False: A Trie is commonly used to implement autocomplete/prefix search.", "Define the term 'Descendant' in your own words.", "State True or False: In a Binary Search Tree, the left subtree contains values smaller than the node.", "State True or False: An unbalanced BST can degrade to O(n) search time, behaving like a Linked List.", "State True or False: A Complete Binary Tree has every level fully filled except possibly the last.", "Write one advantage of a Binary Search Tree over a sorted Array for in-order traversal.", "State True or False: In-order traversal of a BST visits nodes in sorted order.", "What is the time complexity of mirroring/inverting the tree in a Binary Search Tree with 10 nodes (balanced case)?", "Fill in the blank: mirroring/inverting the tree in a balanced BST with 10,000 nodes takes ______ time.", "State True or False: Post-order traversal visits the root after its children.", "What is the time complexity of in-order traversal in a Binary Search Tree with 10,000 nodes (balanced case)?", "Name one real-life example of a tree structure, such as a file system's folder hierarchy.", "Fill in the blank: finding the diameter in a balanced BST with n nodes takes ______ time.", "What is the time complexity of deleting a node in a Binary Search Tree with 10,000 nodes (balanced case)?", "In a file system's folder hierarchy, would you use a Tree to model the hierarchy? Why?", "What is the time complexity of counting total nodes in a Binary Search Tree with 10 nodes (balanced case)?", "In a database index (B-Tree), would you use a Tree to model the hierarchy? Why?", "Write one advantage of a Binary Search Tree over a sorted Array for finding the depth.", "In a book's table of contents, would you use a Tree to model the hierarchy? Why?", "In a taxonomy of biological species, would you use a Tree to model the hierarchy? Why?", "Fill in the blank: inserting a node in a balanced BST with 100 nodes takes ______ time.", "Define the term 'Full Binary Tree' in your own words.", "Name one real-life example of a tree structure, such as a company's organisation chart.", "What is the time complexity of finding the height in a Binary Search Tree with 100 nodes (balanced case)?", "What is the time complexity of pre-order traversal in a Binary Search Tree with n nodes (balanced case)?", "Write one advantage of a Binary Search Tree over a sorted Array for mirroring/inverting the tree.", "Name one real-life example of a tree structure, such as a database index (B-Tree).", "Fill in the blank: level-order traversal (BFS) in a balanced BST with 10 nodes takes ______ time.", "Fill in the blank: deleting a node in a balanced BST with 10^5 nodes takes ______ time.", "Write one advantage of a Binary Search Tree over a sorted Array for finding the height.", "In a tournament bracket, would you use a Tree to model the hierarchy? Why?", "What is the time complexity of counting leaf nodes in a Binary Search Tree with 100 nodes (balanced case)?", "Name one real-life example of a tree structure, such as an HTML/DOM document structure.", "Write one advantage of a Binary Search Tree over a sorted Array for counting leaf nodes.", "Fill in the blank: counting leaf nodes in a balanced BST with 10^5 nodes takes ______ time.", "Fill in the blank: checking if the tree is balanced in a balanced BST with 10,000 nodes takes ______ time.", "In a website's navigation menu structure, would you use a Tree to model the hierarchy? Why?", "What is the time complexity of level-order traversal (BFS) in a Binary Search Tree with 10^5 nodes (balanced case)?", "Fill in the blank: counting total nodes in a balanced BST with 10 nodes takes ______ time.", "Write one advantage of a Binary Search Tree over a sorted Array for finding the lowest common ancestor.", "Fill in the blank: finding the depth in a balanced BST with 10 nodes takes ______ time.", "Name one real-life example of a tree structure, such as an XML configuration file.", "In a company's organisation chart, would you use a Tree to model the hierarchy? Why?", "What is the time complexity of finding the diameter in a Binary Search Tree with 100 nodes (balanced case)?", "Define the term 'Root' in your own words.", "Write one advantage of a Binary Search Tree over a sorted Array for counting total nodes.", "Name one real-life example of a tree structure, such as a taxonomy of biological species.", "Fill in the blank: mirroring/inverting the tree in a balanced BST with 100 nodes takes ______ time.", "Write one advantage of a Binary Search Tree over a sorted Array for finding the minimum value.", "What is the time complexity of inserting a node in a Binary Search Tree with 100 nodes (balanced case)?", "Define the term 'Parent' in your own words.", "What is the time complexity of level-order traversal (BFS) in a Binary Search Tree with n nodes (balanced case)?", "Define the term 'Height of Tree' in your own words.", "Define the term 'Tree' in your own words.", "State True or False: The height of a tree with a single node is 0.", "In an HTML/DOM document structure, would you use a Tree to model the hierarchy? Why?", "Name one real-life example of a tree structure, such as a family tree.", "What is the time complexity of finding the depth in a Binary Search Tree with n nodes (balanced case)?", "Define the term 'Depth of Node' in your own words.", "State True or False: A balanced BST guarantees O(log n) search time.", "What is the time complexity of checking if the tree is balanced in a Binary Search Tree with 1,000 nodes (balanced case)?", "Define the term 'Binary Search Tree (BST)' in your own words.", "Write one advantage of a Binary Search Tree over a sorted Array for level-order traversal (BFS).", "What is the time complexity of counting total nodes in a Binary Search Tree with 10,000 nodes (balanced case)?", "What is the time complexity of finding the height in a Binary Search Tree with 1,000 nodes (balanced case)?", "In a family tree, would you use a Tree to model the hierarchy? Why?", "What is the time complexity of inserting a node in a Binary Search Tree with 1,000 nodes (balanced case)?", "What is the time complexity of serializing the tree in a Binary Search Tree with 10,000 nodes (balanced case)?", "What is the time complexity of in-order traversal in a Binary Search Tree with n nodes (balanced case)?", "What is the time complexity of finding the lowest common ancestor in a Binary Search Tree with 10^5 nodes (balanced case)?", "What is the time complexity of checking if the tree is balanced in a Binary Search Tree with 100 nodes (balanced case)?", "What is the time complexity of searching for a value in a Binary Search Tree with 1,000 nodes (balanced case)?", "Fill in the blank: finding the diameter in a balanced BST with 1,000 nodes takes ______ time.", "What is the time complexity of checking if two trees are identical in a Binary Search Tree with 10,000 nodes (balanced case)?", "Define the term 'Leaf Node' in your own words.", "What is the time complexity of deleting a node in a Binary Search Tree with 10^5 nodes (balanced case)?", "Name one real-life example of a tree structure, such as a book's table of contents.", "In a decision tree for a game AI, would you use a Tree to model the hierarchy? Why?", "Fill in the blank: inserting a node in a balanced BST with 10 nodes takes ______ time.", "Define the term 'Binary Tree' in your own words.", "Define the term 'Perfect Binary Tree' in your own words.", "Write one advantage of a Binary Search Tree over a sorted Array for checking if two trees are identical.", "Fill in the blank: checking if the tree is balanced in a balanced BST with 10^5 nodes takes ______ time.", "What is the time complexity of finding the lowest common ancestor in a Binary Search Tree with 1,000 nodes (balanced case)?", "What is the time complexity of deleting a node in a Binary Search Tree with 100 nodes (balanced case)?", "Define the term 'Sibling' in your own words.", "Define the term 'AVL Tree' in your own words.", "Fill in the blank: in-order traversal in a balanced BST with 10 nodes takes ______ time.", "Fill in the blank: checking if two trees are identical in a balanced BST with 10,000 nodes takes ______ time.", "Write one advantage of a Binary Search Tree over a sorted Array for pre-order traversal.", "Fill in the blank: checking if the tree is balanced in a balanced BST with 1,000 nodes takes ______ time.", "What is the time complexity of inserting a node in a Binary Search Tree with n nodes (balanced case)?", "Fill in the blank: finding the minimum value in a balanced BST with 10^5 nodes takes ______ time.", "Fill in the blank: level-order traversal (BFS) in a balanced BST with 1,000 nodes takes ______ time.", "Define the term 'Ancestor' in your own words.", "Fill in the blank: serializing the tree in a balanced BST with 10,000 nodes takes ______ time.", "Name one real-life example of a tree structure, such as a decision tree for a game AI.", "Fill in the blank: serializing the tree in a balanced BST with 10 nodes takes ______ time.", "What is the time complexity of finding the lowest common ancestor in a Binary Search Tree with 10 nodes (balanced case)?", "What is the time complexity of mirroring/inverting the tree in a Binary Search Tree with 10,000 nodes (balanced case)?", "What is the time complexity of finding the minimum value in a Binary Search Tree with 100 nodes (balanced case)?", "Fill in the blank: inserting a node in a balanced BST with n nodes takes ______ time.", "What is the time complexity of finding the maximum value in a Binary Search Tree with 1,000 nodes (balanced case)?", "What is the time complexity of finding the depth in a Binary Search Tree with 10^5 nodes (balanced case)?", "Fill in the blank: searching for a value in a balanced BST with 10 nodes takes ______ time.", "Write one advantage of a Binary Search Tree over a sorted Array for deleting a node.", "Fill in the blank: finding the diameter in a balanced BST with 10,000 nodes takes ______ time.", "What is the time complexity of serializing the tree in a Binary Search Tree with 10 nodes (balanced case)?", "Define the term 'Child' in your own words.", "What is the time complexity of finding the depth in a Binary Search Tree with 1,000 nodes (balanced case)?", "Fill in the blank: in-order traversal in a balanced BST with 100 nodes takes ______ time.", "Fill in the blank: mirroring/inverting the tree in a balanced BST with 10 nodes takes ______ time.", "Fill in the blank: counting total nodes in a balanced BST with 10^5 nodes takes ______ time.", "State True or False: Pre-order traversal visits the root before its children.", "What is the time complexity of in-order traversal in a Binary Search Tree with 100 nodes (balanced case)?", "Write one advantage of a Binary Search Tree over a sorted Array for finding the maximum value.", "Fill in the blank: in-order traversal in a balanced BST with 1,000 nodes takes ______ time.", "What is the time complexity of deleting a node in a Binary Search Tree with 1,000 nodes (balanced case)?", "Define the term 'Balanced Tree' in your own words.", "Fill in the blank: finding the depth in a balanced BST with 10^5 nodes takes ______ time.", "Fill in the blank: finding the depth in a balanced BST with 1,000 nodes takes ______ time.", "Fill in the blank: checking if two trees are identical in a balanced BST with 100 nodes takes ______ time.", "What is the time complexity of mirroring/inverting the tree in a Binary Search Tree with 10^5 nodes (balanced case)?", "Fill in the blank: checking if the tree is balanced in a balanced BST with 10 nodes takes ______ time.", "What is the time complexity of pre-order traversal in a Binary Search Tree with 1,000 nodes (balanced case)?", "Fill in the blank: searching for a value in a balanced BST with 1,000 nodes takes ______ time.", "What is the time complexity of counting total nodes in a Binary Search Tree with 1,000 nodes (balanced case)?", "Fill in the blank: finding the lowest common ancestor in a balanced BST with 10^5 nodes takes ______ time.", "What is the time complexity of finding the diameter in a Binary Search Tree with n nodes (balanced case)?", "What is the time complexity of serializing the tree in a Binary Search Tree with n nodes (balanced case)?", "Fill in the blank: finding the maximum value in a balanced BST with 10,000 nodes takes ______ time.", "What is the time complexity of inserting a node in a Binary Search Tree with 10,000 nodes (balanced case)?", "Fill in the blank: deleting a node in a balanced BST with n nodes takes ______ time.", "Fill in the blank: finding the maximum value in a balanced BST with 10^5 nodes takes ______ time.", "What is the time complexity of finding the height in a Binary Search Tree with n nodes (balanced case)?", "What is the time complexity of serializing the tree in a Binary Search Tree with 10^5 nodes (balanced case)?", "What is the time complexity of checking if two trees are identical in a Binary Search Tree with 1,000 nodes (balanced case)?", "What is the time complexity of finding the diameter in a Binary Search Tree with 10^5 nodes (balanced case)?", "What is the time complexity of level-order traversal (BFS) in a Binary Search Tree with 1,000 nodes (balanced case)?", "What is the time complexity of checking if the tree is balanced in a Binary Search Tree with 10,000 nodes (balanced case)?", "What is the time complexity of finding the lowest common ancestor in a Binary Search Tree with 10,000 nodes (balanced case)?", "What is the time complexity of finding the maximum value in a Binary Search Tree with 100 nodes (balanced case)?", "What is the time complexity of serializing the tree in a Binary Search Tree with 1,000 nodes (balanced case)?", "What is the time complexity of post-order traversal in a Binary Search Tree with n nodes (balanced case)?", "Fill in the blank: inserting a node in a balanced BST with 1,000 nodes takes ______ time.", "What is the time complexity of post-order traversal in a Binary Search Tree with 10,000 nodes (balanced case)?", "Fill in the blank: checking if the tree is balanced in a balanced BST with 100 nodes takes ______ time.", "Fill in the blank: pre-order traversal in a balanced BST with 10^5 nodes takes ______ time.", "What is the time complexity of counting leaf nodes in a Binary Search Tree with 10,000 nodes (balanced case)?", "What is the time complexity of level-order traversal (BFS) in a Binary Search Tree with 10,000 nodes (balanced case)?", "Fill in the blank: post-order traversal in a balanced BST with 10^5 nodes takes ______ time.", "Fill in the blank: finding the lowest common ancestor in a balanced BST with n nodes takes ______ time.", "What is the time complexity of inserting a node in a Binary Search Tree with 10^5 nodes (balanced case)?", "What is the time complexity of mirroring/inverting the tree in a Binary Search Tree with n nodes (balanced case)?", "Fill in the blank: in-order traversal in a balanced BST with 10^5 nodes takes ______ time.", "What is the time complexity of pre-order traversal in a Binary Search Tree with 10^5 nodes (balanced case)?", "Fill in the blank: pre-order traversal in a balanced BST with 10 nodes takes ______ time.", "What is the time complexity of post-order traversal in a Binary Search Tree with 100 nodes (balanced case)?", "Fill in the blank: checking if two trees are identical in a balanced BST with n nodes takes ______ time.", "Fill in the blank: deleting a node in a balanced BST with 1,000 nodes takes ______ time.", "Fill in the blank: pre-order traversal in a balanced BST with 1,000 nodes takes ______ time.", "Fill in the blank: searching for a value in a balanced BST with n nodes takes ______ time.", "What is the time complexity of level-order traversal (BFS) in a Binary Search Tree with 10 nodes (balanced case)?", "Fill in the blank: serializing the tree in a balanced BST with 100 nodes takes ______ time.", "What is the time complexity of finding the maximum value in a Binary Search Tree with n nodes (balanced case)?", "Fill in the blank: finding the maximum value in a balanced BST with 10 nodes takes ______ time.", "What is the time complexity of counting total nodes in a Binary Search Tree with 10^5 nodes (balanced case)?", "What is the time complexity of finding the height in a Binary Search Tree with 10 nodes (balanced case)?", "Fill in the blank: finding the depth in a balanced BST with n nodes takes ______ time."], "medium": ["Explain how to find the height of a Binary Tree with 100 nodes recursively, and state its time complexity.", "Compare in-order, pre-order, and post-order traversal outputs for a small Binary Search Tree.", "Explain the time complexity of finding the maximum value for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain how the Lowest Common Ancestor of two nodes can be found in a BST with 10,000 nodes in O(h) time.", "Explain how Level-Order Traversal (BFS) works on a Tree with 10^5 nodes, and what data structure it needs.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for counting leaf nodes.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for counting total nodes.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a file system's folder hierarchy as an illustration.", "For a taxonomy of biological species with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for serializing the tree.", "Explain how to find the height of a Binary Tree with 1,000 nodes recursively, and state its time complexity.", "Explain how to find the height of a Binary Tree with 10^5 nodes recursively, and state its time complexity.", "Explain how the Lowest Common Ancestor of two nodes can be found in a BST with 1,000 nodes in O(h) time.", "Explain how a Trie improves prefix-search performance over a plain BST, for a book's table of contents with 100 entries.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for checking if the tree is balanced.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for checking if two trees are identical.", "Explain how Level-Order Traversal (BFS) works on a Tree with 10,000 nodes, and what data structure it needs.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for finding the height.", "Explain how the Lowest Common Ancestor of two nodes can be found in a BST with n nodes in O(h) time.", "Explain how to find the height of a Binary Tree with 10,000 nodes recursively, and state its time complexity.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a company's organisation chart as an illustration.", "For a database index (B-Tree) with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how Level-Order Traversal (BFS) works on a Tree with 10 nodes, and what data structure it needs.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for counting leaf nodes.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for inserting a node.", "Explain how to find the height of a Binary Tree with 10 nodes recursively, and state its time complexity.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for finding the maximum value.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using an HTML/DOM document structure as an illustration.", "Explain the time complexity of finding the lowest common ancestor for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for finding the diameter.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using an XML configuration file as an illustration.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a taxonomy of biological species as an illustration.", "Explain the time complexity of finding the minimum value for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain how to find the height of a Binary Tree with n nodes recursively, and state its time complexity.", "Explain the time complexity of checking if two trees are identical for a Binary Search Tree with 10 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for pre-order traversal.", "Explain how Level-Order Traversal (BFS) works on a Tree with n nodes, and what data structure it needs.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for deleting a node.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using an autocomplete/predictive-text system (Trie) as an illustration.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for finding the minimum value.", "Explain how the Lowest Common Ancestor of two nodes can be found in a BST with 10^5 nodes in O(h) time.", "Explain how Level-Order Traversal (BFS) works on a Tree with 1,000 nodes, and what data structure it needs.", "For a database index (B-Tree) with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a taxonomy of biological species with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Trie improves prefix-search performance over a plain BST, for a chess game's move tree with 10,000 entries.", "For an XML configuration file with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for checking if two trees are identical.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for inserting a node.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a family tree as an illustration.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for checking if the tree is balanced.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for mirroring/inverting the tree.", "Explain the time complexity of post-order traversal for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for checking if the tree is balanced.", "Explain how a Trie improves prefix-search performance over a plain BST, for a decision tree for a game AI with 100 entries.", "Explain the time complexity of checking if two trees are identical for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a book's table of contents with 10 entries.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for finding the diameter.", "For an HTML/DOM document structure with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for counting total nodes.", "Explain the time complexity of checking if the tree is balanced for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for checking if two trees are identical.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for checking if the tree is balanced.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for in-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for a database index (B-Tree) with 10 entries.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for finding the height.", "For an XML configuration file with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of checking if two trees are identical for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "For a decision tree for a game AI with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a website's navigation menu structure as an illustration.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for post-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for an XML configuration file with 10^5 entries.", "Explain how the Lowest Common Ancestor of two nodes can be found in a BST with 100 nodes in O(h) time.", "Explain the time complexity of pre-order traversal for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "For a family tree with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Trie improves prefix-search performance over a plain BST, for a website's navigation menu structure with 10^5 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a taxonomy of biological species with n entries.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for pre-order traversal.", "For a chess game's move tree with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a website's navigation menu structure with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how Level-Order Traversal (BFS) works on a Tree with 100 nodes, and what data structure it needs.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a tournament bracket as an illustration.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a chess game's move tree as an illustration.", "Explain the time complexity of checking if two trees are identical for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for finding the depth.", "For a chess game's move tree with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of counting total nodes for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of finding the depth for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for pre-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for a book's table of contents with 1,000 entries.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for deleting a node.", "Explain the time complexity of counting leaf nodes for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of finding the minimum value for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for mirroring/inverting the tree.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for finding the height.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for finding the diameter.", "Explain how a Trie improves prefix-search performance over a plain BST, for a database index (B-Tree) with 1,000 entries.", "Explain the time complexity of post-order traversal for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a chess game's move tree with 10^5 entries.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for finding the height.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for checking if two trees are identical.", "Explain how a Trie improves prefix-search performance over a plain BST, for a tournament bracket with 10,000 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a chess game's move tree with n entries.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a decision tree for a game AI as an illustration.", "For a file system's folder hierarchy with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for finding the height.", "For an HTML/DOM document structure with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a tournament bracket with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for post-order traversal.", "Explain the time complexity of mirroring/inverting the tree for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "For a file system's folder hierarchy with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for counting leaf nodes.", "Explain how the Lowest Common Ancestor of two nodes can be found in a BST with 10 nodes in O(h) time.", "Explain how a Trie improves prefix-search performance over a plain BST, for a tournament bracket with 10^5 entries.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for finding the minimum value.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for deleting a node.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for level-order traversal (BFS).", "Explain the time complexity of deleting a node for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of finding the maximum value for a Binary Search Tree with 10 nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of finding the diameter for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for searching for a value.", "Explain the time complexity of finding the height for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for counting total nodes.", "Explain the time complexity of finding the lowest common ancestor for a Binary Search Tree with 10 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for checking if the tree is balanced.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for in-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for a family tree with 10,000 entries.", "Explain the time complexity of in-order traversal for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for level-order traversal (BFS).", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for searching for a value.", "Explain how a Trie improves prefix-search performance over a plain BST, for a family tree with n entries.", "Explain the time complexity of in-order traversal for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a taxonomy of biological species with 10 entries.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for finding the lowest common ancestor.", "Explain how a Trie improves prefix-search performance over a plain BST, for a website's navigation menu structure with 100 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for an XML configuration file with 100 entries.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for pre-order traversal.", "Explain the time complexity of checking if two trees are identical for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "For an autocomplete/predictive-text system (Trie) with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Trie improves prefix-search performance over a plain BST, for a website's navigation menu structure with n entries.", "Explain the time complexity of finding the height for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a chess game's move tree with 10 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a company's organisation chart with 10 entries.", "For an autocomplete/predictive-text system (Trie) with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a website's navigation menu structure with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a database index (B-Tree) with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of in-order traversal for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a website's navigation menu structure with 1,000 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a company's organisation chart with 10,000 entries.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for finding the minimum value.", "Explain how a Trie improves prefix-search performance over a plain BST, for a taxonomy of biological species with 10^5 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a decision tree for a game AI with 10 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a taxonomy of biological species with 10,000 entries.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for post-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for a decision tree for a game AI with n entries.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for finding the depth.", "For a taxonomy of biological species with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a database index (B-Tree) as an illustration.", "Explain how a Trie improves prefix-search performance over a plain BST, for a company's organisation chart with n entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a tournament bracket with 10 entries.", "Explain the time complexity of pre-order traversal for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for an XML configuration file with 10 entries.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for in-order traversal.", "For a tournament bracket with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Trie improves prefix-search performance over a plain BST, for a family tree with 10 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for an autocomplete/predictive-text system (Trie) with n entries.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for searching for a value.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for finding the diameter.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for inserting a node.", "For an HTML/DOM document structure with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of deleting a node for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for inserting a node.", "Explain how a Trie improves prefix-search performance over a plain BST, for a family tree with 1,000 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a book's table of contents with n entries.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for searching for a value.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for finding the maximum value.", "Explain how a Trie improves prefix-search performance over a plain BST, for a file system's folder hierarchy with 10^5 entries.", "Explain the time complexity of serializing the tree for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "For an HTML/DOM document structure with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for inserting a node.", "Explain the time complexity of finding the depth for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "For a chess game's move tree with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a file system's folder hierarchy with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For an HTML/DOM document structure with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for deleting a node.", "For a chess game's move tree with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Trie improves prefix-search performance over a plain BST, for a taxonomy of biological species with 1,000 entries.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for deleting a node.", "For a tournament bracket with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for mirroring/inverting the tree.", "For a website's navigation menu structure with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for searching for a value.", "For a file system's folder hierarchy with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for serializing the tree.", "For a company's organisation chart with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of finding the diameter for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for serializing the tree.", "Explain the difference between a Complete Binary Tree and a Full Binary Tree, using a book's table of contents as an illustration.", "Explain the time complexity of finding the depth for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "For a decision tree for a game AI with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for checking if the tree is balanced.", "Explain how a Trie improves prefix-search performance over a plain BST, for an HTML/DOM document structure with 10^5 entries.", "Explain the time complexity of finding the depth for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of level-order traversal (BFS) for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of checking if two trees are identical for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "For a decision tree for a game AI with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for pre-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for a chess game's move tree with 1,000 entries.", "Explain the time complexity of finding the diameter for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "For a taxonomy of biological species with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of finding the diameter for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for an autocomplete/predictive-text system (Trie) with 100 entries.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for finding the maximum value.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for inserting a node.", "Explain the time complexity of serializing the tree for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for checking if two trees are identical.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for counting total nodes.", "Explain the time complexity of finding the diameter for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "For an autocomplete/predictive-text system (Trie) with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a family tree with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of finding the minimum value for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "For a taxonomy of biological species with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of counting total nodes for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for finding the minimum value.", "Explain how a Trie improves prefix-search performance over a plain BST, for a decision tree for a game AI with 10^5 entries.", "Explain the time complexity of deleting a node for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of searching for a value for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "For a decision tree for a game AI with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for counting total nodes.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for mirroring/inverting the tree.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for finding the depth.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for counting leaf nodes.", "For a taxonomy of biological species with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a chess game's move tree with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of serializing the tree for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain the time complexity of finding the lowest common ancestor for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for an XML configuration file with 1,000 entries.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for deleting a node.", "Explain how a Trie improves prefix-search performance over a plain BST, for an autocomplete/predictive-text system (Trie) with 1,000 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for an HTML/DOM document structure with 10 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a family tree with 10^5 entries.", "Explain the time complexity of checking if the tree is balanced for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a database index (B-Tree) with 10,000 entries.", "Explain how a Trie improves prefix-search performance over a plain BST, for a company's organisation chart with 100 entries.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for finding the lowest common ancestor.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for post-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for an HTML/DOM document structure with n entries.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for finding the maximum value.", "Explain how a Trie improves prefix-search performance over a plain BST, for a family tree with 100 entries.", "For a family tree with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a website's navigation menu structure with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for finding the maximum value.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for inserting a node.", "Explain the time complexity of checking if the tree is balanced for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a file system's folder hierarchy with 10 entries.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for deleting a node.", "For an XML configuration file with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10,000 nodes can degrade to O(n) time for finding the depth.", "Explain how a Trie improves prefix-search performance over a plain BST, for an autocomplete/predictive-text system (Trie) with 10 entries.", "For a website's navigation menu structure with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for finding the minimum value.", "Explain the time complexity of post-order traversal for a Binary Search Tree with n nodes, in both balanced and worst (skewed) cases.", "Explain how a Trie improves prefix-search performance over a plain BST, for a chess game's move tree with 100 entries.", "Explain the time complexity of counting total nodes for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for in-order traversal.", "Explain the time complexity of checking if the tree is balanced for a Binary Search Tree with 1,000 nodes, in both balanced and worst (skewed) cases.", "For a book's table of contents with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a book's table of contents with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for finding the lowest common ancestor.", "Explain the time complexity of finding the maximum value for a Binary Search Tree with 10,000 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for in-order traversal.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for post-order traversal.", "Explain how a Trie improves prefix-search performance over a plain BST, for a file system's folder hierarchy with 1,000 entries.", "For a family tree with n entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for post-order traversal.", "Explain the time complexity of inserting a node for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 100 nodes can degrade to O(n) time for checking if two trees are identical.", "For an HTML/DOM document structure with 10 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain how a Trie improves prefix-search performance over a plain BST, for a tournament bracket with n entries.", "Explain how a Balanced Tree (like AVL) prevents the worst-case O(n) degradation seen in a plain BST for counting total nodes.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for mirroring/inverting the tree.", "For a chess game's move tree with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of mirroring/inverting the tree for a Binary Search Tree with 10^5 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for level-order traversal (BFS).", "Explain the time complexity of deleting a node for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "For a book's table of contents with 1,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of in-order traversal for a Binary Search Tree with 100 nodes, in both balanced and worst (skewed) cases.", "For a tournament bracket with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for pre-order traversal.", "For an XML configuration file with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "For a tournament bracket with 10,000 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10^5 nodes can degrade to O(n) time for finding the diameter.", "Explain how a Trie improves prefix-search performance over a plain BST, for a taxonomy of biological species with 100 entries.", "For a family tree with 10^5 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain the time complexity of post-order traversal for a Binary Search Tree with 10 nodes, in both balanced and worst (skewed) cases.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for level-order traversal (BFS).", "For a decision tree for a game AI with 100 entries, would you model it as a Binary Tree or a general (n-ary) Tree? Justify.", "Explain why an unbalanced BST with 10 nodes can degrade to O(n) time for finding the lowest common ancestor.", "Explain why an unbalanced BST with n nodes can degrade to O(n) time for finding the diameter.", "Explain how a Trie improves prefix-search performance over a plain BST, for an autocomplete/predictive-text system (Trie) with 10^5 entries.", "Explain why an unbalanced BST with 1,000 nodes can degrade to O(n) time for finding the minimum value."], "hard": ["Explain how Trie-based autocomplete for a family tree achieves O(L) lookup time (L = word length) regardless of the number of stored words (1,000).", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 1,000 nodes, for an XML configuration file.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a chess game's move tree with 1,000 entries as context.", "Design an algorithm to find the Lowest Common Ancestor of two nodes in a Binary Tree (not necessarily a BST) with 10 nodes.", "Explain how Trie-based autocomplete for a chess game's move tree achieves O(L) lookup time (L = word length) regardless of the number of stored words (n).", "Explain how you would validate whether a given Binary Tree with 10^5 nodes is a correct Binary Search Tree.", "Explain how a B-Tree (used in databases like for a decision tree for a game AI) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Design an algorithm to find the Lowest Common Ancestor of two nodes in a Binary Tree (not necessarily a BST) with n nodes.", "Design an algorithm to check if a Binary Tree with n nodes is height-balanced, in O(n) time (not O(n log n)).", "Explain how to serialize and deserialize a Binary Tree with 100 nodes so it can be reconstructed exactly.", "Explain how Trie-based autocomplete for a database index (B-Tree) achieves O(L) lookup time (L = word length) regardless of the number of stored words (100).", "Design an algorithm to find the Lowest Common Ancestor of two nodes in a Binary Tree (not necessarily a BST) with 10^5 nodes.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using an XML configuration file with 10^5 entries as context.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10 nodes, for an autocomplete/predictive-text system (Trie).", "Design an algorithm to find the diameter (longest path between any two nodes) of a Binary Tree with 1,000 nodes, in O(n) time.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a tournament bracket with 10 entries as context.", "Design an algorithm to check if a Binary Tree with 10,000 nodes is height-balanced, in O(n) time (not O(n log n)).", "Design an algorithm to check if a Binary Tree with 10 nodes is height-balanced, in O(n) time (not O(n log n)).", "Explain how Trie-based autocomplete for a file system's folder hierarchy achieves O(L) lookup time (L = word length) regardless of the number of stored words (100).", "Explain how to serialize and deserialize a Binary Tree with 10 nodes so it can be reconstructed exactly.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a database index (B-Tree) with 10,000 entries as context.", "Design an approach to convert a sorted array of 1,000 elements into a height-balanced BST in O(n) time.", "Design an algorithm to check if a Binary Tree with 10^5 nodes is height-balanced, in O(n) time (not O(n log n)).", "Design an approach to convert a sorted array of 10^5 elements into a height-balanced BST in O(n) time.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a database index (B-Tree) with 10^5 entries as context.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10 nodes, for an HTML/DOM document structure.", "Explain how Trie-based autocomplete for a family tree achieves O(L) lookup time (L = word length) regardless of the number of stored words (10).", "Explain how Trie-based autocomplete for a database index (B-Tree) achieves O(L) lookup time (L = word length) regardless of the number of stored words (1,000).", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10 nodes, for a company's organisation chart.", "Explain how a B-Tree (used in databases like for an HTML/DOM document structure) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Explain how Trie-based autocomplete for an HTML/DOM document structure achieves O(L) lookup time (L = word length) regardless of the number of stored words (100).", "Design an algorithm to find the Lowest Common Ancestor of two nodes in a Binary Tree (not necessarily a BST) with 10,000 nodes.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with n nodes, for a book's table of contents.", "Design an algorithm to find the diameter (longest path between any two nodes) of a Binary Tree with 10 nodes, in O(n) time.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a book's table of contents with 1,000 entries as context.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10,000 nodes, for an autocomplete/predictive-text system (Trie).", "Explain how you would validate whether a given Binary Tree with 10 nodes is a correct Binary Search Tree.", "Explain how to serialize and deserialize a Binary Tree with 1,000 nodes so it can be reconstructed exactly.", "Explain how Trie-based autocomplete for an HTML/DOM document structure achieves O(L) lookup time (L = word length) regardless of the number of stored words (10^5).", "Explain how you would validate whether a given Binary Tree with 1,000 nodes is a correct Binary Search Tree.", "Design an algorithm to find the Lowest Common Ancestor of two nodes in a Binary Tree (not necessarily a BST) with 100 nodes.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a family tree with n entries as context.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a chess game's move tree with 100 entries as context.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 1,000 nodes, for a book's table of contents.", "Design an algorithm to check if a Binary Tree with 100 nodes is height-balanced, in O(n) time (not O(n log n)).", "Explain how Trie-based autocomplete for an autocomplete/predictive-text system (Trie) achieves O(L) lookup time (L = word length) regardless of the number of stored words (10).", "Explain how a B-Tree (used in databases like for a tournament bracket) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a family tree with 10 entries as context.", "Explain how you would validate whether a given Binary Tree with 100 nodes is a correct Binary Search Tree.", "Design an algorithm to find the diameter (longest path between any two nodes) of a Binary Tree with 10^5 nodes, in O(n) time.", "Explain how a B-Tree (used in databases like for a file system's folder hierarchy) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Design an algorithm to find the diameter (longest path between any two nodes) of a Binary Tree with n nodes, in O(n) time.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a company's organisation chart with 10,000 entries as context.", "Design an algorithm to find the diameter (longest path between any two nodes) of a Binary Tree with 100 nodes, in O(n) time.", "Design an algorithm to find the Lowest Common Ancestor of two nodes in a Binary Tree (not necessarily a BST) with 1,000 nodes.", "Design an approach to convert a sorted array of 100 elements into a height-balanced BST in O(n) time.", "Explain how a B-Tree (used in databases like for a family tree) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10^5 nodes, for a decision tree for a game AI.", "Design an approach to convert a sorted array of 10 elements into a height-balanced BST in O(n) time.", "Explain how a B-Tree (used in databases like for an autocomplete/predictive-text system (Trie)) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Explain how a B-Tree (used in databases like for an XML configuration file) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a company's organisation chart with n entries as context.", "Explain how a B-Tree (used in databases like for a database index (B-Tree)) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Explain how Trie-based autocomplete for an autocomplete/predictive-text system (Trie) achieves O(L) lookup time (L = word length) regardless of the number of stored words (10^5).", "Explain how a B-Tree (used in databases like for a book's table of contents) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a website's navigation menu structure with 10^5 entries as context.", "Design an algorithm to check if a Binary Tree with 1,000 nodes is height-balanced, in O(n) time (not O(n log n)).", "Explain how Trie-based autocomplete for a book's table of contents achieves O(L) lookup time (L = word length) regardless of the number of stored words (10).", "Explain how Trie-based autocomplete for a chess game's move tree achieves O(L) lookup time (L = word length) regardless of the number of stored words (1,000).", "Explain how to serialize and deserialize a Binary Tree with 10,000 nodes so it can be reconstructed exactly.", "Explain how a B-Tree (used in databases like for a taxonomy of biological species) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Explain how Trie-based autocomplete for a family tree achieves O(L) lookup time (L = word length) regardless of the number of stored words (10,000).", "Explain how a B-Tree (used in databases like for a chess game's move tree) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Design an approach to convert a sorted array of n elements into a height-balanced BST in O(n) time.", "Explain how you would validate whether a given Binary Tree with n nodes is a correct Binary Search Tree.", "Design an approach to convert a sorted array of 10,000 elements into a height-balanced BST in O(n) time.", "Explain how Trie-based autocomplete for a taxonomy of biological species achieves O(L) lookup time (L = word length) regardless of the number of stored words (10,000).", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a chess game's move tree with n entries as context.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10^5 nodes, for a tournament bracket.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 1,000 nodes, for a website's navigation menu structure.", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a taxonomy of biological species with 10,000 entries as context.", "Explain how Trie-based autocomplete for a company's organisation chart achieves O(L) lookup time (L = word length) regardless of the number of stored words (10^5).", "Explain how you would validate whether a given Binary Tree with 10,000 nodes is a correct Binary Search Tree.", "Explain how Trie-based autocomplete for a website's navigation menu structure achieves O(L) lookup time (L = word length) regardless of the number of stored words (100).", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using an XML configuration file with 10 entries as context.", "Explain how Trie-based autocomplete for an HTML/DOM document structure achieves O(L) lookup time (L = word length) regardless of the number of stored words (10,000).", "Explain how Trie-based autocomplete for a company's organisation chart achieves O(L) lookup time (L = word length) regardless of the number of stored words (100).", "Explain how to serialize and deserialize a Binary Tree with n nodes so it can be reconstructed exactly.", "Explain how Trie-based autocomplete for an autocomplete/predictive-text system (Trie) achieves O(L) lookup time (L = word length) regardless of the number of stored words (n).", "Explain how Trie-based autocomplete for an autocomplete/predictive-text system (Trie) achieves O(L) lookup time (L = word length) regardless of the number of stored words (1,000).", "Critically evaluate: 'A BST is always better than a Hash Table for lookups.' Discuss using a database index (B-Tree) with n entries as context.", "Explain how Trie-based autocomplete for a chess game's move tree achieves O(L) lookup time (L = word length) regardless of the number of stored words (100).", "Explain how a B-Tree (used in databases like for a company's organisation chart) differs structurally from a Binary Search Tree, and why it's preferred for disk-based storage.", "Explain how Trie-based autocomplete for a tournament bracket achieves O(L) lookup time (L = word length) regardless of the number of stored words (10).", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10,000 nodes, for a database index (B-Tree).", "Explain how Trie-based autocomplete for an autocomplete/predictive-text system (Trie) achieves O(L) lookup time (L = word length) regardless of the number of stored words (10,000).", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10,000 nodes, for a taxonomy of biological species.", "Explain how AVL Tree rotations (left/right) restore balance after insertion into a tree with 10 nodes, for a file system's folder hierarchy.", "Design an algorithm to find the diameter (longest path between any two nodes) of a Binary Tree with 10,000 nodes, in O(n) time.", "Explain how Trie-based autocomplete for an XML configuration file achieves O(L) lookup time (L = word length) regardless of the number of stored words (10^5)."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

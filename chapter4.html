@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 4: Stacks & Queues</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li class="current">Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 4</h1>
+  <div class="subtitle">Stacks &amp; Queues</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Explain the <span class="mark">LIFO</span> principle of Stacks and <span class="mark">FIFO</span> principle of Queues.</li>
+    <li>Perform push, pop, enqueue, dequeue and analyse their time complexity.</li>
+    <li>Understand <span class="mark-g">Circular Queues</span> and <span class="mark-g">Deques</span>.</li>
+    <li>Apply Stacks to balanced-parentheses checking and expression evaluation.</li>
+    <li>Apply Queues to BFS-style processing and task scheduling.</li>
+    <li>Implement Stack/Queue operations in Python from scratch.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Stack</b> — a linear data structure that follows LIFO (Last In, First Out) — the most recently added element is removed first.</div>
+  <div class="box def"><b>Queue</b> — a linear data structure that follows FIFO (First In, First Out) — the earliest added element is removed first.</div>
+  <div class="box def"><b>Deque</b> — a Double-Ended Queue — allows insertion and deletion from both the front and the rear.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Stack, Queue, Circular Queue, Deque</h2>
+
+  <h3 class="subsec">Stack — LIFO</h3>
+  <div class="diagram">
+    <div class="stackbox"><div>Plate 1</div><div>Plate 2</div><div>Plate 3 ← top</div></div>
+    <span style="font-family:'Patrick Hand'; font-size:14px;">push() adds to top, pop() removes from top</span>
+  </div>
+  <h3 class="subsec">Queue — FIFO</h3>
+  <div class="diagram">
+    <div class="queuebox"><div>Front → P1</div><div>P2</div><div>P3 ← Rear</div></div>
+    <span style="font-family:'Patrick Hand'; font-size:14px;">enqueue() adds to rear, dequeue() removes from front</span>
+  </div>
+  <h3 class="subsec">Circular Queue</h3>
+  <p>A regular array-based Queue wastes space at the front after dequeues. A <span class="mark">Circular Queue</span> wraps the rear pointer back to index 0 once it reaches the end, reusing freed slots.</p>
+  <h3 class="subsec">Deque (Double-Ended Queue)</h3>
+  <p>Allows <span class="mark">push/pop from both front and rear</span> — a generalisation of both Stack and Queue.</p>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples</h2>
+
+  <div class="box example"><b>Stack:</b> browser back button, undo in a text editor, function call stack during recursion, balanced-bracket checking.</div>
+  <div class="box example"><b>Queue:</b> printer job queue, ticket counter line, BFS traversal, CPU round-robin scheduling.</div>
+  <div class="box example"><b>Deque:</b> sliding window maximum problems, browser tab history (both directions).</div>
+  <div class="box example"><b>Priority Queue:</b> hospital emergency room triage — most critical patient served first, not by arrival order.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Stack: <b>push/pop/peek</b> all O(1). Queue: <b>enqueue/dequeue/front</b> all O(1) (with proper implementation).</li>
+    <li>A naive array Queue wastes space — use a <b>Circular Queue</b> or a Linked-List-based Queue instead.</li>
+    <li>Any Queue can be built from two Stacks, and any Stack from two Queues — a classic interview question.</li>
+    <li>Recursion = an implicit Stack. Deep recursion can cause a real <b>Stack Overflow</b>.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time Complexity Cheat-Table</h2>
+  <table>
+    <tr><th>Operation</th><th>Complexity</th></tr>
+    <tr><td>push / pop / peek (Stack)</td><td>O(1)</td></tr>
+    <tr><td>enqueue / dequeue / front (Queue)</td><td>O(1)</td></tr>
+    <tr><td>Search in Stack/Queue</td><td>O(n)</td></tr>
+    <tr><td>Priority Queue insert/extract (heap-based)</td><td>O(log n)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Stack using a Python list</h3>
+  <div class="codebox"><span class="kw">class</span> Stack:
+    <span class="kw">def</span> __init__(self):
+        self.items = []
+    <span class="kw">def</span> push(self, x):
+        self.items.append(x)          <span class="cm"># O(1)</span>
+    <span class="kw">def</span> pop(self):
+        <span class="kw">return</span> self.items.pop()     <span class="cm"># O(1)</span>
+    <span class="kw">def</span> peek(self):
+        <span class="kw">return</span> self.items[-1]</div>
+
+  <h3 class="subsec">Queue using collections.deque</h3>
+  <div class="codebox"><span class="kw">from</span> collections <span class="kw">import</span> deque
+q = deque()
+q.append(10)      <span class="cm"># enqueue O(1)</span>
+q.append(20)
+q.popleft()        <span class="cm"># dequeue O(1)</span></div>
+
+  <h3 class="subsec">Balanced Parentheses Check</h3>
+  <div class="codebox"><span class="kw">def</span> is_balanced(expr):
+    stack = []
+    pairs = {'<span class="st">)</span>': '<span class="st">(</span>', '<span class="st">]</span>': '<span class="st">[</span>', '<span class="st">}</span>': '<span class="st">{</span>'}
+    <span class="kw">for</span> ch <span class="kw">in</span> expr:
+        <span class="kw">if</span> ch <span class="kw">in</span> '<span class="st">([{</span>':
+            stack.append(ch)
+        <span class="kw">elif</span> ch <span class="kw">in</span> pairs:
+            <span class="kw">if</span> <span class="kw">not</span> stack <span class="kw">or</span> stack.pop() != pairs[ch]:
+                <span class="kw">return</span> <span class="kw">False</span>
+    <span class="kw">return</span> <span class="kw">not</span> stack</div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">Use Python's <code>collections.deque</code> for Queues — it's O(1) at both ends, unlike a plain list's <code>pop(0)</code> which is O(n).</div>
+  <div class="box tip">"Balanced brackets", "expression evaluation", "next greater element" → think <b>Stack</b> immediately.</div>
+  <div class="box tip">"Level-order traversal", "shortest path (unweighted)" → think <b>Queue (BFS)</b> immediately.</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Using Python list's <code>pop(0)</code> for Queue dequeue — this is O(n), not O(1)! Use <code>deque.popleft()</code> instead.</div>
+  <div class="box mistake">Forgetting to check for empty Stack/Queue before pop/dequeue — causes runtime errors.</div>
+  <div class="box mistake">Confusing Stack (LIFO) and Queue (FIFO) behaviour when converting between them.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Implement a Stack using a Python list (push, pop, peek, isEmpty).</li>
+    <li>Implement a Queue using collections.deque (enqueue, dequeue, front, isEmpty).</li>
+    <li>Write a function to check for balanced parentheses using a Stack.</li>
+    <li>Write a function to reverse a string using a Stack.</li>
+    <li>Write a function to evaluate a postfix expression using a Stack.</li>
+    <li>Write a function to convert an infix expression to postfix using a Stack.</li>
+    <li>Write a function to implement a Queue using two Stacks.</li>
+    <li>Write a function to implement a Stack using two Queues.</li>
+    <li>Write a function to sort a Stack using only Stack operations (no extra array).</li>
+    <li>Write a function to reverse a Queue using recursion.</li>
+    <li>Implement a Circular Queue with a fixed-size array.</li>
+    <li>Write a function to design a Stack that supports getMin() in O(1) time.</li>
+    <li>Write a function to find the next greater element for every item in an array using a Monotonic Stack.</li>
+    <li>Write a function to check if a sequence of pushes/pops on a Stack is valid, given push and pop order arrays.</li>
+    <li>Write a function to implement a Deque using a doubly linked list.</li>
+    <li>Write a function to find the maximum of every sliding window of size k using a Deque.</li>
+    <li>Write a function to design a Min Stack that returns the minimum element in O(1).</li>
+    <li>Write a function to simulate a browser's back/forward navigation using two Stacks.</li>
+    <li>Write a function to implement Breadth-First Search (BFS) on a graph using a Queue.</li>
+    <li>Write a function to implement a basic task scheduler using a Queue (round-robin).</li>
+    <li>Write a function to check if a given string of brackets can be made balanced by removing minimum characters.</li>
+    <li>Write a function to implement a Priority Queue using Python's heapq module.</li>
+    <li>Write a function to simulate an LRU Cache using a Queue + Hash Map.</li>
+    <li>Write a function to reverse the first k elements of a Queue.</li>
+    <li>Write a function to design a Stack-based iterative solution for Tower of Hanoi.</li>
+    <li>Write a function that uses two Stacks to simulate a Queue supporting amortised O(1) operations.</li>
+    <li>Write a function to evaluate a fully parenthesised expression using two Stacks (operators and operands).</li>
+    <li>Write a function to implement a Circular Deque supporting O(1) insert/delete at both ends.</li>
+    <li>Write a function to find the celebrity problem solution (who knows nobody, everyone knows them) using a Stack.</li>
+    <li>Write a function to design a Stack-based calculator that evaluates a simple arithmetic expression string.</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    A <b>Stack</b> (LIFO) supports O(1) push/pop/peek — perfect for undo, recursion, and expression evaluation. A <b>Queue</b> (FIFO) supports O(1) enqueue/dequeue — perfect for scheduling and BFS. <b>Circular Queues</b> fix array-Queue space wastage; <b>Deques</b> generalise both. Always use <code>collections.deque</code> in Python for efficient Queue operations.
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">Stack: LIFO — last pushed, first popped<br>Queue: FIFO — first enqueued, first dequeued</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 4 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Stack</td><td>LIFO — push/pop/peek, all O(1)</td></tr>
+    <tr><td>Queue</td><td>FIFO — enqueue/dequeue/front, all O(1)</td></tr>
+    <tr><td>Circular Queue</td><td>Reuses freed slots at the front</td></tr>
+    <tr><td>Deque</td><td>Insert/delete from both ends</td></tr>
+    <tr><td>Priority Queue</td><td>Dequeue by priority, not order (heap-based, O(log n))</td></tr>
+    <tr><td>Balanced Parentheses</td><td>Classic Stack application</td></tr>
+    <tr><td>BFS</td><td>Classic Queue application</td></tr>
+    <tr><td>Stack via 2 Queues / Queue via 2 Stacks</td><td>Classic interview conversion problems</td></tr>
+    <tr><td>Python Queue tip</td><td>Use collections.deque, not list.pop(0)</td></tr>
+  </table>
+  <div class="box formula">Stack: LIFO | Queue: FIFO</div>
+  <div class="box tip">Golden rule: <b>Undo/recursion/expression → Stack. Scheduling/BFS/ordering → Queue.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Implement a Stack using a Python list (push, pop, peek, isEmpty).", "Implement a Queue using collections.deque (enqueue, dequeue, front, isEmpty).", "Write a function to check for balanced parentheses using a Stack.", "Write a function to reverse a string using a Stack.", "Write a function to evaluate a postfix expression using a Stack.", "Write a function to convert an infix expression to postfix using a Stack.", "Write a function to implement a Queue using two Stacks.", "Write a function to implement a Stack using two Queues.", "Write a function to sort a Stack using only Stack operations (no extra array).", "Write a function to reverse a Queue using recursion.", "Implement a Circular Queue with a fixed-size array.", "Write a function to design a Stack that supports getMin() in O(1) time.", "Write a function to find the next greater element for every item in an array using a Monotonic Stack.", "Write a function to check if a sequence of pushes/pops on a Stack is valid, given push and pop order arrays.", "Write a function to implement a Deque using a doubly linked list.", "Write a function to find the maximum of every sliding window of size k using a Deque.", "Write a function to design a Min Stack that returns the minimum element in O(1).", "Write a function to simulate a browser's back/forward navigation using two Stacks.", "Write a function to implement Breadth-First Search (BFS) on a graph using a Queue.", "Write a function to implement a basic task scheduler using a Queue (round-robin).", "Write a function to check if a given string of brackets can be made balanced by removing minimum characters.", "Write a function to implement a Priority Queue using Python's heapq module.", "Write a function to simulate an LRU Cache using a Queue + Hash Map.", "Write a function to reverse the first k elements of a Queue.", "Write a function to design a Stack-based iterative solution for Tower of Hanoi.", "Write a function that uses two Stacks to simulate a Queue supporting amortised O(1) operations.", "Write a function to evaluate a fully parenthesised expression using two Stacks (operators and operands).", "Write a function to implement a Circular Deque supporting O(1) insert/delete at both ends.", "Write a function to find the celebrity problem solution (who knows nobody, everyone knows them) using a Stack.", "Write a function to design a Stack-based calculator that evaluates a simple arithmetic expression string."]}, "practice": {"easy": ["What happens when you try to 'pop' from an empty Stack?", "What is the time complexity of peek/top in a Stack/Queue of size 1,000?", "Name one real-life example of a Stack or Queue, such as an undo feature in a text editor.", "Write one advantage of using a Queue for evaluating a mathematical expression.", "What is a Deque, and how is it different from a regular Queue?", "What real-world object best represents a Queue's FIFO behaviour?", "What is the difference between a Queue and a Circular Queue?", "What does 'Stack Overflow' mean in the context of a fixed-size Stack?", "What real-world object best represents a Stack's LIFO behaviour?", "Fill in the blank: peek/top on a Stack/Queue of size 100 typically takes ______ time.", "What is the time complexity of traversal in a Stack/Queue of size 20?", "Which principle (LIFO/FIFO) applies to a Stack? Which applies to a Queue?", "Define the term 'Pop' in your own words.", "Fill in the blank: traversal on a Stack/Queue of size n typically takes ______ time.", "Write one advantage of using a Stack for BFS traversal of a graph.", "Write one advantage of using a Queue for an undo feature in a text editor.", "What happens when you try to 'dequeue' from an empty Queue?", "Name one real-life example of a Stack or Queue, such as a bank's token/queue system.", "What is the time complexity of implementing a queue using two stacks in a Stack/Queue of size 10,000?", "Write one advantage of using a Queue for backtracking in a maze solver.", "State True or False: BFS graph traversal typically uses a Queue.", "Is a Stack more suitable than a Queue for an undo feature in a text editor? Answer in one line.", "Define the term 'Deque (Double-Ended Queue)' in your own words.", "State True or False: Peek/Top returns and removes the top element of a Stack.", "Name one real-life example of a Stack or Queue, such as CPU task scheduling (round robin).", "Fill in the blank: peek/top on a Stack/Queue of size 10,000 typically takes ______ time.", "Write one advantage of using a Queue for a printer's job queue.", "Name one real-life example of a Stack or Queue, such as function call stack during recursion.", "Write one advantage of using a Queue for a bank's token/queue system.", "Write one advantage of using a Stack for a stack of browser tabs.", "Define the term 'FIFO' in your own words.", "Name one real-life example of a Stack or Queue, such as a plate-stacking dispenser in a canteen.", "What is the time complexity of reversing a queue in a Stack/Queue of size 1,000?", "Fill in the blank: checking balanced parentheses on a Stack/Queue of size 1,000 typically takes ______ time.", "Fill in the blank: peek/top on a Stack/Queue of size 1,000 typically takes ______ time.", "Fill in the blank: checking balanced parentheses on a Stack/Queue of size 100 typically takes ______ time.", "Define the term 'Circular Queue' in your own words.", "Write one advantage of using a Stack for a call centre's customer queue.", "Is a Stack more suitable than a Queue for a bank's token/queue system? Answer in one line.", "Fill in the blank: front on a Stack/Queue of size 100 typically takes ______ time.", "Is a Stack more suitable than a Queue for evaluating a mathematical expression? Answer in one line.", "Define the term 'Stack Overflow' in your own words.", "Fill in the blank: converting infix to postfix on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of implementing a stack using two queues in a Stack/Queue of size 100?", "Is a Stack more suitable than a Queue for a browser's back button (undo history)? Answer in one line.", "Name one real-life example of a Stack or Queue, such as a browser's back button (undo history).", "Define the term 'Push' in your own words.", "Write one advantage of using a Stack for CPU task scheduling (round robin).", "Write one advantage of using a Stack for a chat app's message delivery order.", "Write one advantage of using a Queue for a ticket counter line.", "State True or False: A Stack follows the FIFO principle.", "Fill in the blank: traversal on a Stack/Queue of size 1,000 typically takes ______ time.", "Write one advantage of using a Stack for a ticket counter line.", "What is the time complexity of dequeue in a Stack/Queue of size 100?", "Write one advantage of using a Queue for function call stack during recursion.", "What is the time complexity of enqueue in a Stack/Queue of size n?", "Write one advantage of using a Queue for a browser's back button (undo history).", "Is a Stack more suitable than a Queue for a plate-stacking dispenser in a canteen? Answer in one line.", "Fill in the blank: front on a Stack/Queue of size 20 typically takes ______ time.", "Write one advantage of using a Queue for checking balanced brackets in code.", "Define the term 'Rear' in your own words.", "Is a Stack more suitable than a Queue for backtracking in a maze solver? Answer in one line.", "State True or False: The 'enqueue' operation adds an element to the front of a Queue.", "Fill in the blank: evaluating a postfix expression on a Stack/Queue of size 10,000 typically takes ______ time.", "State True or False: A Priority Queue always dequeues elements in insertion order.", "State True or False: A simple array-based Queue (non-circular) can suffer from wasted space after repeated dequeues.", "State True or False: Balanced parentheses checking is a classic Stack application.", "Write one advantage of using a Queue for a call centre's customer queue.", "What is the time complexity of peek/top in a Stack/Queue of size n?", "State True or False: A Queue follows the FIFO principle.", "Name one real-life example of a Stack or Queue, such as BFS traversal of a graph.", "Fill in the blank: implementing a stack using two queues on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of checking balanced parentheses in a Stack/Queue of size n?", "State True or False: Recursion internally uses a Stack (the call stack) to track function calls.", "What is the time complexity of converting infix to postfix in a Stack/Queue of size n?", "Is a Stack more suitable than a Queue for a stack of browser tabs? Answer in one line.", "Fill in the blank: front on a Stack/Queue of size 10,000 typically takes ______ time.", "Fill in the blank: implementing a queue using two stacks on a Stack/Queue of size 1,000 typically takes ______ time.", "Define the term 'Underflow' in your own words.", "State True or False: The 'push' operation adds an element to the top of a Stack.", "Write one advantage of using a Stack for an undo feature in a text editor.", "Fill in the blank: rear on a Stack/Queue of size 1,000 typically takes ______ time.", "What is the time complexity of peek/top in a Stack/Queue of size 20?", "Fill in the blank: implementing a queue using two stacks on a Stack/Queue of size 100 typically takes ______ time.", "Is a Stack more suitable than a Queue for a call centre's customer queue? Answer in one line.", "What is the time complexity of peek/top in a Stack/Queue of size 100?", "Is a Stack more suitable than a Queue for CPU task scheduling (round robin)? Answer in one line.", "Is a Stack more suitable than a Queue for BFS traversal of a graph? Answer in one line.", "Is a Stack more suitable than a Queue for checking balanced brackets in code? Answer in one line.", "Write one advantage of using a Queue for a chat app's message delivery order.", "Write one advantage of using a Queue for CPU task scheduling (round robin).", "Fill in the blank: front on a Stack/Queue of size 1,000 typically takes ______ time.", "Name one real-life example of a Stack or Queue, such as a ticket counter line.", "Name one real-life example of a Stack or Queue, such as a printer's job queue.", "Fill in the blank: enqueue on a Stack/Queue of size 100 typically takes ______ time.", "Fill in the blank: reversing a queue on a Stack/Queue of size n typically takes ______ time.", "Define the term 'Stack' in your own words.", "Fill in the blank: reversing a stack on a Stack/Queue of size n typically takes ______ time.", "Write one advantage of using a Stack for function call stack during recursion.", "What is the time complexity of converting infix to postfix in a Stack/Queue of size 1,000?", "Fill in the blank: implementing a stack using two queues on a Stack/Queue of size 1,000 typically takes ______ time.", "What is the time complexity of isFull check in a Stack/Queue of size 100?", "What is the time complexity of checking balanced parentheses in a Stack/Queue of size 10,000?", "Fill in the blank: reversing a queue on a Stack/Queue of size 100 typically takes ______ time.", "Fill in the blank: pop on a Stack/Queue of size 1,000 typically takes ______ time.", "Fill in the blank: reversing a queue on a Stack/Queue of size 20 typically takes ______ time.", "Define the term 'Peek/Top' in your own words.", "Write one advantage of using a Stack for backtracking in a maze solver.", "Fill in the blank: push on a Stack/Queue of size 20 typically takes ______ time.", "What is the time complexity of front in a Stack/Queue of size n?", "Define the term 'Dequeue' in your own words.", "What is the time complexity of implementing a stack using two queues in a Stack/Queue of size 10,000?", "Name one real-life example of a Stack or Queue, such as a stack of browser tabs.", "Is a Stack more suitable than a Queue for function call stack during recursion? Answer in one line.", "What is the time complexity of push in a Stack/Queue of size 10,000?", "Name one real-life example of a Stack or Queue, such as a call centre's customer queue.", "Fill in the blank: evaluating a postfix expression on a Stack/Queue of size 1,000 typically takes ______ time.", "Is a Stack more suitable than a Queue for a ticket counter line? Answer in one line.", "What is the time complexity of isEmpty check in a Stack/Queue of size 100?", "Write one advantage of using a Queue for a plate-stacking dispenser in a canteen.", "State True or False: A Deque allows insertion and deletion from both ends.", "Is a Stack more suitable than a Queue for a chat app's message delivery order? Answer in one line.", "Fill in the blank: pop on a Stack/Queue of size 20 typically takes ______ time.", "Fill in the blank: isFull check on a Stack/Queue of size 100 typically takes ______ time.", "What is the time complexity of reversing a stack in a Stack/Queue of size 1,000?", "What is the time complexity of isEmpty check in a Stack/Queue of size 1,000?", "Name one real-life example of a Stack or Queue, such as evaluating a mathematical expression.", "What is the time complexity of rear in a Stack/Queue of size 1,000?", "What is the time complexity of isFull check in a Stack/Queue of size 20?", "What is the time complexity of isFull check in a Stack/Queue of size 10,000?", "Write one advantage of using a Stack for a browser's back button (undo history).", "Write one advantage of using a Queue for a stack of browser tabs.", "What is the time complexity of converting infix to postfix in a Stack/Queue of size 100?", "Define the term 'Priority Queue' in your own words.", "Fill in the blank: rear on a Stack/Queue of size 100 typically takes ______ time.", "State True or False: A Circular Queue reuses freed space at the front once elements are dequeued.", "Fill in the blank: reversing a stack on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of front in a Stack/Queue of size 10,000?", "Fill in the blank: reversing a stack on a Stack/Queue of size 20 typically takes ______ time.", "What is the time complexity of peek/top in a Stack/Queue of size 10,000?", "Write one advantage of using a Stack for a bank's token/queue system.", "Fill in the blank: checking balanced parentheses on a Stack/Queue of size n typically takes ______ time.", "Write one advantage of using a Stack for a printer's job queue.", "Write one advantage of using a Stack for evaluating a mathematical expression.", "Fill in the blank: enqueue on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of front in a Stack/Queue of size 20?", "Fill in the blank: enqueue on a Stack/Queue of size 1,000 typically takes ______ time.", "Write one advantage of using a Stack for checking balanced brackets in code.", "Name one real-life example of a Stack or Queue, such as backtracking in a maze solver.", "What is the time complexity of isFull check in a Stack/Queue of size 1,000?", "What is the time complexity of reversing a queue in a Stack/Queue of size 10,000?", "Fill in the blank: peek/top on a Stack/Queue of size n typically takes ______ time.", "Fill in the blank: implementing a stack using two queues on a Stack/Queue of size 20 typically takes ______ time.", "Fill in the blank: traversal on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of reversing a queue in a Stack/Queue of size 100?", "Define the term 'Enqueue' in your own words.", "Write one advantage of using a Queue for BFS traversal of a graph.", "Define the term 'Queue' in your own words.", "Fill in the blank: push on a Stack/Queue of size 1,000 typically takes ______ time.", "Is a Stack more suitable than a Queue for a printer's job queue? Answer in one line.", "Define the term 'Front' in your own words.", "Name one real-life example of a Stack or Queue, such as checking balanced brackets in code.", "Fill in the blank: isEmpty check on a Stack/Queue of size n typically takes ______ time.", "What is the time complexity of evaluating a postfix expression in a Stack/Queue of size 20?", "Fill in the blank: implementing a queue using two stacks on a Stack/Queue of size 20 typically takes ______ time.", "Fill in the blank: evaluating a postfix expression on a Stack/Queue of size 20 typically takes ______ time.", "Fill in the blank: push on a Stack/Queue of size n typically takes ______ time.", "What is the time complexity of checking balanced parentheses in a Stack/Queue of size 100?", "What is the time complexity of pop in a Stack/Queue of size 10,000?", "What is the time complexity of dequeue in a Stack/Queue of size n?", "Fill in the blank: implementing a stack using two queues on a Stack/Queue of size 100 typically takes ______ time.", "Name one real-life example of a Stack or Queue, such as a chat app's message delivery order.", "Fill in the blank: peek/top on a Stack/Queue of size 20 typically takes ______ time.", "What is the time complexity of enqueue in a Stack/Queue of size 1,000?", "Fill in the blank: reversing a stack on a Stack/Queue of size 100 typically takes ______ time.", "Define the term 'LIFO' in your own words.", "Write one advantage of using a Stack for a plate-stacking dispenser in a canteen.", "What is the time complexity of implementing a stack using two queues in a Stack/Queue of size 1,000?", "What is the time complexity of evaluating a postfix expression in a Stack/Queue of size 100?", "What is the time complexity of traversal in a Stack/Queue of size n?", "Fill in the blank: isEmpty check on a Stack/Queue of size 100 typically takes ______ time.", "What is the time complexity of checking balanced parentheses in a Stack/Queue of size 1,000?", "Fill in the blank: converting infix to postfix on a Stack/Queue of size 100 typically takes ______ time.", "Fill in the blank: pop on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of reversing a queue in a Stack/Queue of size 20?", "What is the time complexity of isFull check in a Stack/Queue of size n?", "What is the time complexity of pop in a Stack/Queue of size n?", "What is the time complexity of isEmpty check in a Stack/Queue of size n?", "Fill in the blank: isFull check on a Stack/Queue of size 20 typically takes ______ time.", "What is the time complexity of enqueue in a Stack/Queue of size 20?", "Fill in the blank: implementing a queue using two stacks on a Stack/Queue of size n typically takes ______ time.", "Fill in the blank: isEmpty check on a Stack/Queue of size 1,000 typically takes ______ time.", "Fill in the blank: checking balanced parentheses on a Stack/Queue of size 10,000 typically takes ______ time.", "What is the time complexity of push in a Stack/Queue of size 20?", "What is the time complexity of pop in a Stack/Queue of size 100?", "What is the time complexity of implementing a queue using two stacks in a Stack/Queue of size 100?", "Fill in the blank: enqueue on a Stack/Queue of size n typically takes ______ time.", "What is the time complexity of dequeue in a Stack/Queue of size 10,000?", "Fill in the blank: rear on a Stack/Queue of size 20 typically takes ______ time.", "Fill in the blank: reversing a stack on a Stack/Queue of size 1,000 typically takes ______ time."], "medium": ["Explain how the function call stack relates to recursion depth, using an undo feature in a text editor as an example, for 100 calls.", "Explain the time complexity of push for a Stack/Queue of size 100, and justify it.", "Explain how a Stack is used to convert an infix expression to postfix, for an expression of length 10,000.", "Explain how a Stack is used to convert an infix expression to postfix, for an expression of length 1,000.", "Explain how a Stack is used to check balanced parentheses, using CPU task scheduling (round robin) as context.", "For function call stack during recursion with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how you would implement a Stack using two Queues, and state the time complexity.", "For a browser's back button (undo history) with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain why a simple array-based Queue wastes space, and how a Circular Queue solves this, for 20 elements.", "Explain how you would implement a Queue using two Stacks, and state the amortised time complexity.", "Explain the time complexity of converting infix to postfix for a Stack/Queue of size 20, and justify it.", "Explain why a simple array-based Queue wastes space, and how a Circular Queue solves this, for 100 elements.", "For a printer's job queue with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how you would reverse a Stack of size 100 using only Stack operations (no extra array).", "Explain why a simple array-based Queue wastes space, and how a Circular Queue solves this, for 1,000 elements.", "Explain how you would evaluate a postfix expression using a Stack, for a chat app's message delivery order.", "Compare the time complexity of 'push+pop' on a Stack vs 'enqueue+dequeue' on a Queue, for 10,000 operations.", "For CPU task scheduling (round robin) with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using checking balanced brackets in code as an example, for 20 calls.", "Explain how you would reverse a Stack of size 10,000 using only Stack operations (no extra array).", "Explain the time complexity of rear for a Stack/Queue of size 100, and justify it.", "Explain how the function call stack relates to recursion depth, using a printer's job queue as an example, for 100 calls.", "Explain why a simple array-based Queue wastes space, and how a Circular Queue solves this, for n elements.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of an undo feature in a text editor.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of backtracking in a maze solver.", "Compare the time complexity of 'push+pop' on a Stack vs 'enqueue+dequeue' on a Queue, for 20 operations.", "Compare the time complexity of 'push+pop' on a Stack vs 'enqueue+dequeue' on a Queue, for 100 operations.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of BFS traversal of a graph.", "Explain how the function call stack relates to recursion depth, using a stack of browser tabs as an example, for 10,000 calls.", "Explain how you would reverse a Stack of size n using only Stack operations (no extra array).", "For a browser's back button (undo history) with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a plate-stacking dispenser in a canteen with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how a Stack is used to convert an infix expression to postfix, for an expression of length n.", "Compare the time complexity of 'push+pop' on a Stack vs 'enqueue+dequeue' on a Queue, for 1,000 operations.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a printer's job queue.", "Explain how you would evaluate a postfix expression using a Stack, for backtracking in a maze solver.", "Explain how you would reverse a Stack of size 1,000 using only Stack operations (no extra array).", "Explain how you would reverse a Stack of size 20 using only Stack operations (no extra array).", "Explain how a Stack is used to convert an infix expression to postfix, for an expression of length 100.", "Explain the time complexity of reversing a queue for a Stack/Queue of size 100, and justify it.", "Explain how you would evaluate a postfix expression using a Stack, for an undo feature in a text editor.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a ticket counter line.", "Explain the time complexity of pop for a Stack/Queue of size 1,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a browser's back button (undo history) as an example, for n calls.", "Explain the time complexity of dequeue for a Stack/Queue of size 20, and justify it.", "Explain the time complexity of reversing a stack for a Stack/Queue of size 20, and justify it.", "Explain how you would evaluate a postfix expression using a Stack, for CPU task scheduling (round robin).", "Explain how a Stack is used to check balanced parentheses, using a chat app's message delivery order as context.", "Explain how you would evaluate a postfix expression using a Stack, for checking balanced brackets in code.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a browser's back button (undo history).", "Explain the time complexity of implementing a queue using two stacks for a Stack/Queue of size 20, and justify it.", "Explain how a Stack is used to convert an infix expression to postfix, for an expression of length 20.", "Explain how you would evaluate a postfix expression using a Stack, for a ticket counter line.", "Explain how a Stack is used to check balanced parentheses, using BFS traversal of a graph as context.", "Explain how the function call stack relates to recursion depth, using a printer's job queue as an example, for 10,000 calls.", "Explain the time complexity of evaluating a postfix expression for a Stack/Queue of size 1,000, and justify it.", "Explain how a Stack is used to check balanced parentheses, using a printer's job queue as context.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a bank's token/queue system.", "Explain how a Stack is used to check balanced parentheses, using backtracking in a maze solver as context.", "Explain the time complexity of implementing a stack using two queues for a Stack/Queue of size n, and justify it.", "Explain how the function call stack relates to recursion depth, using a browser's back button (undo history) as an example, for 100 calls.", "For a call centre's customer queue with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a browser's back button (undo history) with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a printer's job queue as an example, for n calls.", "Explain how a Stack is used to check balanced parentheses, using a plate-stacking dispenser in a canteen as context.", "For BFS traversal of a graph with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a bank's token/queue system with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Compare the time complexity of 'push+pop' on a Stack vs 'enqueue+dequeue' on a Queue, for n operations.", "Explain how the function call stack relates to recursion depth, using a chat app's message delivery order as an example, for n calls.", "Explain how you would evaluate a postfix expression using a Stack, for evaluating a mathematical expression.", "Explain the time complexity of enqueue for a Stack/Queue of size 10,000, and justify it.", "For a bank's token/queue system with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how a Stack is used to check balanced parentheses, using evaluating a mathematical expression as context.", "For a printer's job queue with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a plate-stacking dispenser in a canteen with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a plate-stacking dispenser in a canteen as an example, for 20 calls.", "For a ticket counter line with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using BFS traversal of a graph as an example, for 20 calls.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a stack of browser tabs.", "Explain how a Stack is used to check balanced parentheses, using a bank's token/queue system as context.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of function call stack during recursion.", "Explain the time complexity of rear for a Stack/Queue of size n, and justify it.", "Explain the time complexity of enqueue for a Stack/Queue of size 100, and justify it.", "For a printer's job queue with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using an undo feature in a text editor as an example, for 10,000 calls.", "Explain how the function call stack relates to recursion depth, using a ticket counter line as an example, for 1,000 calls.", "Explain why a simple array-based Queue wastes space, and how a Circular Queue solves this, for 10,000 elements.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of evaluating a mathematical expression.", "Explain the time complexity of checking balanced parentheses for a Stack/Queue of size 100, and justify it.", "For CPU task scheduling (round robin) with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of evaluating a postfix expression for a Stack/Queue of size n, and justify it.", "Explain how the function call stack relates to recursion depth, using a bank's token/queue system as an example, for 100 calls.", "Explain how the function call stack relates to recursion depth, using a bank's token/queue system as an example, for n calls.", "Explain the time complexity of checking balanced parentheses for a Stack/Queue of size n, and justify it.", "Explain how you would evaluate a postfix expression using a Stack, for function call stack during recursion.", "Explain how you would evaluate a postfix expression using a Stack, for BFS traversal of a graph.", "For backtracking in a maze solver with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using checking balanced brackets in code as an example, for n calls.", "Explain the time complexity of front for a Stack/Queue of size 10,000, and justify it.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a call centre's customer queue.", "Explain how the function call stack relates to recursion depth, using a call centre's customer queue as an example, for 100 calls.", "Explain how a Stack is used to check balanced parentheses, using a browser's back button (undo history) as context.", "Explain the time complexity of push for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of pop for a Stack/Queue of size n, and justify it.", "Explain how you would evaluate a postfix expression using a Stack, for a bank's token/queue system.", "Explain how the function call stack relates to recursion depth, using a call centre's customer queue as an example, for 20 calls.", "Explain how you would evaluate a postfix expression using a Stack, for a call centre's customer queue.", "Explain the time complexity of converting infix to postfix for a Stack/Queue of size 10,000, and justify it.", "Explain the time complexity of implementing a queue using two stacks for a Stack/Queue of size 1,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a bank's token/queue system as an example, for 10,000 calls.", "Explain the time complexity of pop for a Stack/Queue of size 10,000, and justify it.", "For BFS traversal of a graph with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of enqueue for a Stack/Queue of size n, and justify it.", "Explain how the function call stack relates to recursion depth, using backtracking in a maze solver as an example, for 1,000 calls.", "Explain how a Stack is used to check balanced parentheses, using checking balanced brackets in code as context.", "Explain how the function call stack relates to recursion depth, using CPU task scheduling (round robin) as an example, for 20 calls.", "Explain the time complexity of implementing a stack using two queues for a Stack/Queue of size 100, and justify it.", "Explain how the function call stack relates to recursion depth, using function call stack during recursion as an example, for 10,000 calls.", "Explain how the function call stack relates to recursion depth, using an undo feature in a text editor as an example, for 1,000 calls.", "Explain how you would evaluate a postfix expression using a Stack, for a printer's job queue.", "Explain how the function call stack relates to recursion depth, using BFS traversal of a graph as an example, for n calls.", "Explain how the function call stack relates to recursion depth, using a chat app's message delivery order as an example, for 100 calls.", "Explain how the function call stack relates to recursion depth, using a call centre's customer queue as an example, for 10,000 calls.", "Explain the time complexity of converting infix to postfix for a Stack/Queue of size 1,000, and justify it.", "For CPU task scheduling (round robin) with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using CPU task scheduling (round robin) as an example, for 1,000 calls.", "Explain the time complexity of rear for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of isEmpty check for a Stack/Queue of size 100, and justify it.", "For BFS traversal of a graph with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a stack of browser tabs as an example, for n calls.", "Explain how you would evaluate a postfix expression using a Stack, for a browser's back button (undo history).", "Explain how the function call stack relates to recursion depth, using a printer's job queue as an example, for 20 calls.", "Explain how you would evaluate a postfix expression using a Stack, for a plate-stacking dispenser in a canteen.", "Explain the time complexity of isFull check for a Stack/Queue of size 100, and justify it.", "For an undo feature in a text editor with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a bank's token/queue system as an example, for 1,000 calls.", "For an undo feature in a text editor with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using backtracking in a maze solver as an example, for 20 calls.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a chat app's message delivery order.", "Explain the time complexity of push for a Stack/Queue of size 20, and justify it.", "Explain how the function call stack relates to recursion depth, using evaluating a mathematical expression as an example, for 10,000 calls.", "Explain the time complexity of push for a Stack/Queue of size 10,000, and justify it.", "Explain how the function call stack relates to recursion depth, using evaluating a mathematical expression as an example, for 100 calls.", "Explain the time complexity of implementing a stack using two queues for a Stack/Queue of size 10,000, and justify it.", "For a call centre's customer queue with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how a Stack is used to check balanced parentheses, using function call stack during recursion as context.", "For a chat app's message delivery order with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using BFS traversal of a graph as an example, for 1,000 calls.", "For backtracking in a maze solver with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of reversing a stack for a Stack/Queue of size n, and justify it.", "Explain how a Stack is used to check balanced parentheses, using an undo feature in a text editor as context.", "For a chat app's message delivery order with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a printer's job queue with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a browser's back button (undo history) as an example, for 1,000 calls.", "For evaluating a mathematical expression with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a plate-stacking dispenser in a canteen as an example, for 10,000 calls.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of checking balanced brackets in code.", "Explain the time complexity of implementing a queue using two stacks for a Stack/Queue of size 10,000, and justify it.", "For a printer's job queue with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how you would evaluate a postfix expression using a Stack, for a stack of browser tabs.", "Explain how the function call stack relates to recursion depth, using function call stack during recursion as an example, for 1,000 calls.", "Explain the time complexity of reversing a stack for a Stack/Queue of size 100, and justify it.", "Explain how the function call stack relates to recursion depth, using a stack of browser tabs as an example, for 20 calls.", "Explain the time complexity of implementing a queue using two stacks for a Stack/Queue of size 100, and justify it.", "Explain the time complexity of peek/top for a Stack/Queue of size 10,000, and justify it.", "Explain the time complexity of isFull check for a Stack/Queue of size 20, and justify it.", "For checking balanced brackets in code with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a call centre's customer queue as an example, for n calls.", "Explain how the function call stack relates to recursion depth, using a chat app's message delivery order as an example, for 20 calls.", "For a stack of browser tabs with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a bank's token/queue system as an example, for 20 calls.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of CPU task scheduling (round robin).", "For a bank's token/queue system with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of traversal for a Stack/Queue of size 20, and justify it.", "For a bank's token/queue system with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using backtracking in a maze solver as an example, for n calls.", "For a chat app's message delivery order with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of implementing a queue using two stacks for a Stack/Queue of size n, and justify it.", "Explain the time complexity of traversal for a Stack/Queue of size 100, and justify it.", "Explain the time complexity of traversal for a Stack/Queue of size n, and justify it.", "Explain the time complexity of dequeue for a Stack/Queue of size n, and justify it.", "Explain how the function call stack relates to recursion depth, using a plate-stacking dispenser in a canteen as an example, for n calls.", "Explain how a Stack is used to check balanced parentheses, using a ticket counter line as context.", "Explain how the function call stack relates to recursion depth, using backtracking in a maze solver as an example, for 100 calls.", "Explain the time complexity of reversing a queue for a Stack/Queue of size n, and justify it.", "Explain the time complexity of peek/top for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of isEmpty check for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of traversal for a Stack/Queue of size 10,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a chat app's message delivery order as an example, for 1,000 calls.", "Explain how the function call stack relates to recursion depth, using BFS traversal of a graph as an example, for 10,000 calls.", "Explain how a Stack is used to check balanced parentheses, using a stack of browser tabs as context.", "For a browser's back button (undo history) with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of converting infix to postfix for a Stack/Queue of size n, and justify it.", "Explain the time complexity of dequeue for a Stack/Queue of size 10,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a ticket counter line as an example, for 10,000 calls.", "For function call stack during recursion with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of push for a Stack/Queue of size n, and justify it.", "Explain how the function call stack relates to recursion depth, using a browser's back button (undo history) as an example, for 20 calls.", "Explain how the function call stack relates to recursion depth, using CPU task scheduling (round robin) as an example, for 100 calls.", "For a plate-stacking dispenser in a canteen with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using CPU task scheduling (round robin) as an example, for 10,000 calls.", "Explain how the function call stack relates to recursion depth, using CPU task scheduling (round robin) as an example, for n calls.", "Explain how the function call stack relates to recursion depth, using a plate-stacking dispenser in a canteen as an example, for 100 calls.", "Explain how the function call stack relates to recursion depth, using checking balanced brackets in code as an example, for 100 calls.", "Explain how the function call stack relates to recursion depth, using a stack of browser tabs as an example, for 100 calls.", "Explain the time complexity of dequeue for a Stack/Queue of size 100, and justify it.", "For backtracking in a maze solver with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For CPU task scheduling (round robin) with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a plate-stacking dispenser in a canteen with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For evaluating a mathematical expression with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using function call stack during recursion as an example, for n calls.", "For function call stack during recursion with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using evaluating a mathematical expression as an example, for 1,000 calls.", "For an undo feature in a text editor with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For backtracking in a maze solver with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of isFull check for a Stack/Queue of size 10,000, and justify it.", "Explain the time complexity of evaluating a postfix expression for a Stack/Queue of size 100, and justify it.", "For checking balanced brackets in code with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For backtracking in a maze solver with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a ticket counter line with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For an undo feature in a text editor with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a stack of browser tabs with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a stack of browser tabs with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using evaluating a mathematical expression as an example, for n calls.", "Explain the time complexity of rear for a Stack/Queue of size 20, and justify it.", "Explain the time complexity of isEmpty check for a Stack/Queue of size 20, and justify it.", "Explain the time complexity of front for a Stack/Queue of size 100, and justify it.", "Explain the time complexity of front for a Stack/Queue of size 20, and justify it.", "For a browser's back button (undo history) with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For BFS traversal of a graph with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a browser's back button (undo history) as an example, for 10,000 calls.", "Explain the time complexity of dequeue for a Stack/Queue of size 1,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a ticket counter line as an example, for 20 calls.", "For a call centre's customer queue with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a chat app's message delivery order with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a ticket counter line with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of peek/top for a Stack/Queue of size 20, and justify it.", "Explain the time complexity of isEmpty check for a Stack/Queue of size n, and justify it.", "For evaluating a mathematical expression with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For BFS traversal of a graph with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of enqueue for a Stack/Queue of size 1,000, and justify it.", "Explain how a Stack is used to check balanced parentheses, using a call centre's customer queue as context.", "Explain the time complexity of enqueue for a Stack/Queue of size 20, and justify it.", "Explain how the function call stack relates to recursion depth, using a ticket counter line as an example, for n calls.", "Explain how the function call stack relates to recursion depth, using function call stack during recursion as an example, for 100 calls.", "Explain how the function call stack relates to recursion depth, using a stack of browser tabs as an example, for 1,000 calls.", "Explain the time complexity of checking balanced parentheses for a Stack/Queue of size 1,000, and justify it.", "For a call centre's customer queue with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of isFull check for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of checking balanced parentheses for a Stack/Queue of size 20, and justify it.", "Explain how a Priority Queue differs from a regular Queue in terms of dequeue order, in the context of a plate-stacking dispenser in a canteen.", "Explain how the function call stack relates to recursion depth, using a ticket counter line as an example, for 100 calls.", "For checking balanced brackets in code with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For function call stack during recursion with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a bank's token/queue system with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using checking balanced brackets in code as an example, for 10,000 calls.", "For a call centre's customer queue with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a plate-stacking dispenser in a canteen with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "For a stack of browser tabs with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of pop for a Stack/Queue of size 100, and justify it.", "For an undo feature in a text editor with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "For CPU task scheduling (round robin) with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using a plate-stacking dispenser in a canteen as an example, for 1,000 calls.", "Explain the time complexity of isEmpty check for a Stack/Queue of size 10,000, and justify it.", "Explain the time complexity of reversing a queue for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of reversing a stack for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of implementing a stack using two queues for a Stack/Queue of size 1,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a printer's job queue as an example, for 1,000 calls.", "Explain the time complexity of converting infix to postfix for a Stack/Queue of size 100, and justify it.", "Explain the time complexity of front for a Stack/Queue of size 1,000, and justify it.", "Explain the time complexity of traversal for a Stack/Queue of size 1,000, and justify it.", "For evaluating a mathematical expression with 10,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using checking balanced brackets in code as an example, for 1,000 calls.", "Explain how the function call stack relates to recursion depth, using a chat app's message delivery order as an example, for 10,000 calls.", "For a ticket counter line with 20 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of peek/top for a Stack/Queue of size 100, and justify it.", "For function call stack during recursion with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using function call stack during recursion as an example, for 20 calls.", "Explain the time complexity of peek/top for a Stack/Queue of size n, and justify it.", "Explain the time complexity of pop for a Stack/Queue of size 20, and justify it.", "Explain the time complexity of evaluating a postfix expression for a Stack/Queue of size 20, and justify it.", "Explain the time complexity of reversing a queue for a Stack/Queue of size 20, and justify it.", "Explain how the function call stack relates to recursion depth, using backtracking in a maze solver as an example, for 10,000 calls.", "Explain how the function call stack relates to recursion depth, using BFS traversal of a graph as an example, for 100 calls.", "Explain the time complexity of reversing a stack for a Stack/Queue of size 10,000, and justify it.", "For a stack of browser tabs with 1,000 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of front for a Stack/Queue of size n, and justify it.", "Explain the time complexity of checking balanced parentheses for a Stack/Queue of size 10,000, and justify it.", "Explain the time complexity of evaluating a postfix expression for a Stack/Queue of size 10,000, and justify it.", "For a ticket counter line with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain how the function call stack relates to recursion depth, using an undo feature in a text editor as an example, for 20 calls.", "Explain the time complexity of reversing a queue for a Stack/Queue of size 10,000, and justify it.", "Explain the time complexity of isFull check for a Stack/Queue of size n, and justify it.", "Explain how the function call stack relates to recursion depth, using evaluating a mathematical expression as an example, for 20 calls.", "For evaluating a mathematical expression with 100 items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of rear for a Stack/Queue of size 10,000, and justify it.", "Explain how the function call stack relates to recursion depth, using a call centre's customer queue as an example, for 1,000 calls.", "Explain how the function call stack relates to recursion depth, using an undo feature in a text editor as an example, for n calls.", "For checking balanced brackets in code with n items, would you use a Stack, Queue, or Deque? Justify your answer.", "Explain the time complexity of implementing a stack using two queues for a Stack/Queue of size 20, and justify it."], "hard": ["Design an approach to implement a Deque using a Circular Array of size 100, supporting O(1) operations at both ends.", "Explain how a Circular Queue of size 20 handles the 'full vs empty' ambiguity problem, and how it's resolved.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a bank's token/queue system as a counter-example.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for function call stack during recursion with 10,000 elements.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for a stack of browser tabs.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a ticket counter line as a counter-example.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for BFS traversal of a graph.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for checking balanced brackets in code with 1,000 elements.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a ticket counter line at scale 20.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for checking balanced brackets in code at scale 100.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for backtracking in a maze solver at scale 100.", "Explain how a Monotonic Stack can be used to solve the 'Next Greater Element' problem for an array of size 10,000, in O(n) time.", "Explain how Stack-based backtracking works for evaluating a mathematical expression, and analyse the worst-case time complexity for 10,000 states.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for an undo feature in a text editor.", "Design an approach to implement a Priority Queue using a Binary Heap, and explain why it achieves O(log n) insert/extract, for n elements.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a call centre's customer queue as a counter-example.", "Design an approach to implement a Priority Queue using a Binary Heap, and explain why it achieves O(log n) insert/extract, for 20 elements.", "Explain how a Circular Queue of size 100 handles the 'full vs empty' ambiguity problem, and how it's resolved.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a stack of browser tabs at scale 1,000.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a stack of browser tabs with 1,000 elements.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for CPU task scheduling (round robin) with 100 elements.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a bank's token/queue system with n elements.", "Explain how Stack-based backtracking works for an undo feature in a text editor, and analyse the worst-case time complexity for 100 states.", "Explain how a Monotonic Stack can be used to solve the 'Next Greater Element' problem for an array of size 1,000, in O(n) time.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for an undo feature in a text editor with 20 elements.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a printer's job queue as a counter-example.", "Design an approach to implement a Deque using a Circular Array of size 1,000, supporting O(1) operations at both ends.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for a browser's back button (undo history).", "Explain how a Circular Queue of size 1,000 handles the 'full vs empty' ambiguity problem, and how it's resolved.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a stack of browser tabs as a counter-example.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for CPU task scheduling (round robin).", "Design an approach to implement a Priority Queue using a Binary Heap, and explain why it achieves O(log n) insert/extract, for 1,000 elements.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a call centre's customer queue with n elements.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for function call stack during recursion.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for an undo feature in a text editor at scale 10,000.", "Design an approach to implement a Priority Queue using a Binary Heap, and explain why it achieves O(log n) insert/extract, for 10,000 elements.", "Explain how a Monotonic Stack can be used to solve the 'Next Greater Element' problem for an array of size 20, in O(n) time.", "Design an approach to implement a Deque using a Circular Array of size 20, supporting O(1) operations at both ends.", "Explain how Stack-based backtracking works for a stack of browser tabs, and analyse the worst-case time complexity for 100 states.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a browser's back button (undo history) with 1,000 elements.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for a plate-stacking dispenser in a canteen.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for function call stack during recursion.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a plate-stacking dispenser in a canteen as a counter-example.", "Explain how a Monotonic Stack can be used to solve the 'Next Greater Element' problem for an array of size 100, in O(n) time.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for a call centre's customer queue.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using CPU task scheduling (round robin) as a counter-example.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for BFS traversal of a graph.", "Design an approach to implement a Deque using a Circular Array of size n, supporting O(1) operations at both ends.", "Explain how a Circular Queue of size 10,000 handles the 'full vs empty' ambiguity problem, and how it's resolved.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using backtracking in a maze solver as a counter-example.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for a bank's token/queue system.", "Explain how Stack-based backtracking works for a printer's job queue, and analyse the worst-case time complexity for 100 states.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for a chat app's message delivery order.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for an undo feature in a text editor.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for CPU task scheduling (round robin) with 1,000 elements.", "Explain how Stack-based backtracking works for BFS traversal of a graph, and analyse the worst-case time complexity for 10,000 states.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for a bank's token/queue system.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a stack of browser tabs at scale n.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using a browser's back button (undo history) as a counter-example.", "Explain how a Circular Queue of size n handles the 'full vs empty' ambiguity problem, and how it's resolved.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for function call stack during recursion with 1,000 elements.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for CPU task scheduling (round robin) at scale 20.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for checking balanced brackets in code.", "Design an approach to implement a Deque using a Circular Array of size 10,000, supporting O(1) operations at both ends.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for CPU task scheduling (round robin).", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for CPU task scheduling (round robin) at scale n.", "Design an approach to implement a Priority Queue using a Binary Heap, and explain why it achieves O(log n) insert/extract, for 100 elements.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a call centre's customer queue at scale 10,000.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for function call stack during recursion at scale 10,000.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for a chat app's message delivery order.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a plate-stacking dispenser in a canteen with 20 elements.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for checking balanced brackets in code.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a plate-stacking dispenser in a canteen at scale 20.", "Explain how Stack-based backtracking works for checking balanced brackets in code, and analyse the worst-case time complexity for 100 states.", "Explain how Stack-based backtracking works for evaluating a mathematical expression, and analyse the worst-case time complexity for 100 states.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for backtracking in a maze solver.", "Explain how Stack-based backtracking works for a bank's token/queue system, and analyse the worst-case time complexity for n states.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using an undo feature in a text editor as a counter-example.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for evaluating a mathematical expression with 100 elements.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for evaluating a mathematical expression.", "Explain how a Monotonic Stack can be used to solve the 'Next Greater Element' problem for an array of size n, in O(n) time.", "Explain how Stack-based backtracking works for a chat app's message delivery order, and analyse the worst-case time complexity for 20 states.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for backtracking in a maze solver with n elements.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a chat app's message delivery order with 1,000 elements.", "Explain how Stack-based backtracking works for a browser's back button (undo history), and analyse the worst-case time complexity for 1,000 states.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for CPU task scheduling (round robin) at scale 10,000.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for an undo feature in a text editor at scale 1,000.", "Explain how Stack-based backtracking works for checking balanced brackets in code, and analyse the worst-case time complexity for 20 states.", "Explain how Stack-based backtracking works for a printer's job queue, and analyse the worst-case time complexity for 1,000 states.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a stack of browser tabs with n elements.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a bank's token/queue system at scale 100.", "Explain how to implement a Queue using two Stacks with amortised O(1) time per operation, for a browser's back button (undo history).", "Explain how Stack-based backtracking works for a call centre's customer queue, and analyse the worst-case time complexity for 1,000 states.", "Explain how Stack-based backtracking works for backtracking in a maze solver, and analyse the worst-case time complexity for n states.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for an undo feature in a text editor with 10,000 elements.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a printer's job queue with 100 elements.", "Explain the trade-offs between array-based and linked-list-based implementations of a Stack/Queue for a ticket counter line at scale 10,000.", "Critically evaluate: 'A Queue is always better than a Stack for scheduling tasks.' Discuss using BFS traversal of a graph as a counter-example.", "Design an algorithm to implement a Stack that also supports getMin() in O(1) time, for a stack of browser tabs with 10,000 elements.", "Design an algorithm to evaluate a fully parenthesised infix expression using two Stacks (operators + operands), for a printer's job queue."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

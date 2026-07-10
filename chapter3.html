@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 3: Linked Lists</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li class="current">Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 3</h1>
+  <div class="subtitle">Linked Lists</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Explain what a <span class="mark">Linked List</span> is and how nodes connect via pointers.</li>
+    <li>Differentiate <span class="mark-g">Singly, Doubly, and Circular</span> Linked Lists.</li>
+    <li>Analyse time complexity of insertion, deletion, search and traversal.</li>
+    <li>Compare Linked Lists vs Arrays — when to use which.</li>
+    <li>Master the <span class="mark">slow/fast pointer</span> technique for cycle detection and middle-node problems.</li>
+    <li>Implement basic Linked List operations in Python.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Linked List</b> — a linear data structure where each element (node) stores data plus a pointer/reference to the next node — nodes are scattered in memory, not contiguous.</div>
+  <div class="box def"><b>Node</b> — the basic unit of a Linked List containing a data field and one or more pointer fields (next, and prev for doubly linked lists).</div>
+  <div class="box def"><b>Head</b> — a pointer to the first node of the Linked List — the entry point for all traversal.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Types &amp; Array Comparison</h2>
+
+  <h3 class="subsec">Singly Linked List</h3>
+  <div class="diagram">
+    <div class="node">5</div><span class="arrow">→</span>
+    <div class="node">9</div><span class="arrow">→</span>
+    <div class="node">2</div><span class="arrow">→</span>
+    <div class="node">NULL</div>
+  </div>
+  <p>Each node has <span class="mark">data</span> + a single <span class="mark">next</span> pointer. Traversal is one-directional.</p>
+
+  <h3 class="subsec">Doubly Linked List</h3>
+  <div class="diagram">
+    <div class="node">5</div><span class="arrow">⇄</span>
+    <div class="node">9</div><span class="arrow">⇄</span>
+    <div class="node">2</div>
+  </div>
+  <p>Each node has an extra <span class="mark">prev</span> pointer — allows backward traversal at the cost of extra memory per node.</p>
+
+  <h3 class="subsec">Circular Linked List</h3>
+  <p>The last node's <span class="mark">next</span> points back to the <span class="mark">head</span> instead of NULL — useful for round-robin scheduling, playlists on loop, etc.</p>
+
+  <h3 class="subsec">Array vs Linked List</h3>
+  <table>
+    <tr><th>Array</th><th>Linked List</th></tr>
+    <tr><td>Contiguous memory</td><td>Scattered memory (nodes + pointers)</td></tr>
+    <tr><td>O(1) index access</td><td>O(n) access (must traverse)</td></tr>
+    <tr><td>O(n) insert at head</td><td>O(1) insert at head</td></tr>
+    <tr><td>Fixed/resize overhead</td><td>Grows/shrinks node-by-node, no resize needed</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples</h2>
+
+  <div class="box example"><b>Music Playlist:</b> next/previous song — a Doubly Linked List fits perfectly.</div>
+  <div class="box example"><b>Browser History:</b> back/forward navigation using a Doubly Linked List.</div>
+  <div class="box example"><b>Train Coaches:</b> coaches (nodes) connected end-to-end — add/remove without shifting others.</div>
+  <div class="box example"><b>Round-Robin Scheduler:</b> a Circular Linked List cycles through processes fairly.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>Linked Lists trade <b>O(1) index access</b> (which they don't have) for <b>O(1) insert/delete at head</b>.</li>
+    <li>Every node needs extra memory for the pointer(s) — a real memory overhead vs arrays.</li>
+    <li>The <b>slow/fast pointer</b> technique elegantly solves middle-node and cycle-detection problems in O(n) time, O(1) space.</li>
+    <li>Always handle <b>edge cases</b>: empty list, single node, and operations on head/tail.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">7</span> Time Complexity Cheat-Table</h2>
+  <table>
+    <tr><th>Operation</th><th>Singly Linked List</th></tr>
+    <tr><td>Access by index</td><td>O(n)</td></tr>
+    <tr><td>Search</td><td>O(n)</td></tr>
+    <tr><td>Insert/Delete at head</td><td>O(1)</td></tr>
+    <tr><td>Insert/Delete at tail (no tail pointer)</td><td>O(n)</td></tr>
+    <tr><td>Insert/Delete at tail (with tail pointer)</td><td>O(1) / O(n) resp.</td></tr>
+    <tr><td>Reverse the list</td><td>O(n)</td></tr>
+  </table>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Node Class &amp; Basic Structure</h3>
+  <div class="codebox"><span class="kw">class</span> Node:
+    <span class="kw">def</span> __init__(self, data):
+        self.data = data
+        self.next = <span class="kw">None</span></div>
+
+  <h3 class="subsec">Insert at Head</h3>
+  <div class="codebox"><span class="cm"># O(1)</span>
+<span class="kw">def</span> insert_at_head(head, data):
+    new_node = Node(data)
+    new_node.next = head
+    <span class="kw">return</span> new_node  <span class="cm"># new head</span></div>
+
+  <h3 class="subsec">Reverse a Linked List</h3>
+  <div class="codebox"><span class="cm"># O(n) time, O(1) space</span>
+<span class="kw">def</span> reverse_list(head):
+    prev = <span class="kw">None</span>
+    curr = head
+    <span class="kw">while</span> curr:
+        nxt = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    <span class="kw">return</span> prev  <span class="cm"># new head</span></div>
+
+  <h3 class="subsec">Detect Cycle (Floyd's Algorithm)</h3>
+  <div class="codebox"><span class="cm"># O(n) time, O(1) space</span>
+<span class="kw">def</span> has_cycle(head):
+    slow = fast = head
+    <span class="kw">while</span> fast <span class="kw">and</span> fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        <span class="kw">if</span> slow == fast:
+            <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">return</span> <span class="kw">False</span></div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">Always draw the pointers on paper before coding — Linked List bugs are almost always pointer-order mistakes.</div>
+  <div class="box tip">Use a <b>Dummy/Sentinel node</b> before the head to avoid special-casing "empty list" or "delete head" scenarios.</div>
+  <div class="box tip">Whenever you see "middle node", "cycle", or "nth from end" — think <b>slow/fast pointers</b> immediately.</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Losing the reference to the rest of the list when reversing (forgetting to save 'next' before overwriting it).</div>
+  <div class="box mistake">Not handling the empty-list or single-node edge cases separately.</div>
+  <div class="box mistake">Creating a cycle accidentally while manipulating pointers (e.g. during reversal) and causing infinite loops.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Implement a Node class and build a Singly Linked List by inserting at the head.</li>
+    <li>Write a function to traverse and print all elements of a Linked List.</li>
+    <li>Write a function to insert a node at the end (tail) of a Linked List.</li>
+    <li>Write a function to insert a node at a given position in a Linked List.</li>
+    <li>Write a function to delete a node from the head of a Linked List.</li>
+    <li>Write a function to delete a node from the tail of a Linked List.</li>
+    <li>Write a function to delete a node at a given position.</li>
+    <li>Write a function to search for a value in a Linked List and return its position.</li>
+    <li>Write a function to count the number of nodes in a Linked List.</li>
+    <li>Write a function to find the middle node of a Linked List using slow/fast pointers.</li>
+    <li>Write a function to reverse a Singly Linked List iteratively.</li>
+    <li>Write a recursive function to reverse a Singly Linked List.</li>
+    <li>Write a function to detect a cycle in a Linked List (Floyd's Algorithm).</li>
+    <li>Write a function to find the starting node of a cycle in a Linked List.</li>
+    <li>Write a function to remove duplicates from an unsorted Linked List using a hash set.</li>
+    <li>Write a function to find the nth node from the end of a Linked List in one pass.</li>
+    <li>Write a function to merge two sorted Linked Lists into one sorted list.</li>
+    <li>Write a function to check if a Linked List is a palindrome.</li>
+    <li>Write a function to remove the nth node from the end of a Linked List in one pass.</li>
+    <li>Write a function to swap every two adjacent nodes in a Linked List.</li>
+    <li>Write a function to rotate a Linked List to the right by k places.</li>
+    <li>Write a function to convert a Singly Linked List into a Doubly Linked List.</li>
+    <li>Write a function to delete a node given only access to that node (not the head).</li>
+    <li>Write a function to find the intersection point of two Linked Lists.</li>
+    <li>Write a function to reverse a Linked List in groups of k nodes.</li>
+    <li>Write a function to flatten a multi-level Linked List (each node may have a 'child' pointer).</li>
+    <li>Write a function to sort a Linked List using Merge Sort.</li>
+    <li>Write a function to add two numbers represented as Linked Lists (digits in reverse order).</li>
+    <li>Write a function to clone a Linked List with an additional random pointer per node.</li>
+    <li>Write a function implementing an LRU Cache using a Doubly Linked List + Hash Map.</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    A <b>Linked List</b> stores data in nodes connected by pointers, trading O(1) index access for flexible O(1) head insert/delete. <b>Singly</b> lists move forward only; <b>Doubly</b> lists move both ways at the cost of extra memory; <b>Circular</b> lists loop back to the head. The <b>slow/fast pointer</b> pattern is the single most powerful trick for Linked List problems — middle node, cycle detection, and nth-from-end all use it.
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">Fast pointer moves 2 steps, Slow pointer moves 1 step → they meet inside a cycle (Floyd's Cycle Detection)</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 3 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Linked List</td><td>Nodes connected via pointers, scattered memory</td></tr>
+    <tr><td>Singly Linked List</td><td>One-directional (next only)</td></tr>
+    <tr><td>Doubly Linked List</td><td>Bi-directional (next + prev)</td></tr>
+    <tr><td>Circular Linked List</td><td>Last node points back to head</td></tr>
+    <tr><td>Access by index</td><td>O(n)</td></tr>
+    <tr><td>Insert/Delete at head</td><td>O(1)</td></tr>
+    <tr><td>Search</td><td>O(n)</td></tr>
+    <tr><td>Reverse list</td><td>O(n) time, O(1) space</td></tr>
+    <tr><td>Slow/Fast Pointers</td><td>Middle node, cycle detection, nth from end</td></tr>
+    <tr><td>Floyd's Algorithm</td><td>Cycle detection in O(n)/O(1)</td></tr>
+  </table>
+  <div class="box formula">Floyd's: slow +1 step, fast +2 steps → meet inside cycle</div>
+  <div class="box tip">Golden rule: <b>Need fast insert/delete at ends? → Linked List. Need fast random access? → Array.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Implement a Node class and build a Singly Linked List by inserting at the head.", "Write a function to traverse and print all elements of a Linked List.", "Write a function to insert a node at the end (tail) of a Linked List.", "Write a function to insert a node at a given position in a Linked List.", "Write a function to delete a node from the head of a Linked List.", "Write a function to delete a node from the tail of a Linked List.", "Write a function to delete a node at a given position.", "Write a function to search for a value in a Linked List and return its position.", "Write a function to count the number of nodes in a Linked List.", "Write a function to find the middle node of a Linked List using slow/fast pointers.", "Write a function to reverse a Singly Linked List iteratively.", "Write a recursive function to reverse a Singly Linked List.", "Write a function to detect a cycle in a Linked List (Floyd's Algorithm).", "Write a function to find the starting node of a cycle in a Linked List.", "Write a function to remove duplicates from an unsorted Linked List using a hash set.", "Write a function to find the nth node from the end of a Linked List in one pass.", "Write a function to merge two sorted Linked Lists into one sorted list.", "Write a function to check if a Linked List is a palindrome.", "Write a function to remove the nth node from the end of a Linked List in one pass.", "Write a function to swap every two adjacent nodes in a Linked List.", "Write a function to rotate a Linked List to the right by k places.", "Write a function to convert a Singly Linked List into a Doubly Linked List.", "Write a function to delete a node given only access to that node (not the head).", "Write a function to find the intersection point of two Linked Lists.", "Write a function to reverse a Linked List in groups of k nodes.", "Write a function to flatten a multi-level Linked List (each node may have a 'child' pointer).", "Write a function to sort a Linked List using Merge Sort.", "Write a function to add two numbers represented as Linked Lists (digits in reverse order).", "Write a function to clone a Linked List with an additional random pointer per node.", "Write a function implementing an LRU Cache using a Doubly Linked List + Hash Map."]}, "practice": {"easy": ["Write one disadvantage of a Linked List compared to an Array, for a memory allocator's free-block list.", "What extra field does a Doubly Linked List's node have that a Singly Linked List's node does not?", "What does a Node in a Singly Linked List typically contain?", "What is a 'Head' pointer used for in a Linked List representing a browser tab history list?", "State True or False: Recursive reversal of a Linked List uses O(n) extra space on the call stack.", "What is the difference between a Singly and a Doubly Linked List?", "Is a Linked List a Linear or Non-Linear data structure?", "Why can't we do direct index-based access (like arr[i]) on a Linked List?", "What is the main risk of an improperly terminated Circular Linked List used for an image viewer's next/previous photo feature?", "Define the term 'Circular Doubly Linked List' in your own words.", "Fill in the blank: Performing swapping two nodes on a Linked List of size 10,000 typically takes ______ time.", "Write one advantage of a Linked List over an Array for a navigation app's route waypoints.", "Name one real-life example of a Linked List, such as a round-robin CPU scheduler (circular list).", "State True or False: A Doubly Linked List uses more memory per node than a Singly Linked List.", "What is the time complexity of deletion from the head in a Linked List of size 10,000?", "What is a 'Head' pointer used for in a Linked List representing a round-robin CPU scheduler (circular list)?", "What is the main risk of an improperly terminated Circular Linked List used for a social media 'infinite scroll' feed?", "Write one disadvantage of a Linked List compared to an Array, for an image viewer's next/previous photo feature.", "What is the main risk of an improperly terminated Circular Linked List used for a music playlist with next/previous songs?", "Define the term 'Self-Referential Structure' in your own words.", "State True or False: A Circular Linked List's last node points back to the head.", "Define the term 'Singly Linked List' in your own words.", "Fill in the blank: Performing deletion at a given position on a Linked List of size 50 typically takes ______ time.", "Name one real-life example of a Linked List, such as a social media 'infinite scroll' feed.", "In a Circular Linked List used for an undo/redo stack in a text editor, what does the last node point to?", "Write one disadvantage of a Linked List compared to an Array, for a train with attachable/detachable coaches.", "Write one disadvantage of a Linked List compared to an Array, for a to-do list app.", "Write one advantage of a Linked List over an Array for a round-robin CPU scheduler (circular list).", "Name one real-life example of a Linked List, such as a memory allocator's free-block list.", "What is stored in the 'next' pointer of the last node of a Singly Linked List?", "Would you use finding the nth node from the end more often in a memory allocator's free-block list \u2014 explain in one line.", "For a card game's shuffled deck chain of size 10,000, which data structure concept (Head Pointer) is most relevant?", "Fill in the blank: Performing traversing the list on a Linked List of size n typically takes ______ time.", "In a Circular Linked List used for a to-do list app, what does the last node point to?", "Would you use searching for a value more often in a video streaming app's 'up next' queue \u2014 explain in one line.", "Define the term 'Circular Linked List' in your own words.", "In a Circular Linked List used for a browser tab history list, what does the last node point to?", "Name one real-life example of a Linked List, such as an undo/redo stack in a text editor.", "What is a 'Head' pointer used for in a Linked List representing a to-do list app?", "Would you use sorting the list more often in an image viewer's next/previous photo feature \u2014 explain in one line.", "State True or False: Linked Lists support O(1) random access like arrays.", "What is the time complexity of sorting the list in a Linked List of size 1,000?", "Fill in the blank: Performing insertion at a given position on a Linked List of size 1,000 typically takes ______ time.", "In a Circular Linked List used for a polynomial represented as a chain of terms, what does the last node point to?", "What is a 'Head' pointer used for in a Linked List representing a social media 'infinite scroll' feed?", "For a browser tab history list of size 10,000, which data structure concept (Null Pointer) is most relevant?", "Define the term 'Head Pointer' in your own words.", "What is the time complexity of finding the nth node from the end in a Linked List of size 1,000?", "Fill in the blank: Performing merging two sorted lists on a Linked List of size 10,000 typically takes ______ time.", "Would you use removing duplicates more often in a browser tab history list \u2014 explain in one line.", "What is the main risk of an improperly terminated Circular Linked List used for a to-do list app?", "What is the time complexity of rotating the list in a Linked List of size 10^5?", "In a Circular Linked List used for a music playlist with next/previous songs, what does the last node point to?", "What is the time complexity of traversing the list in a Linked List of size 10^5?", "What is a 'Head' pointer used for in a Linked List representing a simple chat message queue?", "What is the main risk of an improperly terminated Circular Linked List used for a browser's forward/back history?", "Would you use finding the intersection of two lists more often in a round-robin CPU scheduler (circular list) \u2014 explain in one line.", "Would you use counting the number of nodes more often in a social media 'infinite scroll' feed \u2014 explain in one line.", "Would you use detecting a cycle more often in a video streaming app's 'up next' queue \u2014 explain in one line.", "What is the main risk of an improperly terminated Circular Linked List used for a browser tab history list?", "What is a 'Head' pointer used for in a Linked List representing a train with attachable/detachable coaches?", "Fill in the blank: Performing checking if the list is a palindrome on a Linked List of size 50 typically takes ______ time.", "What is the main risk of an improperly terminated Circular Linked List used for a round-robin CPU scheduler (circular list)?", "What is the time complexity of searching for a value in a Linked List of size 100?", "State True or False: A Doubly Linked List allows traversal in both directions.", "Fill in the blank: Performing insertion at the head on a Linked List of size 100 typically takes ______ time.", "What is a 'Head' pointer used for in a Linked List representing a browser's forward/back history?", "Would you use reversing the list more often in a browser's forward/back history \u2014 explain in one line.", "Name one real-life example of a Linked List, such as a train with attachable/detachable coaches.", "Name one real-life example of a Linked List, such as a to-do list app.", "State True or False: Insertion at the head of a Linked List takes O(1) time.", "Write one disadvantage of a Linked List compared to an Array, for a simple chat message queue.", "What is the main risk of an improperly terminated Circular Linked List used for a simple chat message queue?", "Name one real-life example of a Linked List, such as a card game's shuffled deck chain.", "What is a 'Head' pointer used for in a Linked List representing a memory allocator's free-block list?", "In a Circular Linked List used for a navigation app's route waypoints, what does the last node point to?", "Define the term 'Node' in your own words.", "Would you use searching for a value more often in a music playlist with next/previous songs \u2014 explain in one line.", "For a social media 'infinite scroll' feed of size 100, which data structure concept (Self-Referential Structure) is most relevant?", "Define the term 'Dummy Node' in your own words.", "What is the time complexity of detecting a cycle in a Linked List of size 50?", "Write one advantage of a Linked List over an Array for a card game's shuffled deck chain.", "Name one real-life example of a Linked List, such as an image viewer's next/previous photo feature.", "What is the main risk of an improperly terminated Circular Linked List used for an undo/redo stack in a text editor?", "Define the term 'Null Pointer' in your own words.", "What is a 'Head' pointer used for in a Linked List representing a music playlist with next/previous songs?", "Would you use deletion at a given position more often in a browser tab history list \u2014 explain in one line.", "State True or False: You must traverse from the head to reach the middle of a Singly Linked List.", "Write one advantage of a Linked List over an Array for a simple chat message queue.", "Name one real-life example of a Linked List, such as a music playlist with next/previous songs.", "For a round-robin CPU scheduler (circular list) of size 50, which data structure concept (Dummy Node) is most relevant?", "Define the term 'Tail Pointer' in your own words.", "State True or False: Deletion at the tail of a Singly Linked List (no tail pointer) takes O(n) time.", "Define the term 'Doubly Linked List' in your own words.", "Would you use detecting a cycle more often in an undo/redo stack in a text editor \u2014 explain in one line.", "What is a 'Head' pointer used for in a Linked List representing a polynomial represented as a chain of terms?", "What is a 'Head' pointer used for in a Linked List representing a navigation app's route waypoints?", "Fill in the blank: Performing merging two sorted lists on a Linked List of size n typically takes ______ time.", "What is the time complexity of splitting a list into two halves in a Linked List of size 50?", "Write one disadvantage of a Linked List compared to an Array, for an undo/redo stack in a text editor.", "State True or False: Each node in a Singly Linked List points to the next node only.", "Write one advantage of a Linked List over an Array for a browser's forward/back history.", "Write one disadvantage of a Linked List compared to an Array, for a social media 'infinite scroll' feed.", "Name one real-life example of a Linked List, such as a navigation app's route waypoints.", "In a Circular Linked List used for a browser's forward/back history, what does the last node point to?", "Would you use searching for a value more often in an undo/redo stack in a text editor \u2014 explain in one line.", "Fill in the blank: Performing traversing the list on a Linked List of size 1,000 typically takes ______ time.", "Write one advantage of a Linked List over an Array for a train with attachable/detachable coaches.", "Would you use sorting the list more often in a music playlist with next/previous songs \u2014 explain in one line.", "Write one advantage of a Linked List over an Array for a polynomial represented as a chain of terms.", "For an undo/redo stack in a text editor of size 50, which data structure concept (Traversal) is most relevant?", "Write one disadvantage of a Linked List compared to an Array, for a navigation app's route waypoints.", "For a video streaming app's 'up next' queue of size 100, which data structure concept (Pointer) is most relevant?", "In a Circular Linked List used for a video streaming app's 'up next' queue, what does the last node point to?", "For a to-do list app of size 100, which data structure concept (Dummy Node) is most relevant?", "Fill in the blank: Performing insertion at the tail on a Linked List of size 10,000 typically takes ______ time.", "For a polynomial represented as a chain of terms of size 50, which data structure concept (Self-Referential Structure) is most relevant?", "Write one disadvantage of a Linked List compared to an Array, for a card game's shuffled deck chain.", "Fill in the blank: Performing swapping two nodes on a Linked List of size 100 typically takes ______ time.", "For a memory allocator's free-block list of size 10^5, which data structure concept (Pointer) is most relevant?", "Would you use finding the nth node from the end more often in a simple chat message queue \u2014 explain in one line.", "Fill in the blank: Performing deletion from the tail on a Linked List of size n typically takes ______ time.", "Write one disadvantage of a Linked List compared to an Array, for a video streaming app's 'up next' queue.", "Name one real-life example of a Linked List, such as a browser tab history list.", "Would you use checking if the list is a palindrome more often in a video streaming app's 'up next' queue \u2014 explain in one line.", "In a Circular Linked List used for a train with attachable/detachable coaches, what does the last node point to?", "Fill in the blank: Performing detecting a cycle on a Linked List of size 1,000 typically takes ______ time.", "Would you use deletion from the head more often in a card game's shuffled deck chain \u2014 explain in one line.", "What is a 'Head' pointer used for in a Linked List representing an image viewer's next/previous photo feature?", "Fill in the blank: Performing checking if the list is a palindrome on a Linked List of size 10^5 typically takes ______ time.", "For an image viewer's next/previous photo feature of size 1,000, which data structure concept (Dummy Node) is most relevant?", "Write one advantage of a Linked List over an Array for a music playlist with next/previous songs.", "Fill in the blank: Performing deletion from the tail on a Linked List of size 10,000 typically takes ______ time.", "Fill in the blank: Performing finding the middle node on a Linked List of size 100 typically takes ______ time.", "Would you use traversing the list more often in a card game's shuffled deck chain \u2014 explain in one line.", "State True or False: Accessing the k-th element of a Linked List takes O(1) time.", "What is the time complexity of merging two sorted lists in a Linked List of size 50?", "What is the time complexity of searching for a value in a Linked List of size 1,000?", "Define the term 'Memory Fragmentation' in your own words.", "What is the main risk of an improperly terminated Circular Linked List used for a card game's shuffled deck chain?", "Would you use removing duplicates more often in an undo/redo stack in a text editor \u2014 explain in one line.", "What is the time complexity of finding the nth node from the end in a Linked List of size 100?", "Write one advantage of a Linked List over an Array for a browser tab history list.", "What is the time complexity of insertion at a given position in a Linked List of size 10^5?", "Fill in the blank: Performing splitting a list into two halves on a Linked List of size 10,000 typically takes ______ time.", "Write one advantage of a Linked List over an Array for an image viewer's next/previous photo feature.", "Would you use insertion at the head more often in a video streaming app's 'up next' queue \u2014 explain in one line.", "What is the time complexity of deletion at a given position in a Linked List of size 1,000?", "What is the main risk of an improperly terminated Circular Linked List used for a polynomial represented as a chain of terms?", "Would you use traversing the list more often in an undo/redo stack in a text editor \u2014 explain in one line.", "Would you use searching for a value more often in a round-robin CPU scheduler (circular list) \u2014 explain in one line.", "Would you use removing duplicates more often in a navigation app's route waypoints \u2014 explain in one line.", "Fill in the blank: Performing deletion from the head on a Linked List of size 50 typically takes ______ time.", "Write one advantage of a Linked List over an Array for a to-do list app.", "Write one disadvantage of a Linked List compared to an Array, for a browser tab history list.", "For a music playlist with next/previous songs of size n, which data structure concept (Pointer) is most relevant?", "For a music playlist with next/previous songs of size 10,000, which data structure concept (Circular Linked List) is most relevant?", "Would you use finding the nth node from the end more often in a browser tab history list \u2014 explain in one line.", "Would you use checking if the list is a palindrome more often in a simple chat message queue \u2014 explain in one line.", "For a round-robin CPU scheduler (circular list) of size n, which data structure concept (Sentinel Node) is most relevant?", "Would you use finding the intersection of two lists more often in a train with attachable/detachable coaches \u2014 explain in one line.", "What is the main risk of an improperly terminated Circular Linked List used for a video streaming app's 'up next' queue?", "Would you use detecting a cycle more often in an image viewer's next/previous photo feature \u2014 explain in one line.", "Would you use searching for a value more often in a browser tab history list \u2014 explain in one line.", "For a memory allocator's free-block list of size 10,000, which data structure concept (Self-Referential Structure) is most relevant?", "Would you use removing duplicates more often in a card game's shuffled deck chain \u2014 explain in one line.", "For a train with attachable/detachable coaches of size 10^5, which data structure concept (Linked List Cycle) is most relevant?", "What is the time complexity of finding the middle node in a Linked List of size 10^5?", "Write one disadvantage of a Linked List compared to an Array, for a round-robin CPU scheduler (circular list).", "Name one real-life example of a Linked List, such as a simple chat message queue.", "Write one disadvantage of a Linked List compared to an Array, for a browser's forward/back history.", "Write one advantage of a Linked List over an Array for a social media 'infinite scroll' feed.", "Name one real-life example of a Linked List, such as a video streaming app's 'up next' queue.", "For a train with attachable/detachable coaches of size 100, which data structure concept (Dummy Node) is most relevant?", "Define the term 'Linked List Cycle' in your own words.", "In a Circular Linked List used for a social media 'infinite scroll' feed, what does the last node point to?", "Would you use deletion from the tail more often in a browser tab history list \u2014 explain in one line.", "What is the time complexity of merging two sorted lists in a Linked List of size 1,000?", "Fill in the blank: Performing finding the middle node on a Linked List of size 10^5 typically takes ______ time.", "Fill in the blank: Performing concatenating two lists on a Linked List of size 10^5 typically takes ______ time.", "For an image viewer's next/previous photo feature of size 1,000, which data structure concept (Sentinel Node) is most relevant?", "Fill in the blank: Performing removing duplicates on a Linked List of size n typically takes ______ time.", "What is a 'Head' pointer used for in a Linked List representing a video streaming app's 'up next' queue?", "Would you use traversing the list more often in a train with attachable/detachable coaches \u2014 explain in one line.", "State True or False: A Linked List stores elements in contiguous memory like an array.", "Write one advantage of a Linked List over an Array for a video streaming app's 'up next' queue.", "Fill in the blank: Performing swapping two nodes on a Linked List of size 50 typically takes ______ time.", "What is the time complexity of reversing the list in a Linked List of size 50?", "What is the time complexity of deletion from the head in a Linked List of size 1,000?", "Fill in the blank: Performing concatenating two lists on a Linked List of size n typically takes ______ time.", "For a round-robin CPU scheduler (circular list) of size n, which data structure concept (Doubly Linked List) is most relevant?", "Would you use searching for a value more often in a navigation app's route waypoints \u2014 explain in one line.", "Fill in the blank: Performing checking if the list is a palindrome on a Linked List of size 1,000 typically takes ______ time.", "State True or False: In a Circular Linked List, traversal can loop forever if not handled carefully.", "Would you use counting the number of nodes more often in a simple chat message queue \u2014 explain in one line.", "Define the term 'Traversal' in your own words.", "For a polynomial represented as a chain of terms of size 100, which data structure concept (Circular Doubly Linked List) is most relevant?", "In a Circular Linked List used for a simple chat message queue, what does the last node point to?", "For a memory allocator's free-block list of size 1,000, which data structure concept (Linked List Cycle) is most relevant?", "Would you use finding the intersection of two lists more often in a navigation app's route waypoints \u2014 explain in one line."], "medium": ["Explain how a Dummy/Sentinel node simplifies edge cases when performing swapping two nodes on a Linked List of size 10^5.", "Explain why searching for a value requires careful pointer updates to avoid breaking the rest of the list, for a navigation app's route waypoints.", "Discuss the trade-off between recursive and iterative reversal of a Linked List of size 1,000.", "Explain why deletion at a given position in a Doubly Linked List is easier than in a Singly Linked List, for an undo/redo stack in a text editor.", "What is the time complexity of merging two sorted Linked Lists of total size n, used for a polynomial represented as a chain of terms?", "Explain the steps and complexity of traversing the list on a Circular Linked List representing a round-robin CPU scheduler (circular list).", "What is the time and space complexity of reversing a Linked List of size 50 iteratively?", "Explain the steps and complexity of deletion from the head on a Circular Linked List representing a music playlist with next/previous songs.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing concatenating two lists on a Linked List of size 10^5.", "What is the time and space complexity of reversing a Linked List of size 1,000 iteratively?", "Explain how a Dummy/Sentinel node simplifies edge cases when performing finding the middle node on a Linked List of size 10,000.", "Explain how to detect a cycle in a Linked List used for an undo/redo stack in a text editor using Floyd's algorithm (conceptually).", "What is the time complexity of merging two sorted Linked Lists of total size n, used for a simple chat message queue?", "Explain how a Dummy/Sentinel node simplifies edge cases when performing deletion at a given position on a Linked List of size n.", "Compare the memory overhead of a Linked List vs an Array for storing a navigation app's route waypoints with 50 items.", "What is the time complexity of merging two sorted Linked Lists of total size n, used for a memory allocator's free-block list?", "What is the time complexity of merging two sorted Linked Lists of total size 100, used for a browser tab history list?", "What is the time and space complexity of reversing a Linked List of size 100 iteratively?", "Explain why merging two sorted lists requires careful pointer updates to avoid breaking the rest of the list, for a social media 'infinite scroll' feed.", "Explain why finding the intersection of two lists in a Doubly Linked List is easier than in a Singly Linked List, for a card game's shuffled deck chain.", "Explain why insertion at the head in a Doubly Linked List is easier than in a Singly Linked List, for a video streaming app's 'up next' queue.", "Explain how you would find the nth node from the end of a Linked List of size 100 in one pass.", "Compare the memory overhead of a Linked List vs an Array for storing a music playlist with next/previous songs with 50 items.", "For a card game's shuffled deck chain with n items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why traversing the list in a Doubly Linked List is easier than in a Singly Linked List, for a browser tab history list.", "Explain why reversing the list is O(1) for a Linked List but different for an Array, for a list of size 50.", "Compare the memory overhead of a Linked List vs an Array for storing a card game's shuffled deck chain with n items.", "Discuss the trade-off between recursive and iterative reversal of a Linked List of size 10,000.", "Explain why removing duplicates requires careful pointer updates to avoid breaking the rest of the list, for a simple chat message queue.", "Explain why traversing the list is O(1) for a Linked List but different for an Array, for a list of size 50.", "Explain how to detect a cycle in a Linked List used for a social media 'infinite scroll' feed using Floyd's algorithm (conceptually).", "Explain how you would find the nth node from the end of a Linked List of size 50 in one pass.", "Explain why reversing the list in a Doubly Linked List is easier than in a Singly Linked List, for an image viewer's next/previous photo feature.", "Explain how to detect a cycle in a Linked List used for a browser tab history list using Floyd's algorithm (conceptually).", "Explain how you would split a Linked List of size 100 (context: a social media 'infinite scroll' feed) into two equal halves efficiently.", "Compare the memory overhead of a Linked List vs an Array for storing a polynomial represented as a chain of terms with 10^5 items.", "Explain why splitting a list into two halves in a Doubly Linked List is easier than in a Singly Linked List, for a memory allocator's free-block list.", "Compare the memory overhead of a Linked List vs an Array for storing a browser's forward/back history with 100 items.", "Explain how you would split a Linked List of size 50 (context: a card game's shuffled deck chain) into two equal halves efficiently.", "Discuss the trade-off between recursive and iterative reversal of a Linked List of size 50.", "What is the time and space complexity of reversing a Linked List of size 10^5 iteratively?", "For a memory allocator's free-block list with 10,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how you would find the nth node from the end of a Linked List of size n in one pass.", "Compare the memory overhead of a Linked List vs an Array for storing a card game's shuffled deck chain with 10,000 items.", "Explain how to find the middle node of a Linked List of size 10^5 in a single pass (slow/fast pointer).", "What is the time complexity of merging two sorted Linked Lists of total size 10^5, used for a train with attachable/detachable coaches?", "Explain how you would split a Linked List of size 50 (context: a browser's forward/back history) into two equal halves efficiently.", "Explain why rotating the list is O(1) for a Linked List but different for an Array, for a list of size 1,000.", "What is the time complexity of merging two sorted Linked Lists of total size n, used for an image viewer's next/previous photo feature?", "Compare the memory overhead of a Linked List vs an Array for storing a navigation app's route waypoints with 100 items.", "For a polynomial represented as a chain of terms with 1,000 items, would you choose a Singly or Doubly Linked List? Justify.", "For a memory allocator's free-block list with n items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why traversing the list requires careful pointer updates to avoid breaking the rest of the list, for a social media 'infinite scroll' feed.", "Explain why finding the nth node from the end requires careful pointer updates to avoid breaking the rest of the list, for a music playlist with next/previous songs.", "Explain how to find the middle node of a Linked List of size 50 in a single pass (slow/fast pointer).", "For a simple chat message queue with 50 items, would you choose a Singly or Doubly Linked List? Justify.", "For an image viewer's next/previous photo feature with 10,000 items, would you choose a Singly or Doubly Linked List? Justify.", "For an undo/redo stack in a text editor with 1,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how you would split a Linked List of size n (context: a browser's forward/back history) into two equal halves efficiently.", "For a card game's shuffled deck chain with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why searching for a value requires careful pointer updates to avoid breaking the rest of the list, for a train with attachable/detachable coaches.", "Explain how to detect a cycle in a Linked List used for a polynomial represented as a chain of terms using Floyd's algorithm (conceptually).", "Explain the steps and complexity of deletion at a given position on a Circular Linked List representing a train with attachable/detachable coaches.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing deletion from the head on a Linked List of size 50.", "Explain why deletion at a given position requires careful pointer updates to avoid breaking the rest of the list, for a navigation app's route waypoints.", "Explain how to detect a cycle in a Linked List used for an image viewer's next/previous photo feature using Floyd's algorithm (conceptually).", "Explain how you would find the nth node from the end of a Linked List of size 10^5 in one pass.", "Explain how you would split a Linked List of size 10,000 (context: a music playlist with next/previous songs) into two equal halves efficiently.", "Explain why traversing the list requires careful pointer updates to avoid breaking the rest of the list, for a memory allocator's free-block list.", "Explain how to find the middle node of a Linked List of size 1,000 in a single pass (slow/fast pointer).", "Explain how to find the middle node of a Linked List of size 10,000 in a single pass (slow/fast pointer).", "Explain how a Dummy/Sentinel node simplifies edge cases when performing counting the number of nodes on a Linked List of size n.", "Explain how you would split a Linked List of size 10,000 (context: a social media 'infinite scroll' feed) into two equal halves efficiently.", "Compare the memory overhead of a Linked List vs an Array for storing a music playlist with next/previous songs with n items.", "For a navigation app's route waypoints with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why removing duplicates in a Doubly Linked List is easier than in a Singly Linked List, for a music playlist with next/previous songs.", "Explain why swapping two nodes requires careful pointer updates to avoid breaking the rest of the list, for a simple chat message queue.", "For a to-do list app with 10,000 items, would you choose a Singly or Doubly Linked List? Justify.", "For a polynomial represented as a chain of terms with n items, would you choose a Singly or Doubly Linked List? Justify.", "Discuss the trade-off between recursive and iterative reversal of a Linked List of size 100.", "Explain how to detect a cycle in a Linked List used for a memory allocator's free-block list using Floyd's algorithm (conceptually).", "Explain how a Dummy/Sentinel node simplifies edge cases when performing finding the intersection of two lists on a Linked List of size 100.", "Explain how you would split a Linked List of size 10^5 (context: a train with attachable/detachable coaches) into two equal halves efficiently.", "Explain the steps and complexity of rotating the list on a Circular Linked List representing a music playlist with next/previous songs.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing merging two sorted lists on a Linked List of size 10^5.", "Explain how you would split a Linked List of size 1,000 (context: a card game's shuffled deck chain) into two equal halves efficiently.", "For a social media 'infinite scroll' feed with 10^5 items, would you choose a Singly or Doubly Linked List? Justify.", "For a social media 'infinite scroll' feed with 1,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing finding the middle node on a Linked List of size 50.", "Explain how you would find the nth node from the end of a Linked List of size 1,000 in one pass.", "For an image viewer's next/previous photo feature with 10^5 items, would you choose a Singly or Doubly Linked List? Justify.", "Discuss the trade-off between recursive and iterative reversal of a Linked List of size n.", "Explain why sorting the list in a Doubly Linked List is easier than in a Singly Linked List, for an image viewer's next/previous photo feature.", "Explain why finding the nth node from the end requires careful pointer updates to avoid breaking the rest of the list, for a to-do list app.", "Explain why removing duplicates is O(1) for a Linked List but different for an Array, for a list of size 1,000.", "Explain how to detect a cycle in a Linked List used for a navigation app's route waypoints using Floyd's algorithm (conceptually).", "Explain the steps and complexity of merging two sorted lists on a Circular Linked List representing a browser's forward/back history.", "Explain the steps and complexity of splitting a list into two halves on a Circular Linked List representing a simple chat message queue.", "Compare the memory overhead of a Linked List vs an Array for storing a music playlist with next/previous songs with 10^5 items.", "What is the time and space complexity of reversing a Linked List of size n iteratively?", "Explain the steps and complexity of removing duplicates on a Circular Linked List representing a music playlist with next/previous songs.", "What is the time and space complexity of reversing a Linked List of size 10,000 iteratively?", "Explain why traversing the list in a Doubly Linked List is easier than in a Singly Linked List, for a train with attachable/detachable coaches.", "For a browser's forward/back history with n items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why traversing the list is O(1) for a Linked List but different for an Array, for a list of size 100.", "Explain how you would split a Linked List of size 1,000 (context: a music playlist with next/previous songs) into two equal halves efficiently.", "Compare the memory overhead of a Linked List vs an Array for storing a round-robin CPU scheduler (circular list) with 10^5 items.", "Explain how to detect a cycle in a Linked List used for a train with attachable/detachable coaches using Floyd's algorithm (conceptually).", "Compare the memory overhead of a Linked List vs an Array for storing a memory allocator's free-block list with 100 items.", "Explain why deletion at a given position requires careful pointer updates to avoid breaking the rest of the list, for a round-robin CPU scheduler (circular list).", "Explain how to find the middle node of a Linked List of size n in a single pass (slow/fast pointer).", "Explain how a Dummy/Sentinel node simplifies edge cases when performing swapping two nodes on a Linked List of size 10,000.", "For a video streaming app's 'up next' queue with 10,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Compare the memory overhead of a Linked List vs an Array for storing an undo/redo stack in a text editor with 50 items.", "Explain how you would split a Linked List of size 10^5 (context: a browser's forward/back history) into two equal halves efficiently.", "Explain why insertion at the head in a Doubly Linked List is easier than in a Singly Linked List, for an undo/redo stack in a text editor.", "Explain why merging two sorted lists is O(1) for a Linked List but different for an Array, for a list of size 100.", "Explain why deletion from the head requires careful pointer updates to avoid breaking the rest of the list, for a navigation app's route waypoints.", "Explain how to detect a cycle in a Linked List used for a round-robin CPU scheduler (circular list) using Floyd's algorithm (conceptually).", "What is the time complexity of merging two sorted Linked Lists of total size 50, used for a browser tab history list?", "Explain how to find the middle node of a Linked List of size 100 in a single pass (slow/fast pointer).", "What is the time complexity of merging two sorted Linked Lists of total size 100, used for a card game's shuffled deck chain?", "Explain why insertion at a given position in a Doubly Linked List is easier than in a Singly Linked List, for a to-do list app.", "Explain how you would find the nth node from the end of a Linked List of size 10,000 in one pass.", "Explain why deletion from the tail requires careful pointer updates to avoid breaking the rest of the list, for a memory allocator's free-block list.", "Explain how you would split a Linked List of size n (context: a video streaming app's 'up next' queue) into two equal halves efficiently.", "Explain why traversing the list in a Doubly Linked List is easier than in a Singly Linked List, for a music playlist with next/previous songs.", "What is the time complexity of merging two sorted Linked Lists of total size 10^5, used for a polynomial represented as a chain of terms?", "Explain why merging two sorted lists requires careful pointer updates to avoid breaking the rest of the list, for a music playlist with next/previous songs.", "Explain why insertion at the head in a Doubly Linked List is easier than in a Singly Linked List, for a round-robin CPU scheduler (circular list).", "Explain how you would split a Linked List of size n (context: an undo/redo stack in a text editor) into two equal halves efficiently.", "What is the time complexity of merging two sorted Linked Lists of total size 10,000, used for a polynomial represented as a chain of terms?", "Explain how a Dummy/Sentinel node simplifies edge cases when performing counting the number of nodes on a Linked List of size 100.", "Explain how you would split a Linked List of size n (context: a simple chat message queue) into two equal halves efficiently.", "What is the time complexity of merging two sorted Linked Lists of total size 100, used for a simple chat message queue?", "Explain why rotating the list is O(1) for a Linked List but different for an Array, for a list of size 100.", "What is the time complexity of merging two sorted Linked Lists of total size 1,000, used for a polynomial represented as a chain of terms?", "Explain how a Dummy/Sentinel node simplifies edge cases when performing checking if the list is a palindrome on a Linked List of size 10,000.", "Explain the steps and complexity of detecting a cycle on a Circular Linked List representing a train with attachable/detachable coaches.", "What is the time complexity of merging two sorted Linked Lists of total size 10^5, used for a browser's forward/back history?", "What is the time complexity of merging two sorted Linked Lists of total size 1,000, used for a social media 'infinite scroll' feed?", "Compare the memory overhead of a Linked List vs an Array for storing a card game's shuffled deck chain with 10^5 items.", "Explain why sorting the list requires careful pointer updates to avoid breaking the rest of the list, for an image viewer's next/previous photo feature.", "Explain the steps and complexity of counting the number of nodes on a Circular Linked List representing a browser tab history list.", "Explain the steps and complexity of swapping two nodes on a Circular Linked List representing a simple chat message queue.", "Explain the steps and complexity of merging two sorted lists on a Circular Linked List representing a browser tab history list.", "Explain the steps and complexity of reversing the list on a Circular Linked List representing a card game's shuffled deck chain.", "Compare the memory overhead of a Linked List vs an Array for storing a video streaming app's 'up next' queue with 10^5 items.", "Explain why deletion from the head requires careful pointer updates to avoid breaking the rest of the list, for a music playlist with next/previous songs.", "Explain how to detect a cycle in a Linked List used for a to-do list app using Floyd's algorithm (conceptually).", "Explain why searching for a value requires careful pointer updates to avoid breaking the rest of the list, for a memory allocator's free-block list.", "For a card game's shuffled deck chain with 1,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how you would split a Linked List of size 1,000 (context: a memory allocator's free-block list) into two equal halves efficiently.", "Explain why splitting a list into two halves in a Doubly Linked List is easier than in a Singly Linked List, for an image viewer's next/previous photo feature.", "Explain how you would split a Linked List of size 10^5 (context: a video streaming app's 'up next' queue) into two equal halves efficiently.", "Explain why concatenating two lists is O(1) for a Linked List but different for an Array, for a list of size n.", "Explain the steps and complexity of deletion from the head on a Circular Linked List representing a memory allocator's free-block list.", "What is the time complexity of merging two sorted Linked Lists of total size 10,000, used for an image viewer's next/previous photo feature?", "Explain the steps and complexity of insertion at a given position on a Circular Linked List representing a navigation app's route waypoints.", "Compare the memory overhead of a Linked List vs an Array for storing a simple chat message queue with 1,000 items.", "Explain why sorting the list requires careful pointer updates to avoid breaking the rest of the list, for a round-robin CPU scheduler (circular list).", "Compare the memory overhead of a Linked List vs an Array for storing an undo/redo stack in a text editor with 100 items.", "For a browser tab history list with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how you would split a Linked List of size 10^5 (context: a navigation app's route waypoints) into two equal halves efficiently.", "What is the time complexity of merging two sorted Linked Lists of total size 10,000, used for a memory allocator's free-block list?", "Explain why searching for a value is O(1) for a Linked List but different for an Array, for a list of size 10,000.", "Explain why splitting a list into two halves in a Doubly Linked List is easier than in a Singly Linked List, for a social media 'infinite scroll' feed.", "Explain why removing duplicates in a Doubly Linked List is easier than in a Singly Linked List, for an undo/redo stack in a text editor.", "Explain how to detect a cycle in a Linked List used for a simple chat message queue using Floyd's algorithm (conceptually).", "Explain why insertion at the tail requires careful pointer updates to avoid breaking the rest of the list, for a to-do list app.", "For a memory allocator's free-block list with 10^5 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why finding the nth node from the end in a Doubly Linked List is easier than in a Singly Linked List, for a browser tab history list.", "For a browser's forward/back history with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how you would split a Linked List of size 50 (context: a polynomial represented as a chain of terms) into two equal halves efficiently.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing rotating the list on a Linked List of size 10,000.", "Explain why sorting the list requires careful pointer updates to avoid breaking the rest of the list, for a navigation app's route waypoints.", "Explain why checking if the list is a palindrome requires careful pointer updates to avoid breaking the rest of the list, for a navigation app's route waypoints.", "Explain the steps and complexity of counting the number of nodes on a Circular Linked List representing a card game's shuffled deck chain.", "For a social media 'infinite scroll' feed with 50 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how you would split a Linked List of size 10^5 (context: an undo/redo stack in a text editor) into two equal halves efficiently.", "Explain why insertion at the tail in a Doubly Linked List is easier than in a Singly Linked List, for a music playlist with next/previous songs.", "Explain how you would split a Linked List of size 10^5 (context: a card game's shuffled deck chain) into two equal halves efficiently.", "Explain why insertion at the tail requires careful pointer updates to avoid breaking the rest of the list, for a social media 'infinite scroll' feed.", "What is the time complexity of merging two sorted Linked Lists of total size 100, used for a browser's forward/back history?", "Explain how a Dummy/Sentinel node simplifies edge cases when performing reversing the list on a Linked List of size n.", "Explain why deletion at a given position is O(1) for a Linked List but different for an Array, for a list of size 10,000.", "Explain why insertion at a given position in a Doubly Linked List is easier than in a Singly Linked List, for a browser tab history list.", "Explain why counting the number of nodes in a Doubly Linked List is easier than in a Singly Linked List, for a music playlist with next/previous songs.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing finding the intersection of two lists on a Linked List of size 1,000.", "Explain the steps and complexity of splitting a list into two halves on a Circular Linked List representing a train with attachable/detachable coaches.", "Explain why sorting the list requires careful pointer updates to avoid breaking the rest of the list, for a music playlist with next/previous songs.", "Explain why finding the middle node in a Doubly Linked List is easier than in a Singly Linked List, for a to-do list app.", "Explain how to detect a cycle in a Linked List used for a browser's forward/back history using Floyd's algorithm (conceptually).", "For a browser's forward/back history with 50 items, would you choose a Singly or Doubly Linked List? Justify.", "For a polynomial represented as a chain of terms with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why concatenating two lists requires careful pointer updates to avoid breaking the rest of the list, for a simple chat message queue.", "What is the time complexity of merging two sorted Linked Lists of total size n, used for a navigation app's route waypoints?", "Explain why removing duplicates is O(1) for a Linked List but different for an Array, for a list of size n.", "Explain the steps and complexity of deletion from the tail on a Circular Linked List representing a train with attachable/detachable coaches.", "Explain why deletion from the head in a Doubly Linked List is easier than in a Singly Linked List, for a to-do list app.", "Explain how you would split a Linked List of size 10^5 (context: a social media 'infinite scroll' feed) into two equal halves efficiently.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing deletion at a given position on a Linked List of size 10,000.", "What is the time complexity of merging two sorted Linked Lists of total size 10,000, used for a music playlist with next/previous songs?", "Explain why swapping two nodes in a Doubly Linked List is easier than in a Singly Linked List, for a browser tab history list.", "Discuss the trade-off between recursive and iterative reversal of a Linked List of size 10^5.", "Explain how you would split a Linked List of size 100 (context: a train with attachable/detachable coaches) into two equal halves efficiently.", "For a train with attachable/detachable coaches with 10^5 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how to detect a cycle in a Linked List used for a card game's shuffled deck chain using Floyd's algorithm (conceptually).", "Explain why splitting a list into two halves is O(1) for a Linked List but different for an Array, for a list of size 100.", "Explain the steps and complexity of traversing the list on a Circular Linked List representing a browser tab history list.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing splitting a list into two halves on a Linked List of size 1,000.", "Compare the memory overhead of a Linked List vs an Array for storing a music playlist with next/previous songs with 1,000 items.", "Explain why finding the middle node requires careful pointer updates to avoid breaking the rest of the list, for an image viewer's next/previous photo feature.", "Explain the steps and complexity of merging two sorted lists on a Circular Linked List representing a to-do list app.", "Explain why checking if the list is a palindrome is O(1) for a Linked List but different for an Array, for a list of size 10,000.", "Explain why deletion at a given position in a Doubly Linked List is easier than in a Singly Linked List, for a social media 'infinite scroll' feed.", "Explain why finding the middle node in a Doubly Linked List is easier than in a Singly Linked List, for a browser's forward/back history.", "Explain why finding the nth node from the end in a Doubly Linked List is easier than in a Singly Linked List, for a card game's shuffled deck chain.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing swapping two nodes on a Linked List of size n.", "Explain the steps and complexity of detecting a cycle on a Circular Linked List representing a browser tab history list.", "Explain how you would split a Linked List of size 10^5 (context: a round-robin CPU scheduler (circular list)) into two equal halves efficiently.", "For a train with attachable/detachable coaches with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Compare the memory overhead of a Linked List vs an Array for storing a browser's forward/back history with 50 items.", "For a to-do list app with 100 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why rotating the list is O(1) for a Linked List but different for an Array, for a list of size n.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing counting the number of nodes on a Linked List of size 10,000.", "Explain why traversing the list requires careful pointer updates to avoid breaking the rest of the list, for a browser tab history list.", "Explain why deletion at a given position is O(1) for a Linked List but different for an Array, for a list of size 1,000.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing sorting the list on a Linked List of size n.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing merging two sorted lists on a Linked List of size 100.", "Explain the steps and complexity of counting the number of nodes on a Circular Linked List representing a social media 'infinite scroll' feed.", "Explain why finding the nth node from the end is O(1) for a Linked List but different for an Array, for a list of size 1,000.", "Explain the steps and complexity of merging two sorted lists on a Circular Linked List representing a social media 'infinite scroll' feed.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing sorting the list on a Linked List of size 1,000.", "Explain why insertion at a given position is O(1) for a Linked List but different for an Array, for a list of size 100.", "Explain why finding the middle node requires careful pointer updates to avoid breaking the rest of the list, for a social media 'infinite scroll' feed.", "Explain why checking if the list is a palindrome requires careful pointer updates to avoid breaking the rest of the list, for a browser tab history list.", "What is the time complexity of merging two sorted Linked Lists of total size 50, used for a social media 'infinite scroll' feed?", "Explain the steps and complexity of rotating the list on a Circular Linked List representing a navigation app's route waypoints.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing detecting a cycle on a Linked List of size 10^5.", "Explain the steps and complexity of traversing the list on a Circular Linked List representing an image viewer's next/previous photo feature.", "For a round-robin CPU scheduler (circular list) with 1,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain why merging two sorted lists requires careful pointer updates to avoid breaking the rest of the list, for a card game's shuffled deck chain.", "Explain why removing duplicates in a Doubly Linked List is easier than in a Singly Linked List, for a navigation app's route waypoints.", "For a train with attachable/detachable coaches with 1,000 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing deletion from the head on a Linked List of size 1,000.", "Compare the memory overhead of a Linked List vs an Array for storing a video streaming app's 'up next' queue with n items.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing finding the middle node on a Linked List of size 100.", "Explain why merging two sorted lists in a Doubly Linked List is easier than in a Singly Linked List, for an undo/redo stack in a text editor.", "Compare the memory overhead of a Linked List vs an Array for storing a polynomial represented as a chain of terms with n items.", "What is the time complexity of merging two sorted Linked Lists of total size 10^5, used for a simple chat message queue?", "Explain why finding the middle node is O(1) for a Linked List but different for an Array, for a list of size 10^5.", "Explain why insertion at the tail in a Doubly Linked List is easier than in a Singly Linked List, for a memory allocator's free-block list.", "Explain why detecting a cycle is O(1) for a Linked List but different for an Array, for a list of size 10^5.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing counting the number of nodes on a Linked List of size 50.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing finding the intersection of two lists on a Linked List of size 10^5.", "Explain why counting the number of nodes in a Doubly Linked List is easier than in a Singly Linked List, for a browser tab history list.", "Explain why reversing the list requires careful pointer updates to avoid breaking the rest of the list, for a navigation app's route waypoints.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing deletion from the head on a Linked List of size 10,000.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing merging two sorted lists on a Linked List of size 1,000.", "Compare the memory overhead of a Linked List vs an Array for storing a social media 'infinite scroll' feed with 50 items.", "Compare the memory overhead of a Linked List vs an Array for storing a memory allocator's free-block list with 50 items.", "Explain how to detect a cycle in a Linked List used for a music playlist with next/previous songs using Floyd's algorithm (conceptually).", "Explain why removing duplicates in a Doubly Linked List is easier than in a Singly Linked List, for a card game's shuffled deck chain.", "Explain the steps and complexity of checking if the list is a palindrome on a Circular Linked List representing a round-robin CPU scheduler (circular list).", "Explain why rotating the list in a Doubly Linked List is easier than in a Singly Linked List, for an image viewer's next/previous photo feature.", "Compare the memory overhead of a Linked List vs an Array for storing a card game's shuffled deck chain with 1,000 items.", "Explain why traversing the list is O(1) for a Linked List but different for an Array, for a list of size 10^5.", "Explain how you would split a Linked List of size 10,000 (context: a train with attachable/detachable coaches) into two equal halves efficiently.", "What is the time complexity of merging two sorted Linked Lists of total size 10^5, used for a social media 'infinite scroll' feed?", "Explain why deletion from the head is O(1) for a Linked List but different for an Array, for a list of size 10^5.", "For a memory allocator's free-block list with 50 items, would you choose a Singly or Doubly Linked List? Justify.", "What is the time complexity of merging two sorted Linked Lists of total size 100, used for an undo/redo stack in a text editor?", "Explain why insertion at a given position is O(1) for a Linked List but different for an Array, for a list of size 50.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing swapping two nodes on a Linked List of size 50.", "For a round-robin CPU scheduler (circular list) with n items, would you choose a Singly or Doubly Linked List? Justify.", "What is the time complexity of merging two sorted Linked Lists of total size 10,000, used for a browser's forward/back history?", "Explain how you would split a Linked List of size 10^5 (context: a simple chat message queue) into two equal halves efficiently.", "Explain why finding the intersection of two lists requires careful pointer updates to avoid breaking the rest of the list, for a browser tab history list.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing concatenating two lists on a Linked List of size 50.", "Explain the steps and complexity of insertion at the tail on a Circular Linked List representing a card game's shuffled deck chain.", "Explain the steps and complexity of finding the middle node on a Circular Linked List representing a browser's forward/back history.", "Explain the steps and complexity of merging two sorted lists on a Circular Linked List representing a navigation app's route waypoints.", "What is the time complexity of merging two sorted Linked Lists of total size 10^5, used for a navigation app's route waypoints?", "Explain why deletion from the head requires careful pointer updates to avoid breaking the rest of the list, for a video streaming app's 'up next' queue.", "Explain how you would split a Linked List of size 50 (context: a browser tab history list) into two equal halves efficiently.", "Explain why insertion at a given position requires careful pointer updates to avoid breaking the rest of the list, for a music playlist with next/previous songs.", "Explain why insertion at a given position requires careful pointer updates to avoid breaking the rest of the list, for an image viewer's next/previous photo feature.", "Explain why finding the middle node requires careful pointer updates to avoid breaking the rest of the list, for a memory allocator's free-block list.", "Explain how a Dummy/Sentinel node simplifies edge cases when performing checking if the list is a palindrome on a Linked List of size 100.", "Compare the memory overhead of a Linked List vs an Array for storing a social media 'infinite scroll' feed with 10,000 items.", "Compare the memory overhead of a Linked List vs an Array for storing a to-do list app with 50 items.", "Explain why traversing the list in a Doubly Linked List is easier than in a Singly Linked List, for a round-robin CPU scheduler (circular list).", "Explain the steps and complexity of deletion from the head on a Circular Linked List representing a to-do list app.", "For a music playlist with next/previous songs with 50 items, would you choose a Singly or Doubly Linked List? Justify.", "Explain the steps and complexity of finding the middle node on a Circular Linked List representing a train with attachable/detachable coaches.", "Explain why insertion at the head is O(1) for a Linked List but different for an Array, for a list of size 50.", "Explain why removing duplicates requires careful pointer updates to avoid breaking the rest of the list, for a card game's shuffled deck chain.", "Compare the memory overhead of a Linked List vs an Array for storing a memory allocator's free-block list with 1,000 items.", "Explain how you would split a Linked List of size 100 (context: a to-do list app) into two equal halves efficiently."], "hard": ["Explain how detecting a cycle would need to change if the Linked List for a browser tab history list were Circular instead of linear, at scale 10,000.", "Explain how to merge k sorted linked lists (context: a browser tab history list, size 1,000) efficiently, and analyse the time complexity.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 100, used for a music playlist with next/previous songs.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for an image viewer's next/previous photo feature.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a social media 'infinite scroll' feed with 10,000 nodes.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a memory allocator's free-block list with 1,000 nodes.", "Explain how to merge k sorted linked lists (context: a memory allocator's free-block list, size 50) efficiently, and analyse the time complexity.", "Explain how to reverse a Linked List of size 1,000 in groups of k nodes \u2014 describe the approach and complexity, in context of a round-robin CPU scheduler (circular list).", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 10,000, used for a browser tab history list.", "Design an approach to check whether a Linked List of size 100 is a palindrome, using O(1) extra space.", "Design an approach to check whether a Linked List of size 10,000 is a palindrome, using O(1) extra space.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a browser's forward/back history.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a to-do list app.", "Explain how to merge k sorted linked lists (context: a polynomial represented as a chain of terms, size 100) efficiently, and analyse the time complexity.", "Explain how checking if the list is a palindrome would need to change if the Linked List for a round-robin CPU scheduler (circular list) were Circular instead of linear, at scale n.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a video streaming app's 'up next' queue with 1,000 nodes.", "Explain how to merge k sorted linked lists (context: a to-do list app, size 50) efficiently, and analyse the time complexity.", "Explain the trade-offs of implementing an LRU cache (context: a to-do list app) using a Doubly Linked List plus a Hash Map, for 100 entries.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a train with attachable/detachable coaches.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a video streaming app's 'up next' queue.", "Explain how to merge k sorted linked lists (context: a to-do list app, size 10,000) efficiently, and analyse the time complexity.", "Explain the trade-offs of implementing an LRU cache (context: an image viewer's next/previous photo feature) using a Doubly Linked List plus a Hash Map, for 1,000 entries.", "Design an algorithm to detect and remove a cycle in a Linked List used for a video streaming app's 'up next' queue (size 100), in O(n) time and O(1) space.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a card game's shuffled deck chain with 100 nodes.", "Explain how to merge k sorted linked lists (context: a card game's shuffled deck chain, size 1,000) efficiently, and analyse the time complexity.", "Explain how to merge k sorted linked lists (context: a to-do list app, size 1,000) efficiently, and analyse the time complexity.", "Explain how to merge k sorted linked lists (context: a polynomial represented as a chain of terms, size 10^5) efficiently, and analyse the time complexity.", "Explain how detecting a cycle would need to change if the Linked List for a music playlist with next/previous songs were Circular instead of linear, at scale 1,000.", "Explain how swapping two nodes would need to change if the Linked List for a simple chat message queue were Circular instead of linear, at scale 50.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a simple chat message queue.", "Explain how to merge k sorted linked lists (context: a train with attachable/detachable coaches, size n) efficiently, and analyse the time complexity.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for a polynomial represented as a chain of terms.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for a browser tab history list.", "Design an algorithm to detect and remove a cycle in a Linked List used for a social media 'infinite scroll' feed (size 50), in O(n) time and O(1) space.", "Explain how to reverse a Linked List of size 50 in groups of k nodes \u2014 describe the approach and complexity, in context of a simple chat message queue.", "Design an algorithm to detect and remove a cycle in a Linked List used for an undo/redo stack in a text editor (size 10,000), in O(n) time and O(1) space.", "Design an algorithm to detect and remove a cycle in a Linked List used for a memory allocator's free-block list (size 100), in O(n) time and O(1) space.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for a music playlist with next/previous songs.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a browser's forward/back history with 100 nodes.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 50, used for an undo/redo stack in a text editor.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 1,000, used for a to-do list app.", "Explain how to merge k sorted linked lists (context: a train with attachable/detachable coaches, size 10^5) efficiently, and analyse the time complexity.", "Explain how to merge k sorted linked lists (context: a navigation app's route waypoints, size n) efficiently, and analyse the time complexity.", "Explain the trade-offs of implementing an LRU cache (context: a train with attachable/detachable coaches) using a Doubly Linked List plus a Hash Map, for 50 entries.", "Explain how to reverse a Linked List of size 10,000 in groups of k nodes \u2014 describe the approach and complexity, in context of a video streaming app's 'up next' queue.", "Explain the trade-offs of implementing an LRU cache (context: a social media 'infinite scroll' feed) using a Doubly Linked List plus a Hash Map, for 10^5 entries.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 100, used for a round-robin CPU scheduler (circular list).", "Explain how to merge k sorted linked lists (context: a video streaming app's 'up next' queue, size n) efficiently, and analyse the time complexity.", "Design an approach to check whether a Linked List of size 1,000 is a palindrome, using O(1) extra space.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a polynomial represented as a chain of terms with 10^5 nodes.", "Explain how to merge k sorted linked lists (context: a train with attachable/detachable coaches, size 1,000) efficiently, and analyse the time complexity.", "Design an algorithm to detect and remove a cycle in a Linked List used for an undo/redo stack in a text editor (size 10^5), in O(n) time and O(1) space.", "Explain how to reverse a Linked List of size 50 in groups of k nodes \u2014 describe the approach and complexity, in context of a browser's forward/back history.", "Design an algorithm to detect and remove a cycle in a Linked List used for a memory allocator's free-block list (size 10^5), in O(n) time and O(1) space.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 100, used for a navigation app's route waypoints.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 1,000, used for an undo/redo stack in a text editor.", "Explain how concatenating two lists would need to change if the Linked List for a browser tab history list were Circular instead of linear, at scale 100.", "Explain how to merge k sorted linked lists (context: a to-do list app, size n) efficiently, and analyse the time complexity.", "Explain how to reverse a Linked List of size 50 in groups of k nodes \u2014 describe the approach and complexity, in context of a polynomial represented as a chain of terms.", "Explain the trade-offs of implementing an LRU cache (context: a video streaming app's 'up next' queue) using a Doubly Linked List plus a Hash Map, for 100 entries.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size n, used for a simple chat message queue.", "Explain how to reverse a Linked List of size n in groups of k nodes \u2014 describe the approach and complexity, in context of a navigation app's route waypoints.", "Explain the trade-offs of implementing an LRU cache (context: a simple chat message queue) using a Doubly Linked List plus a Hash Map, for 1,000 entries.", "Explain how to merge k sorted linked lists (context: a simple chat message queue, size 1,000) efficiently, and analyse the time complexity.", "Design an algorithm to detect and remove a cycle in a Linked List used for a round-robin CPU scheduler (circular list) (size 100), in O(n) time and O(1) space.", "Design an algorithm to detect and remove a cycle in a Linked List used for a browser tab history list (size 10,000), in O(n) time and O(1) space.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for an undo/redo stack in a text editor.", "Design an algorithm to detect and remove a cycle in a Linked List used for a train with attachable/detachable coaches (size 100), in O(n) time and O(1) space.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a social media 'infinite scroll' feed.", "Explain the trade-offs of implementing an LRU cache (context: a video streaming app's 'up next' queue) using a Doubly Linked List plus a Hash Map, for 1,000 entries.", "Explain how reversing the list would need to change if the Linked List for a card game's shuffled deck chain were Circular instead of linear, at scale 10^5.", "Explain how to merge k sorted linked lists (context: an image viewer's next/previous photo feature, size n) efficiently, and analyse the time complexity.", "Explain how to merge k sorted linked lists (context: an undo/redo stack in a text editor, size 10,000) efficiently, and analyse the time complexity.", "Explain the trade-offs of implementing an LRU cache (context: a round-robin CPU scheduler (circular list)) using a Doubly Linked List plus a Hash Map, for n entries.", "Explain the trade-offs of implementing an LRU cache (context: a card game's shuffled deck chain) using a Doubly Linked List plus a Hash Map, for 100 entries.", "Explain how to merge k sorted linked lists (context: a browser tab history list, size 100) efficiently, and analyse the time complexity.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 10^5, used for a card game's shuffled deck chain.", "Explain how to merge k sorted linked lists (context: a train with attachable/detachable coaches, size 100) efficiently, and analyse the time complexity.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 10^5, used for a memory allocator's free-block list.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for a browser's forward/back history.", "Explain how detecting a cycle would need to change if the Linked List for a to-do list app were Circular instead of linear, at scale 10^5.", "Explain the trade-offs of implementing an LRU cache (context: a simple chat message queue) using a Doubly Linked List plus a Hash Map, for 50 entries.", "Explain how to merge k sorted linked lists (context: a card game's shuffled deck chain, size 10^5) efficiently, and analyse the time complexity.", "Explain how insertion at the head would need to change if the Linked List for a memory allocator's free-block list were Circular instead of linear, at scale 10,000.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 10,000, used for a card game's shuffled deck chain.", "Explain how to reverse a Linked List of size 50 in groups of k nodes \u2014 describe the approach and complexity, in context of a navigation app's route waypoints.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size 100, used for a memory allocator's free-block list.", "Design an O(n) algorithm to find the intersection point of two Linked Lists of combined size n, used for an image viewer's next/previous photo feature.", "Explain how to reverse a Linked List of size 10,000 in groups of k nodes \u2014 describe the approach and complexity, in context of a social media 'infinite scroll' feed.", "Design an algorithm to detect and remove a cycle in a Linked List used for a to-do list app (size 10^5), in O(n) time and O(1) space.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for an undo/redo stack in a text editor with 1,000 nodes.", "Explain how the slow/fast pointer technique generalises to solve multiple Linked List problems (cycle detection, middle node, nth from end) for a round-robin CPU scheduler (circular list).", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a video streaming app's 'up next' queue with 10^5 nodes.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a navigation app's route waypoints with 100 nodes.", "Explain how to merge k sorted linked lists (context: a music playlist with next/previous songs, size 100) efficiently, and analyse the time complexity.", "Design an approach to check whether a Linked List of size 10^5 is a palindrome, using O(1) extra space.", "Design a solution to clone a Linked List that has an extra 'random' pointer per node, in O(n) time, for a polynomial represented as a chain of terms.", "Explain how to reverse a Linked List of size 1,000 in groups of k nodes \u2014 describe the approach and complexity, in context of a navigation app's route waypoints.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a to-do list app with 10,000 nodes.", "Critically evaluate: 'A Doubly Linked List is always better than a Singly Linked List.' Discuss the memory trade-off for a navigation app's route waypoints with 1,000 nodes."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

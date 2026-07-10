@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Final Revision Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li>Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page revision">
+  <div class="pagenum">pg. 1</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">📕 Final Revision Notebook</h1>
+  <div class="subtitle">All 10 Chapters — Key Points Only</div>
+  <p style="font-family:'Patrick Hand'; font-size:16px;">Use this the night before your exam or interview — every chapter's core ideas in one place.</p>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">1</span> Chapter 1 — Introduction to Data Structures & Algorithms</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Data Structure</td><td>Organises data (the container)</td></tr>
+    <tr><td>Algorithm</td><td>Step-by-step procedure (the recipe)</td></tr>
+    <tr><td>ADT</td><td>What operations exist, not how they're built</td></tr>
+    <tr><td>Linear DS</td><td>Array, Stack, Queue, Linked List</td></tr>
+    <tr><td>Non-Linear DS</td><td>Tree, Graph, Heap</td></tr>
+    <tr><td>Big-O / Ω / Θ</td><td>Upper / Lower / Tight bound</td></tr>
+    <tr><td>Growth order</td><td>O(1)<O(log n)<O(n)<O(n log n)<O(n²)<O(2ⁿ)<O(n!)</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Right structure + right algorithm = efficient program.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">2</span> Chapter 2 — Arrays</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Array</td><td>Contiguous memory, indexed access</td></tr>
+    <tr><td>Access by index</td><td>O(1)</td></tr>
+    <tr><td>Search (unsorted)</td><td>O(n)</td></tr>
+    <tr><td>Insert/Delete at end</td><td>O(1) amortised</td></tr>
+    <tr><td>Insert/Delete at beginning/middle</td><td>O(n)</td></tr>
+    <tr><td>Two-Pointer / Sliding Window / Prefix Sum</td><td>Core array techniques, O(n)</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Index access = O(1), everything else usually O(n) unless you use a technique.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+  <h2 class="sec"><span class="num">3</span> Chapter 3 — Linked Lists</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Linked List</td><td>Nodes + pointers, scattered memory</td></tr>
+    <tr><td>Access by index</td><td>O(n)</td></tr>
+    <tr><td>Insert/Delete at head</td><td>O(1)</td></tr>
+    <tr><td>Slow/Fast Pointers</td><td>Middle node, cycle detection, nth from end</td></tr>
+    <tr><td>Floyd's Algorithm</td><td>Cycle detection O(n)/O(1)</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Need fast insert/delete at ends? → Linked List. Need fast random access? → Array.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+  <h2 class="sec"><span class="num">4</span> Chapter 4 — Stacks & Queues</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Stack</td><td>LIFO — push/pop/peek O(1)</td></tr>
+    <tr><td>Queue</td><td>FIFO — enqueue/dequeue O(1)</td></tr>
+    <tr><td>Circular Queue</td><td>Reuses freed slots</td></tr>
+    <tr><td>Deque</td><td>Insert/delete both ends</td></tr>
+    <tr><td>Balanced Parens → Stack</td><td>BFS → Queue</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Undo/recursion/expression → Stack. Scheduling/BFS/ordering → Queue.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">5</span> Chapter 5 — Recursion</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Recursion</td><td>Function calls itself on smaller input</td></tr>
+    <tr><td>Base Case</td><td>Mandatory stopping condition</td></tr>
+    <tr><td>Call Stack</td><td>Risk of Stack Overflow on deep recursion</td></tr>
+    <tr><td>Memoization</td><td>Cache to avoid recomputation</td></tr>
+    <tr><td>Backtracking</td><td>Recursion + undo failed choices</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Overlapping subproblems? → Memoize. Trying &amp; undoing choices? → Backtrack.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+  <h2 class="sec"><span class="num">6</span> Chapter 6 — Trees</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Tree</td><td>Hierarchical, one root, no cycles</td></tr>
+    <tr><td>BST</td><td>Left < Node < Right</td></tr>
+    <tr><td>Balanced BST</td><td>O(log n) ops</td></tr>
+    <tr><td>Skewed BST</td><td>Degrades to O(n)</td></tr>
+    <tr><td>In-order traversal</td><td>Sorted output from a BST</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Need sorted order? → In-order traversal. Need O(log n) guarantee? → self-balancing tree.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 8</div>
+  <h2 class="sec"><span class="num">7</span> Chapter 7 — Graphs</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Graph</td><td>Vertices + Edges</td></tr>
+    <tr><td>Adjacency List</td><td>O(V+E) space, sparse graphs</td></tr>
+    <tr><td>Adjacency Matrix</td><td>O(V²) space, dense graphs</td></tr>
+    <tr><td>BFS</td><td>Shortest path, unweighted</td></tr>
+    <tr><td>Dijkstra's</td><td>Shortest path, weighted, non-negative</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Unweighted shortest path → BFS. Weighted (non-neg) → Dijkstra. Negative weights → Bellman-Ford.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 9</div>
+  <h2 class="sec"><span class="num">8</span> Chapter 8 — Sorting Algorithms</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Merge Sort</td><td>O(n log n) always, O(n) space, stable</td></tr>
+    <tr><td>Quick Sort</td><td>O(n log n) avg, O(n²) worst</td></tr>
+    <tr><td>Heap Sort</td><td>O(n log n) always, O(1) space</td></tr>
+    <tr><td>Comparison-sort lower bound</td><td>Ω(n log n)</td></tr>
+    <tr><td>Counting/Radix Sort</td><td>Beats O(n log n) for bounded integers</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Guaranteed O(n log n)+stable → Merge Sort. Fast+low memory → Quick/Heap Sort. Bounded ints → Counting/Radix.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 10</div>
+  <h2 class="sec"><span class="num">9</span> Chapter 9 — Searching Algorithms</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Linear Search</td><td>O(n), any data</td></tr>
+    <tr><td>Binary Search</td><td>O(log n), needs sorted data</td></tr>
+    <tr><td>Search on Answer</td><td>Binary Search over a monotonic predicate</td></tr>
+    <tr><td>1M elements</td><td>Linear: 1M steps | Binary: ~20 steps</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Sorted data? → Binary Search. Unsorted+frequent lookups? → Hash Table.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 11</div>
+  <h2 class="sec"><span class="num">10</span> Chapter 10 — Hashing</h2>
+  <table>
+    <tr><th>Concept</th><th>Key Takeaway</th></tr>
+    <tr><td>Hash Table</td><td>Average O(1) insert/lookup/delete</td></tr>
+    <tr><td>Collision</td><td>Two keys, same index</td></tr>
+    <tr><td>Chaining vs Open Addressing</td><td>Two collision-resolution strategies</td></tr>
+    <tr><td>Load Factor</td><td>n / table_size, triggers rehashing</td></tr>
+    <tr><td>Two Sum pattern</td><td>O(n²) → O(n) with a Hash Map</td></tr>
+  </table>
+  <div class="box tip"><b>Golden Rule:</b> Need O(1) lookup/duplicate-check, don't care about order → Hash Table/Set.</div>
+
+</div>
+
+<script id="chdata" type="application/json">{"interview":{"coding":[]},"practice":{"easy":[],"medium":[],"hard":[]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+  function renderList(id, items){ const el = document.getElementById(id); if(el){ el.innerHTML = items.map(q => `<li>${q}</li>`).join(''); } }
+  function toggleQ(level){ const wrap = document.getElementById('wrap-' + level); if(wrap) wrap.classList.toggle('open'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Notes — Chapter 8: Sorting Algorithms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Architects+Daughter&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f2;
+    --paper2:#f7f4ea;
+    --rule:#c9d8ee;
+    --margin:#e79b9b;
+    --ink:#1a3d8f;
+    --ink2:#12296b;
+    --pencil:#3a3a3a;
+    --red:#c0392b;
+    --green:#1e7d32;
+    --hi-yellow:#fff59d;
+    --hi-green:#c8f7c5;
+    --hi-pink:#ffd6e8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9dee6;
+    font-family:'Kalam', cursive;
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 10px 80px;
+  }
+  .toc{
+    width:100%;
+    max-width:900px;
+    background:var(--paper);
+    border:2px solid #2b2b2b22;
+    border-radius:6px;
+    padding:18px 26px;
+    margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+  }
+  .toc h2{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    margin:0 0 8px;
+    color:var(--ink2);
+    border-bottom:3px solid var(--ink);
+    display:inline-block;
+    padding-bottom:2px;
+  }
+  .toc ol{margin:8px 0 0 22px;padding:0;font-size:19px;line-height:1.9;}
+  .toc li.current{color:var(--red);font-weight:700;}
+  .toc .note{font-family:'Patrick Hand',cursive;font-size:15px;color:#555;margin-top:10px;}
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:900px;
+    background:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 34px, var(--rule) 35px),
+      linear-gradient(90deg, transparent 0 64px, var(--margin) 64px 66px, transparent 66px);
+    background-size:100% 35px, 100% 100%;
+    padding:40px 34px 40px 84px;
+    margin-bottom:26px;
+    border-radius:3px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.4) inset;
+    font-size:19px;
+    line-height:35px;
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background:repeating-linear-gradient(#fff 0 18px, transparent 18px 36px);
+    opacity:.5;
+  }
+  .page.torn::after{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:10px;
+    background:repeating-linear-gradient(100deg,#d9dee6 0 8px, transparent 8px 16px);
+  }
+  .pagenum{
+    position:absolute; bottom:10px; right:26px;
+    font-family:'Patrick Hand',cursive; font-size:15px; color:#888;
+  }
+
+  h1.chtitle{
+    font-family:'Caveat',cursive;
+    font-size:56px;
+    color:var(--ink2);
+    margin:0 0 4px;
+    line-height:1.1;
+    text-shadow:1px 1px 0 rgba(0,0,0,.05);
+  }
+  .subtitle{
+    font-family:'Patrick Hand',cursive;
+    font-size:20px;
+    color:var(--red);
+    margin-bottom:18px;
+    display:inline-block;
+    border-bottom:2px dashed var(--red);
+  }
+  h2.sec{
+    font-family:'Caveat',cursive;
+    font-size:34px;
+    color:var(--ink2);
+    margin:26px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.sec .num{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+    border-radius:50%;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+  }
+  h3.subsec{
+    font-family:'Architects Daughter', cursive;
+    font-size:22px;
+    color:var(--ink2);
+    margin:16px 0 4px;
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+  }
+  p, li{font-size:18.5px; line-height:33px;}
+  .mark{background:linear-gradient(120deg, var(--hi-yellow) 0%, var(--hi-yellow) 100%); padding:1px 5px; border-radius:3px;}
+  .mark-g{background:var(--hi-green); padding:1px 5px; border-radius:3px;}
+  .mark-p{background:var(--hi-pink); padding:1px 5px; border-radius:3px;}
+  .red{color:var(--red); font-weight:700;}
+  .green{color:var(--green); font-weight:700;}
+
+  .box{
+    border:2.5px solid var(--ink);
+    border-radius:10px 3px 10px 3px;
+    padding:14px 18px;
+    margin:14px 0;
+    background:rgba(255,255,255,.35);
+    position:relative;
+    transform:rotate(-.3deg);
+  }
+  .box.def::before{
+    content:"DEFINITION";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:2px;
+  }
+  .box.formula::before{
+    content:"FORMULA";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+    letter-spacing:2px;
+  }
+  .box.tip{border-color:var(--green); background:rgba(200,247,197,.25);}
+  .box.tip::before{
+    content:"✎ TIP";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--green);
+  }
+  .box.mistake{border-color:var(--red); background:rgba(255,214,232,.2);}
+  .box.mistake::before{
+    content:"✗ COMMON MISTAKE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:var(--red);
+  }
+  .box.example::before{
+    content:"EXAMPLE";
+    position:absolute; top:-13px; left:14px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:'Patrick Hand',cursive;
+    font-size:13px;
+    color:#8e5b00;
+  }
+  .box.example{border-color:#c98a00;background:rgba(255,244,214,.3);}
+
+  ul.checklist{list-style:none; padding-left:4px;}
+  ul.checklist li{position:relative; padding-left:30px; margin-bottom:2px;}
+  ul.checklist li::before{
+    content:"✓";
+    position:absolute; left:0; top:0;
+    color:var(--green); font-weight:700; font-size:20px;
+    font-family:'Patrick Hand',cursive;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    margin:14px 0;
+    font-family:'Patrick Hand',cursive;
+    font-size:16px;
+  }
+  table th, table td{
+    border:2px solid var(--ink);
+    padding:8px 10px;
+    text-align:left;
+  }
+  table th{background:#dbe6ff; color:var(--ink2);}
+  table tr:nth-child(even) td{background:rgba(255,255,255,.4);}
+
+  .codebox{
+    background:#0f1b33;
+    color:#a9d6ff;
+    font-family:'Courier New', monospace;
+    font-size:14.5px;
+    border-radius:8px;
+    padding:16px 18px;
+    line-height:1.6;
+    margin:14px 0;
+    white-space:pre;
+    overflow-x:auto;
+    box-shadow:inset 0 0 0 2px #2a3a5c;
+  }
+  .codebox .cm{color:#7fd88f;}
+  .codebox .kw{color:#ff9d76;}
+  .codebox .st{color:#ffe08a;}
+
+  .diagram{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin:16px 0; font-family:'Patrick Hand',cursive; font-size:15px;
+  }
+  .cell{
+    border:2.5px solid var(--ink); min-width:44px; padding:8px 10px; text-align:center;
+    background:rgba(255,255,255,.5); border-radius:4px;
+  }
+  .idx{font-size:12px; color:#777; text-align:center; margin-top:2px;}
+  .arrow{font-size:22px;}
+  .node{
+    border:2.5px solid var(--ink2); border-radius:50%; width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .stackbox{display:flex; flex-direction:column-reverse; width:90px; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden;}
+  .stackbox div{padding:8px; text-align:center; border-top:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .stackbox div:first-child{border-top:none;}
+  .queuebox{display:flex; border:2.5px solid var(--ink); border-radius:4px; overflow:hidden; width:fit-content;}
+  .queuebox div{padding:8px 14px; border-left:2px dashed var(--ink); background:rgba(255,255,255,.5);}
+  .queuebox div:first-child{border-left:none;}
+
+  .revision{
+    background:#fffde7;
+    background-image: radial-gradient(circle, #eadfa0 1px, transparent 1px);
+    background-size: 14px 14px;
+    border:3px solid var(--ink2);
+    box-shadow:0 8px 24px rgba(0,0,0,.25), 6px 6px 0 #f6c945;
+  }
+  .revision h1.chtitle{font-size:44px;}
+  .pin{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a80, #c0392b);
+    box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+
+  .qlist{list-style:none; padding-left:0; counter-reset:q;}
+  .qlist li{
+    counter-increment:q;
+    padding:6px 0 6px 40px;
+    position:relative;
+    font-size:17.5px;
+    line-height:1.5;
+    border-bottom:1px dashed #c9c2a8;
+  }
+  .qlist li::before{
+    content: counter(q) ".";
+    position:absolute; left:0; top:6px;
+    font-family:'Patrick Hand',cursive;
+    color:var(--ink2); font-weight:700; font-size:16px;
+  }
+  .qsection-title{
+    font-family:'Architects Daughter',cursive;
+    font-size:22px; color:#fff; background:var(--ink2);
+    display:inline-block; padding:4px 16px; border-radius:14px; margin:18px 0 8px;
+  }
+  .qsection-title.easy{background:var(--green);}
+  .qsection-title.medium{background:#c98a00;}
+  .qsection-title.hard{background:var(--red);}
+
+  .loading{font-family:'Patrick Hand',cursive; color:#888; padding:12px; text-align:center;}
+  .toggle-btn{
+    font-family:'Patrick Hand',cursive; font-size:16px; background:var(--ink); color:#fff;
+    border:none; border-radius:6px; padding:8px 16px; cursor:pointer; margin:8px 0;
+  }
+  .toggle-btn:hover{background:var(--ink2);}
+  .qwrap{display:none;}
+  .qwrap.open{display:block;}
+
+  .footer-signature{
+    font-family:'Shadows Into Light', cursive;
+    font-size:16px; color:#888; text-align:right; margin-top:10px;
+  }
+  .growth-chart{width:100%; height:170px;}
+  @media (max-width:600px){
+    .page{padding:32px 16px 32px 56px;}
+    h1.chtitle{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="toc">
+  <h2>📘 DSA Handwritten Notes — Notebook Index</h2>
+  <ol>
+    <li>Chapter 1 — Introduction to Data Structures & Algorithms</li>
+    <li>Chapter 2 — Arrays</li>
+    <li>Chapter 3 — Linked Lists</li>
+    <li>Chapter 4 — Stacks & Queues</li>
+    <li>Chapter 5 — Recursion</li>
+    <li>Chapter 6 — Trees</li>
+    <li>Chapter 7 — Graphs</li>
+    <li class="current">Chapter 8 — Sorting Algorithms</li>
+    <li>Chapter 9 — Searching Algorithms</li>
+    <li>Chapter 10 — Hashing</li>
+  </ol>
+  <div class="note">📝 Complete 10-chapter notebook — each chapter has 600 practice Qs + 30 coding interview Qs.</div>
+</div>
+<div class="page torn">
+  <div class="pagenum">pg. 1</div>
+  <h1 class="chtitle">Chapter 8</h1>
+  <div class="subtitle">Sorting Algorithms</div>
+
+  <h2 class="sec"><span class="num">1</span> Learning Objectives</h2>
+  <ul class="checklist">
+    <li>Understand and implement <span class="mark">Bubble, Selection, Insertion, Merge, Quick, and Heap Sort</span>.</li>
+    <li>Analyse best/average/worst case time complexity for each algorithm.</li>
+    <li>Differentiate <span class="mark-g">Stable vs Unstable</span> and <span class="mark-g">In-place vs Not</span> sorts.</li>
+    <li>Understand non-comparison sorts: Counting, Radix, Bucket Sort.</li>
+    <li>Choose the right sorting algorithm for a given real-world scenario.</li>
+    <li>Implement sorting algorithms in Python from scratch.</li>
+  </ul>
+
+  <h2 class="sec"><span class="num">2</span> Definitions</h2>
+  <div class="box def"><b>Stable Sort</b> — a sort where elements with equal keys retain their original relative order after sorting.</div>
+  <div class="box def"><b>In-place Sort</b> — a sort that requires only O(1) (constant) extra memory, rearranging elements within the original array.</div>
+  <div class="box def"><b>Divide and Conquer</b> — an algorithmic strategy that breaks a problem into smaller subproblems, solves them recursively, and combines the results — used by Merge Sort and Quick Sort.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 2</div>
+  <h2 class="sec"><span class="num">3</span> Concepts — Complexity Table &amp; Merge Sort</h2>
+
+  <h3 class="subsec">Sorting Algorithm Family Tree</h3>
+  <table>
+    <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th></tr>
+    <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+    <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>No</td></tr>
+    <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+    <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>Yes</td></tr>
+    <tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>No</td></tr>
+    <tr><td>Heap Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>No</td></tr>
+    <tr><td>Counting Sort</td><td>O(n+k)</td><td>O(n+k)</td><td>O(n+k)</td><td>O(k)</td><td>Yes</td></tr>
+  </table>
+
+  <h3 class="subsec">Merge Sort — Divide &amp; Conquer</h3>
+  <div class="diagram">
+    <div class="cell">8 3 5 1</div><span class="arrow">→</span>
+    <div class="cell">8 3</div><div class="cell">5 1</div><span class="arrow">→</span>
+    <div class="cell">3 8</div><div class="cell">1 5</div><span class="arrow">→</span>
+    <div class="cell">1 3 5 8</div>
+  </div>
+  <p>Split → Sort halves recursively → <span class="mark">Merge</span> sorted halves. Always O(n log n).</p>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 3</div>
+  <h2 class="sec"><span class="num">5</span> Real-Life Examples &amp; Key Points</h2>
+
+  <div class="box example"><b>Exam Rankings:</b> sorting scores to determine class rank — stability matters if ties should keep submission order.</div>
+  <div class="box example"><b>E-commerce:</b> sorting products by price, rating, or relevance — often uses Timsort (Python's built-in, a Merge+Insertion hybrid).</div>
+  <div class="box example"><b>Nearly-Sorted Logs:</b> new log entries appended to an already-sorted list — Insertion Sort shines here (adaptive).</div>
+  <div class="box example"><b>Huge Datasets:</b> sorting data too large for memory — External Merge Sort processes it in chunks.</div>
+
+  <h2 class="sec"><span class="num">6</span> Important Points</h2>
+  <ul class="checklist">
+    <li>No comparison-based sort can beat <b>O(n log n)</b> in the worst case — this is a proven lower bound.</li>
+    <li><b>Merge Sort</b> guarantees O(n log n) always, but needs O(n) extra space. <b>Quick Sort</b> is usually faster in practice but risks O(n²).</li>
+    <li><b>Non-comparison sorts</b> (Counting, Radix) can beat O(n log n) — but only work for specific data types (e.g. integers in a known range).</li>
+    <li>Python's built-in <code>sort()</code> uses <b>Timsort</b> — a hybrid of Merge Sort and Insertion Sort, O(n log n) worst case, O(n) best case.</li>
+  </ul>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 4</div>
+
+  <h2 class="sec"><span class="num">8</span> Python Code Examples</h2>
+  <h3 class="subsec">Bubble Sort</h3>
+  <div class="codebox"><span class="kw">def</span> bubble_sort(arr):
+    n = len(arr)
+    <span class="kw">for</span> i <span class="kw">in</span> range(n):
+        <span class="kw">for</span> j <span class="kw">in</span> range(0, n-i-1):
+            <span class="kw">if</span> arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    <span class="kw">return</span> arr</div>
+
+  <h3 class="subsec">Merge Sort</h3>
+  <div class="codebox"><span class="kw">def</span> merge_sort(arr):
+    <span class="kw">if</span> len(arr) <= 1: <span class="kw">return</span> arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    <span class="kw">return</span> merge(left, right)
+
+<span class="kw">def</span> merge(left, right):
+    result, i, j = [], 0, 0
+    <span class="kw">while</span> i < len(left) <span class="kw">and</span> j < len(right):
+        <span class="kw">if</span> left[i] <= right[j]:
+            result.append(left[i]); i += 1
+        <span class="kw">else</span>:
+            result.append(right[j]); j += 1
+    <span class="kw">return</span> result + left[i:] + right[j:]</div>
+
+  <h3 class="subsec">Quick Sort</h3>
+  <div class="codebox"><span class="kw">def</span> quick_sort(arr):
+    <span class="kw">if</span> len(arr) <= 1: <span class="kw">return</span> arr
+    pivot = arr[len(arr)//2]
+    left = [x <span class="kw">for</span> x <span class="kw">in</span> arr <span class="kw">if</span> x < pivot]
+    mid = [x <span class="kw">for</span> x <span class="kw">in</span> arr <span class="kw">if</span> x == pivot]
+    right = [x <span class="kw">for</span> x <span class="kw">in</span> arr <span class="kw">if</span> x > pivot]
+    <span class="kw">return</span> quick_sort(left) + mid + quick_sort(right)</div>
+
+  <h2 class="sec"><span class="num">9</span> Tips &amp; Tricks</h2>
+  <div class="box tip">"Guaranteed O(n log n), space isn't a concern" → <b>Merge Sort</b>. "Fast in practice, space-constrained" → <b>Quick Sort / Heap Sort</b>.</div>
+  <div class="box tip">"Nearly sorted / small input" → <b>Insertion Sort</b> (adaptive, beats O(n log n) sorts for tiny/nearly-sorted data).</div>
+  <div class="box tip">"Integers in a small known range" → <b>Counting Sort</b> can be O(n), beating comparison-sort limits.</div>
+
+  <h2 class="sec"><span class="num">10</span> Common Mistakes</h2>
+  <div class="box mistake">Assuming Quick Sort is always O(n log n) — worst case (already-sorted input + bad pivot choice) is O(n²).</div>
+  <div class="box mistake">Forgetting that Selection Sort and Quick Sort are typically <b>unstable</b> — equal elements may get reordered.</div>
+  <div class="box mistake">Using Counting/Radix Sort on non-integer or unbounded-range data — they don't generalise like comparison sorts.</div>
+
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 5</div>
+  <h2 class="sec"><span class="num">12</span> Interview Questions — Coding (30)</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">Ordered <b>Basic → Advance</b> — practice writing these out by hand before checking your code.</p>
+  <ol class="qlist">
+    <li>Implement Bubble Sort and state its time complexity.</li>
+    <li>Implement Selection Sort and state its time complexity.</li>
+    <li>Implement Insertion Sort and state its time complexity.</li>
+    <li>Implement Merge Sort and state its time and space complexity.</li>
+    <li>Implement Quick Sort and explain its worst-case scenario.</li>
+    <li>Implement Heap Sort using a Max-Heap.</li>
+    <li>Implement Counting Sort for an array of non-negative integers.</li>
+    <li>Implement Radix Sort for an array of non-negative integers.</li>
+    <li>Write a function to check if an array is sorted.</li>
+    <li>Write a function to find the kth smallest element using a sorting-based approach, then optimise using Quickselect.</li>
+    <li>Write a function to sort an array of 0s, 1s, and 2s in a single pass (Dutch National Flag problem).</li>
+    <li>Write a function to merge two sorted arrays into one sorted array without extra space (in-place merge).</li>
+    <li>Write a function to sort an array of strings by length, then alphabetically for ties (custom comparator).</li>
+    <li>Write a function to find the number of inversions in an array using Merge Sort.</li>
+    <li>Write a function to sort a nearly-sorted array (each element misplaced by at most k positions) efficiently.</li>
+    <li>Write a function to implement Bucket Sort for floating-point numbers in the range [0, 1).</li>
+    <li>Write a function to sort an array of intervals by start time, then merge overlapping intervals.</li>
+    <li>Write a function to find the median of two sorted arrays using a merge-based approach.</li>
+    <li>Write a function to sort a linked list using Merge Sort.</li>
+    <li>Write a function to implement a randomized Quick Sort (random pivot selection).</li>
+    <li>Write a function to sort an array using Shell Sort.</li>
+    <li>Write a function to find the top k largest elements using a Min-Heap based approach.</li>
+    <li>Write a function to check if two arrays are equal when both are sorted, without modifying the original arrays.</li>
+    <li>Write a function to sort an array such that all negative numbers appear before positive numbers (stable, in-place if possible).</li>
+    <li>Write a function to implement Timsort's core idea: use Insertion Sort for small runs, then Merge Sort them.</li>
+    <li>Write a function to sort a large file of numbers that doesn't fit into memory (conceptual External Merge Sort).</li>
+    <li>Write a function to sort an array of objects by multiple keys (e.g. sort students by grade, then by name).</li>
+    <li>Write a function to find the smallest missing positive integer in an unsorted array (in O(n) using sorting-style in-place swaps).</li>
+    <li>Write a function to sort a 'nearly sorted' k-sorted array using a Min-Heap in O(n log k).</li>
+    <li>Write a function that determines the minimum number of swaps needed to sort an array.</li>
+  </ol>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 6</div>
+  <h2 class="sec"><span class="num">13</span> Practice Questions</h2>
+  <p style="font-family:'Patrick Hand'; font-size:15px; color:#666;">200 Easy + 300 Medium + 100 Hard = <b>600 questions</b> for this chapter. Click each level to expand.</p>
+
+  <div class="qsection-title easy">🟢 EASY — 200 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('easy')">Show / Hide Easy Questions</button>
+  <div class="qwrap" id="wrap-easy"><ol class="qlist" id="list-easy"></ol></div>
+
+  <div class="qsection-title medium">🟠 MEDIUM — 300 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('medium')">Show / Hide Medium Questions</button>
+  <div class="qwrap" id="wrap-medium"><ol class="qlist" id="list-medium"></ol></div>
+
+  <div class="qsection-title hard">🔴 HARD — 100 Questions</div><br>
+  <button class="toggle-btn" onclick="toggleQ('hard')">Show / Hide Hard Questions</button>
+  <div class="qwrap" id="wrap-hard"><ol class="qlist" id="list-hard"></ol></div>
+</div>
+
+<div class="page">
+  <div class="pagenum">pg. 7</div>
+
+  <h2 class="sec"><span class="num">14</span> Chapter Summary</h2>
+  <div class="box">
+    Comparison-based sorts (<b>Bubble, Selection, Insertion</b>) are simple but O(n²). <b>Merge Sort</b> guarantees O(n log n) with O(n) space; <b>Quick Sort</b> is fast in practice (O(n log n) average) but risks O(n²) worst case; <b>Heap Sort</b> guarantees O(n log n) with O(1) space. <b>Counting/Radix Sort</b> beat the O(n log n) comparison-sort lower bound for specific data types.
+  </div>
+  <h2 class="sec"><span class="num">15</span> Key Formulae</h2>
+  <div class="box formula">Comparison-sort lower bound: Ω(n log n) &nbsp;|&nbsp; Counting Sort: O(n + k)</div>
+
+</div>
+
+<div class="page revision">
+  <div class="pagenum">quick revision</div>
+  <div class="pin"></div>
+  <h1 class="chtitle" style="font-size:40px;">⚡ Chapter 8 — Quick Revision Sheet</h1>
+  <table>
+    <tr><th>Concept</th><th>One-line takeaway</th></tr>
+    <tr><td>Bubble/Selection/Insertion Sort</td><td>O(n²) worst case, O(1) space</td></tr>
+    <tr><td>Merge Sort</td><td>O(n log n) always, O(n) space, stable</td></tr>
+    <tr><td>Quick Sort</td><td>O(n log n) avg, O(n²) worst, O(log n) space, unstable</td></tr>
+    <tr><td>Heap Sort</td><td>O(n log n) always, O(1) space, unstable</td></tr>
+    <tr><td>Counting Sort</td><td>O(n+k), stable, needs bounded integer range</td></tr>
+    <tr><td>Radix Sort</td><td>O(d·(n+k)), works digit by digit</td></tr>
+    <tr><td>Comparison-sort lower bound</td><td>Ω(n log n)</td></tr>
+    <tr><td>Stable sort</td><td>Equal keys keep original relative order</td></tr>
+    <tr><td>In-place sort</td><td>O(1) extra space</td></tr>
+    <tr><td>Python's sort()</td><td>Timsort — hybrid Merge + Insertion Sort</td></tr>
+  </table>
+  <div class="box formula">Comparison-sort lower bound: Ω(n log n)</div>
+  <div class="box tip">Golden rule: <b>Need guaranteed O(n log n) + stability → Merge Sort. Need speed + low memory → Quick/Heap Sort. Bounded integers → Counting/Radix Sort.</b></div>
+</div>
+
+<script id="chdata" type="application/json">{"interview": {"coding": ["Implement Bubble Sort and state its time complexity.", "Implement Selection Sort and state its time complexity.", "Implement Insertion Sort and state its time complexity.", "Implement Merge Sort and state its time and space complexity.", "Implement Quick Sort and explain its worst-case scenario.", "Implement Heap Sort using a Max-Heap.", "Implement Counting Sort for an array of non-negative integers.", "Implement Radix Sort for an array of non-negative integers.", "Write a function to check if an array is sorted.", "Write a function to find the kth smallest element using a sorting-based approach, then optimise using Quickselect.", "Write a function to sort an array of 0s, 1s, and 2s in a single pass (Dutch National Flag problem).", "Write a function to merge two sorted arrays into one sorted array without extra space (in-place merge).", "Write a function to sort an array of strings by length, then alphabetically for ties (custom comparator).", "Write a function to find the number of inversions in an array using Merge Sort.", "Write a function to sort a nearly-sorted array (each element misplaced by at most k positions) efficiently.", "Write a function to implement Bucket Sort for floating-point numbers in the range [0, 1).", "Write a function to sort an array of intervals by start time, then merge overlapping intervals.", "Write a function to find the median of two sorted arrays using a merge-based approach.", "Write a function to sort a linked list using Merge Sort.", "Write a function to implement a randomized Quick Sort (random pivot selection).", "Write a function to sort an array using Shell Sort.", "Write a function to find the top k largest elements using a Min-Heap based approach.", "Write a function to check if two arrays are equal when both are sorted, without modifying the original arrays.", "Write a function to sort an array such that all negative numbers appear before positive numbers (stable, in-place if possible).", "Write a function to implement Timsort's core idea: use Insertion Sort for small runs, then Merge Sort them.", "Write a function to sort a large file of numbers that doesn't fit into memory (conceptual External Merge Sort).", "Write a function to sort an array of objects by multiple keys (e.g. sort students by grade, then by name).", "Write a function to find the smallest missing positive integer in an unsorted array (in O(n) using sorting-style in-place swaps).", "Write a function to sort a 'nearly sorted' k-sorted array using a Min-Heap in O(n log k).", "Write a function that determines the minimum number of swaps needed to sort an array."]}, "practice": {"easy": ["What is the space complexity of Heap Sort?", "What is the worst-case time complexity of Insertion Sort?", "Define the term 'Best Case' in your own words.", "For sorting a leaderboard of game scores, name one sorting algorithm you could use.", "Which sorting algorithm would be fastest for sorting employee records by salary if the data is already nearly sorted?", "Which sorting algorithm would be fastest for sorting a leaderboard of game scores if the data is already nearly sorted?", "What is the best-case time complexity of Bubble Sort?", "For an already-sorted array of size 10, what is the best-case time complexity of Merge Sort?", "Would you use Bubble Sort for sorting a list of names alphabetically if stability (preserving order of equal elements) matters? Why or why not?", "If sorting a list of names alphabetically needs data sorted with minimal extra memory, would Shell Sort be a good fit?", "Between Insertion Sort and Bubble Sort, which would you expect to be faster for sorting product prices on an e-commerce site of size 10,000?", "What is meant by a 'stable' sort?", "For sorting product prices on an e-commerce site, name one sorting algorithm you could use.", "For an already-sorted array of size 10^6, what is the best-case time complexity of Selection Sort?", "What is meant by an 'in-place' sort?", "Between Insertion Sort and Bubble Sort, which would you expect to be faster for sorting a huge dataset that doesn't fit in memory of size 1,000?", "Define the term 'In-place Sort' in your own words.", "Why is Bubble Sort rarely used in production code despite being easy to understand?", "Is Counting Sort a stable sorting algorithm?", "What is the worst-case time complexity of Shell Sort?", "What is the worst-case time complexity of Selection Sort?", "For an already-sorted array of size 10,000, what is the best-case time complexity of Radix Sort?", "Define the term 'External Sort' in your own words.", "What is the best-case time complexity of Quick Sort?", "What is the time complexity difference between Merge Sort's best and worst case?", "Is Insertion Sort an in-place sorting algorithm (O(1) extra space)?", "What is the worst-case time complexity of Merge Sort?", "Is Radix Sort a stable sorting algorithm?", "State True or False: Bubble Sort has a worst-case time complexity of O(n\u00b2).", "For an already-sorted array of size 10,000, what is the best-case time complexity of Shell Sort?", "For an already-sorted array of size 10^6, what is the best-case time complexity of Counting Sort?", "Fill in the blank: Shell Sort has an average-case time complexity of ______.", "What is the space complexity of Quick Sort?", "What is the best-case time complexity of Merge Sort?", "Fill in the blank: Merge Sort has an average-case time complexity of ______.", "For an already-sorted array of size 10,000, what is the best-case time complexity of Heap Sort?", "Between Merge Sort and Bubble Sort, which would you expect to be faster for sorting a list of names alphabetically of size 10,000?", "What is the best-case time complexity of Shell Sort?", "Which sorting algorithm would be fastest for sorting a huge dataset that doesn't fit in memory if the data is already nearly sorted?", "What is the space complexity of Merge Sort?", "What is the space complexity of Shell Sort?", "What is the best-case time complexity of Selection Sort?", "Between Bubble Sort and Bubble Sort, which would you expect to be faster for sorting product prices on an e-commerce site of size n?", "Fill in the blank: Heap Sort has an average-case time complexity of ______.", "What is the worst-case time complexity of Quick Sort?", "State True or False: Quick Sort's worst-case time complexity is O(n\u00b2), occurring with a poor pivot choice.", "Would you use Heap Sort for sorting a deck of playing cards if stability (preserving order of equal elements) matters? Why or why not?", "If sorting a list of names alphabetically needs data sorted with minimal extra memory, would Bubble Sort be a good fit?", "Fill in the blank: Counting Sort has an average-case time complexity of ______.", "What is the time complexity difference between Heap Sort's best and worst case?", "What is the time complexity difference between Insertion Sort's best and worst case?", "Would you use Bucket Sort for sorting a deck of playing cards if stability (preserving order of equal elements) matters? Why or why not?", "Is Bubble Sort a stable sorting algorithm?", "Is Merge Sort an in-place sorting algorithm (O(1) extra space)?", "Is Heap Sort a stable sorting algorithm?", "Fill in the blank: Insertion Sort has an average-case time complexity of ______.", "What is the time complexity difference between Radix Sort's best and worst case?", "Is Bucket Sort a stable sorting algorithm?", "For sorting a huge dataset that doesn't fit in memory, name one sorting algorithm you could use.", "Fill in the blank: Quick Sort has an average-case time complexity of ______.", "For an already-sorted array of size 1,000, what is the best-case time complexity of Bucket Sort?", "Between Bucket Sort and Bubble Sort, which would you expect to be faster for sorting product prices on an e-commerce site of size n?", "Between Bubble Sort and Bubble Sort, which would you expect to be faster for sorting a deck of playing cards of size 1,000?", "Define the term 'Divide and Conquer' in your own words.", "What is the space complexity of Bubble Sort?", "Fill in the blank: Bucket Sort has an average-case time complexity of ______.", "For sorting log entries by timestamp, name one sorting algorithm you could use.", "Would you use Merge Sort for sorting log entries by timestamp if stability (preserving order of equal elements) matters? Why or why not?", "If sorting a nearly-sorted list after a small update needs data sorted with minimal extra memory, would Heap Sort be a good fit?", "Between Shell Sort and Bubble Sort, which would you expect to be faster for sorting exam scores of students of size 1,000?", "For sorting exam scores of students, name one sorting algorithm you could use.", "Is Selection Sort an in-place sorting algorithm (O(1) extra space)?", "Would you use Bubble Sort for sorting log entries by timestamp if stability (preserving order of equal elements) matters? Why or why not?", "State True or False: Heap Sort has O(n log n) time complexity in all cases (best, average, worst).", "Is Radix Sort an in-place sorting algorithm (O(1) extra space)?", "If sorting log entries by timestamp needs data sorted with minimal extra memory, would Shell Sort be a good fit?", "Is Heap Sort an in-place sorting algorithm (O(1) extra space)?", "What is the best-case time complexity of Radix Sort?", "Which sorting algorithm would be fastest for sorting log entries by timestamp if the data is already nearly sorted?", "Fill in the blank: Selection Sort has an average-case time complexity of ______.", "What is the best-case time complexity of Insertion Sort?", "For an already-sorted array of size n, what is the best-case time complexity of Heap Sort?", "What is the time complexity difference between Shell Sort's best and worst case?", "What is the time complexity difference between Counting Sort's best and worst case?", "Define the term 'Worst Case' in your own words.", "For an already-sorted array of size n, what is the best-case time complexity of Counting Sort?", "Between Insertion Sort and Bubble Sort, which would you expect to be faster for sorting a leaderboard of game scores of size 10^6?", "If sorting a deck of playing cards needs data sorted with minimal extra memory, would Merge Sort be a good fit?", "Is Bucket Sort an in-place sorting algorithm (O(1) extra space)?", "Is Merge Sort a stable sorting algorithm?", "What is the time complexity difference between Quick Sort's best and worst case?", "What is the worst-case time complexity of Bucket Sort?", "State True or False: Counting Sort is a comparison-based sorting algorithm.", "Between Bubble Sort and Bubble Sort, which would you expect to be faster for sorting log entries by timestamp of size n?", "For an already-sorted array of size 10,000, what is the best-case time complexity of Bubble Sort?", "Is Quick Sort a stable sorting algorithm?", "For an already-sorted array of size n, what is the best-case time complexity of Bucket Sort?", "For an already-sorted array of size 10^6, what is the best-case time complexity of Merge Sort?", "Would you use Bubble Sort for sorting search results by relevance if stability (preserving order of equal elements) matters? Why or why not?", "What is the best-case time complexity of Counting Sort?", "Would you use Counting Sort for sorting a nearly-sorted list after a small update if stability (preserving order of equal elements) matters? Why or why not?", "For sorting delivery routes by distance, name one sorting algorithm you could use.", "Which sorting algorithm would be fastest for sorting search results by relevance if the data is already nearly sorted?", "For an already-sorted array of size n, what is the best-case time complexity of Merge Sort?", "Fill in the blank: Bubble Sort has an average-case time complexity of ______.", "Which sorting algorithm would be fastest for sorting a nearly-sorted list after a small update if the data is already nearly sorted?", "What is the best-case time complexity of Heap Sort?", "If sorting employee records by salary needs data sorted with minimal extra memory, would Heap Sort be a good fit?", "Would you use Counting Sort for sorting product prices on an e-commerce site if stability (preserving order of equal elements) matters? Why or why not?", "Which sorting algorithm would be fastest for sorting exam scores of students if the data is already nearly sorted?", "State True or False: Merge Sort is a stable sorting algorithm.", "If sorting a huge dataset that doesn't fit in memory needs data sorted with minimal extra memory, would Radix Sort be a good fit?", "Which sorting algorithm would be fastest for sorting delivery routes by distance if the data is already nearly sorted?", "Between Selection Sort and Bubble Sort, which would you expect to be faster for sorting product prices on an e-commerce site of size 10^6?", "For an already-sorted array of size 100, what is the best-case time complexity of Selection Sort?", "Between Quick Sort and Bubble Sort, which would you expect to be faster for sorting a deck of playing cards of size 1,000?", "What is the space complexity of Selection Sort?", "State True or False: Radix Sort's time complexity depends on the number of digits, not just n.", "For sorting a list of names alphabetically, name one sorting algorithm you could use.", "Is Shell Sort a stable sorting algorithm?", "Is Counting Sort an in-place sorting algorithm (O(1) extra space)?", "What is the space complexity of Counting Sort?", "If sorting a nearly-sorted list after a small update needs data sorted with minimal extra memory, would Insertion Sort be a good fit?", "What is the time complexity difference between Bucket Sort's best and worst case?", "If sorting product prices on an e-commerce site needs data sorted with minimal extra memory, would Counting Sort be a good fit?", "Between Heap Sort and Bubble Sort, which would you expect to be faster for sorting a deck of playing cards of size n?", "For sorting employee records by salary, name one sorting algorithm you could use.", "Between Insertion Sort and Bubble Sort, which would you expect to be faster for sorting a list of names alphabetically of size 10^6?", "Between Bucket Sort and Bubble Sort, which would you expect to be faster for sorting a deck of playing cards of size n?", "What is the best-case time complexity of Bucket Sort?", "Define the term 'Comparison-based Sort' in your own words.", "What is the worst-case time complexity of Radix Sort?", "For an already-sorted array of size 10, what is the best-case time complexity of Heap Sort?", "For sorting a nearly-sorted list after a small update, name one sorting algorithm you could use.", "Between Selection Sort and Bubble Sort, which would you expect to be faster for sorting a leaderboard of game scores of size 10^6?", "Would you use Counting Sort for sorting a list of names alphabetically if stability (preserving order of equal elements) matters? Why or why not?", "What is the space complexity of Insertion Sort?", "Define the term 'Adaptive Sort' in your own words.", "For an already-sorted array of size 10^6, what is the best-case time complexity of Insertion Sort?", "Would you use Selection Sort for sorting log entries by timestamp if stability (preserving order of equal elements) matters? Why or why not?", "What is the space complexity of Bucket Sort?", "What is the worst-case time complexity of Counting Sort?", "If sorting a leaderboard of game scores needs data sorted with minimal extra memory, would Shell Sort be a good fit?", "Would you use Heap Sort for sorting a nearly-sorted list after a small update if stability (preserving order of equal elements) matters? Why or why not?", "For an already-sorted array of size 1,000, what is the best-case time complexity of Counting Sort?", "Would you use Counting Sort for sorting employee records by salary if stability (preserving order of equal elements) matters? Why or why not?", "Define the term 'Non-comparison Sort' in your own words.", "Would you use Bubble Sort for sorting a deck of playing cards if stability (preserving order of equal elements) matters? Why or why not?", "Would you use Counting Sort for sorting a leaderboard of game scores if stability (preserving order of equal elements) matters? Why or why not?", "If sorting delivery routes by distance needs data sorted with minimal extra memory, would Selection Sort be a good fit?", "For an already-sorted array of size 10, what is the best-case time complexity of Shell Sort?", "Between Merge Sort and Bubble Sort, which would you expect to be faster for sorting product prices on an e-commerce site of size 10^6?", "If sorting log entries by timestamp needs data sorted with minimal extra memory, would Heap Sort be a good fit?", "Would you use Selection Sort for sorting delivery routes by distance if stability (preserving order of equal elements) matters? Why or why not?", "Would you use Shell Sort for sorting employee records by salary if stability (preserving order of equal elements) matters? Why or why not?", "Fill in the blank: Radix Sort has an average-case time complexity of ______.", "State True or False: Quick Sort is generally an in-place sorting algorithm.", "Would you use Shell Sort for sorting search results by relevance if stability (preserving order of equal elements) matters? Why or why not?", "For an already-sorted array of size 10, what is the best-case time complexity of Bucket Sort?", "For an already-sorted array of size 10, what is the best-case time complexity of Selection Sort?", "Define the term 'Average Case' in your own words.", "Is Shell Sort an in-place sorting algorithm (O(1) extra space)?", "State True or False: Insertion Sort performs well on nearly-sorted data (adaptive).", "For an already-sorted array of size 10, what is the best-case time complexity of Radix Sort?", "Between Quick Sort and Bubble Sort, which would you expect to be faster for sorting a huge dataset that doesn't fit in memory of size n?", "For an already-sorted array of size 100, what is the best-case time complexity of Shell Sort?", "Which sorting algorithm would be fastest for sorting a list of names alphabetically if the data is already nearly sorted?", "Between Bubble Sort and Bubble Sort, which would you expect to be faster for sorting exam scores of students of size 10?", "What is the time complexity difference between Selection Sort's best and worst case?", "For an already-sorted array of size 10,000, what is the best-case time complexity of Quick Sort?", "For an already-sorted array of size 10^6, what is the best-case time complexity of Quick Sort?", "Is Insertion Sort a stable sorting algorithm?", "Which sorting algorithm would be fastest for sorting a deck of playing cards if the data is already nearly sorted?", "What is the time complexity difference between Bubble Sort's best and worst case?", "Would you use Heap Sort for sorting product prices on an e-commerce site if stability (preserving order of equal elements) matters? Why or why not?", "For an already-sorted array of size 1,000, what is the best-case time complexity of Selection Sort?", "If sorting exam scores of students needs data sorted with minimal extra memory, would Shell Sort be a good fit?", "Between Counting Sort and Bubble Sort, which would you expect to be faster for sorting employee records by salary of size 100?", "Would you use Insertion Sort for sorting employee records by salary if stability (preserving order of equal elements) matters? Why or why not?", "Would you use Bucket Sort for sorting employee records by salary if stability (preserving order of equal elements) matters? Why or why not?", "Would you use Bubble Sort for sorting exam scores of students if stability (preserving order of equal elements) matters? Why or why not?", "Would you use Quick Sort for sorting log entries by timestamp if stability (preserving order of equal elements) matters? Why or why not?", "Between Heap Sort and Bubble Sort, which would you expect to be faster for sorting a list of names alphabetically of size 10,000?", "Between Bubble Sort and Bubble Sort, which would you expect to be faster for sorting product prices on an e-commerce site of size 1,000?", "Between Insertion Sort and Bubble Sort, which would you expect to be faster for sorting a deck of playing cards of size 10,000?", "State True or False: Merge Sort requires O(n) additional space.", "If sorting a deck of playing cards needs data sorted with minimal extra memory, would Insertion Sort be a good fit?", "For sorting search results by relevance, name one sorting algorithm you could use.", "Between Bucket Sort and Bubble Sort, which would you expect to be faster for sorting delivery routes by distance of size 1,000?", "Between Selection Sort and Bubble Sort, which would you expect to be faster for sorting log entries by timestamp of size 1,000?", "For sorting a deck of playing cards, name one sorting algorithm you could use.", "If sorting a nearly-sorted list after a small update needs data sorted with minimal extra memory, would Shell Sort be a good fit?", "Would you use Shell Sort for sorting delivery routes by distance if stability (preserving order of equal elements) matters? Why or why not?", "Between Shell Sort and Bubble Sort, which would you expect to be faster for sorting exam scores of students of size n?", "Would you use Quick Sort for sorting a huge dataset that doesn't fit in memory if stability (preserving order of equal elements) matters? Why or why not?", "Would you use Shell Sort for sorting a nearly-sorted list after a small update if stability (preserving order of equal elements) matters? Why or why not?", "If sorting a list of names alphabetically needs data sorted with minimal extra memory, would Heap Sort be a good fit?", "Would you use Merge Sort for sorting search results by relevance if stability (preserving order of equal elements) matters? Why or why not?", "Between Counting Sort and Bubble Sort, which would you expect to be faster for sorting delivery routes by distance of size 10?", "Is Bubble Sort an in-place sorting algorithm (O(1) extra space)?"], "medium": ["Explain why Counting Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "Explain the time complexity of Bubble Sort for input size 10,000 in the best, average, and worst cases.", "Compare Shell Sort and Merge Sort in terms of stability and space complexity.", "Compare Merge Sort and Merge Sort in terms of stability and space complexity.", "Explain how External Sorting would handle sorting a list of names alphabetically where the dataset (size 10) doesn't fit in memory.", "For sorting product prices on an e-commerce site with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting search results by relevance.", "Explain the time complexity of Merge Sort for input size 1,000 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Radix Sort for an array of size 100.", "Explain how the 'divide and conquer' strategy applies to Selection Sort for an array of size 100.", "Explain why Quick Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "Compare Selection Sort and Merge Sort in terms of stability and space complexity.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting employee records by salary.", "Explain why Bubble Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "Explain how External Sorting would handle sorting a leaderboard of game scores where the dataset (size 100) doesn't fit in memory.", "Compare Insertion Sort and Merge Sort in terms of stability and space complexity.", "Explain the time complexity of Insertion Sort for input size 10 in the best, average, and worst cases.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting a leaderboard of game scores.", "Compare Bucket Sort and Merge Sort in terms of stability and space complexity.", "Compare the space complexity of Merge Sort and Quick Sort for an input of size 10.", "Compare Bubble Sort and Merge Sort in terms of stability and space complexity.", "Explain how the 'divide and conquer' strategy applies to Quick Sort for an array of size n.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting a nearly-sorted list after a small update.", "Explain why Selection Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "Explain how the 'divide and conquer' strategy applies to Counting Sort for an array of size n.", "Explain why Heap Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "For sorting log entries by timestamp with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain why Shell Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "Explain how External Sorting would handle sorting a deck of playing cards where the dataset (size 100) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Shell Sort for an array of size 10.", "Explain how External Sorting would handle sorting a nearly-sorted list after a small update where the dataset (size 1,000) doesn't fit in memory.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting product prices on an e-commerce site.", "Explain how External Sorting would handle sorting exam scores of students where the dataset (size 10^6) doesn't fit in memory.", "Explain how External Sorting would handle sorting a huge dataset that doesn't fit in memory where the dataset (size 10^6) doesn't fit in memory.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting exam scores of students.", "Explain why Quick Sort's worst case is O(n\u00b2), and what pivot-selection strategy helps avoid it, for 10 elements.", "Explain why Radix Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "For sorting a list of names alphabetically with 100 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting a huge dataset that doesn't fit in memory where the dataset (size 100) doesn't fit in memory.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting a huge dataset that doesn't fit in memory.", "Explain why Quick Sort's worst case is O(n\u00b2), and what pivot-selection strategy helps avoid it, for n elements.", "Compare the space complexity of Merge Sort and Quick Sort for an input of size 10,000.", "Compare Counting Sort and Merge Sort in terms of stability and space complexity.", "Explain how the 'divide and conquer' strategy applies to Selection Sort for an array of size 1,000.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting a list of names alphabetically.", "Explain how External Sorting would handle sorting search results by relevance where the dataset (size 10,000) doesn't fit in memory.", "Compare the space complexity of Merge Sort and Quick Sort for an input of size n.", "Explain why Merge Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "For sorting a huge dataset that doesn't fit in memory with n items, which sorting algorithm would you recommend, and why?", "For sorting log entries by timestamp with 100 items, which sorting algorithm would you recommend, and why?", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting a leaderboard of game scores.", "Explain why Quick Sort's worst case is O(n\u00b2), and what pivot-selection strategy helps avoid it, for 1,000 elements.", "For sorting log entries by timestamp with n items, which sorting algorithm would you recommend, and why?", "Explain why Quick Sort's worst case is O(n\u00b2), and what pivot-selection strategy helps avoid it, for 10^6 elements.", "Compare the space complexity of Merge Sort and Quick Sort for an input of size 100.", "Explain how External Sorting would handle sorting a leaderboard of game scores where the dataset (size 10^6) doesn't fit in memory.", "Explain how External Sorting would handle sorting a deck of playing cards where the dataset (size 10) doesn't fit in memory.", "Explain why Quick Sort's worst case is O(n\u00b2), and what pivot-selection strategy helps avoid it, for 100 elements.", "Compare the space complexity of Merge Sort and Quick Sort for an input of size 10^6.", "Explain the time complexity of Bucket Sort for input size 10,000 in the best, average, and worst cases.", "Explain the time complexity of Insertion Sort for input size n in the best, average, and worst cases.", "Compare Radix Sort and Merge Sort in terms of stability and space complexity.", "Explain the time complexity of Merge Sort for input size 100 in the best, average, and worst cases.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting product prices on an e-commerce site.", "Explain how External Sorting would handle sorting log entries by timestamp where the dataset (size n) doesn't fit in memory.", "For sorting delivery routes by distance with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Merge Sort for input size 10 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Bucket Sort for an array of size 1,000.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting a list of names alphabetically.", "For sorting search results by relevance with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Bucket Sort for an array of size 10.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting delivery routes by distance.", "For sorting product prices on an e-commerce site with n items, which sorting algorithm would you recommend, and why?", "For sorting a huge dataset that doesn't fit in memory with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting delivery routes by distance where the dataset (size 10) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Counting Sort for an array of size 10.", "Explain how the 'divide and conquer' strategy applies to Shell Sort for an array of size 100.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting log entries by timestamp.", "Explain why Counting Sort achieves O(n+k) time, and under what conditions it's practical, for sorting a deck of playing cards.", "For sorting employee records by salary with 100 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Bubble Sort for an array of size 10^6.", "Explain why Quick Sort's worst case is O(n\u00b2), and what pivot-selection strategy helps avoid it, for 10,000 elements.", "Explain the time complexity of Shell Sort for input size 10 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a list of names alphabetically where the dataset (size 1,000) doesn't fit in memory.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting exam scores of students.", "Compare the space complexity of Merge Sort and Quick Sort for an input of size 1,000.", "Explain how External Sorting would handle sorting a huge dataset that doesn't fit in memory where the dataset (size 10) doesn't fit in memory.", "For sorting employee records by salary with n items, which sorting algorithm would you recommend, and why?", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting employee records by salary.", "Explain how the 'divide and conquer' strategy applies to Selection Sort for an array of size 10^6.", "Explain how External Sorting would handle sorting a leaderboard of game scores where the dataset (size 10) doesn't fit in memory.", "Explain the time complexity of Merge Sort for input size 10^6 in the best, average, and worst cases.", "Explain the time complexity of Quick Sort for input size 10^6 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Quick Sort for an array of size 10.", "For sorting delivery routes by distance with n items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Heap Sort for an array of size 10,000.", "Explain why Insertion Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "Explain how External Sorting would handle sorting product prices on an e-commerce site where the dataset (size 10) doesn't fit in memory.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting a deck of playing cards.", "Explain the time complexity of Selection Sort for input size 10 in the best, average, and worst cases.", "For sorting a huge dataset that doesn't fit in memory with 100 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Radix Sort for input size 100 in the best, average, and worst cases.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting a nearly-sorted list after a small update.", "Explain why Bucket Sort is/is not a stable sorting algorithm, using a concrete example with duplicate keys.", "For sorting exam scores of students with 10^6 items, which sorting algorithm would you recommend, and why?", "For sorting a deck of playing cards with n items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Bucket Sort for input size 10 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting product prices on an e-commerce site where the dataset (size n) doesn't fit in memory.", "Explain the time complexity of Bucket Sort for input size 10^6 in the best, average, and worst cases.", "For sorting delivery routes by distance with 10^6 items, which sorting algorithm would you recommend, and why?", "For sorting a list of names alphabetically with n items, which sorting algorithm would you recommend, and why?", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting log entries by timestamp.", "For sorting exam scores of students with 10,000 items, which sorting algorithm would you recommend, and why?", "For sorting product prices on an e-commerce site with 10 items, which sorting algorithm would you recommend, and why?", "Compare Heap Sort and Merge Sort in terms of stability and space complexity.", "Explain how External Sorting would handle sorting a huge dataset that doesn't fit in memory where the dataset (size 10,000) doesn't fit in memory.", "Explain how External Sorting would handle sorting employee records by salary where the dataset (size 100) doesn't fit in memory.", "Explain the time complexity of Selection Sort for input size 10^6 in the best, average, and worst cases.", "Explain the time complexity of Bubble Sort for input size 100 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a nearly-sorted list after a small update where the dataset (size 10,000) doesn't fit in memory.", "Explain how External Sorting would handle sorting exam scores of students where the dataset (size 10,000) doesn't fit in memory.", "For sorting a nearly-sorted list after a small update with 10,000 items, which sorting algorithm would you recommend, and why?", "For sorting a nearly-sorted list after a small update with n items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Insertion Sort for input size 10^6 in the best, average, and worst cases.", "Compare Quick Sort and Merge Sort in terms of stability and space complexity.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting a huge dataset that doesn't fit in memory.", "For sorting a nearly-sorted list after a small update with 1,000 items, which sorting algorithm would you recommend, and why?", "For sorting employee records by salary with 10 items, which sorting algorithm would you recommend, and why?", "For sorting log entries by timestamp with 10 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Shell Sort for input size n in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Bubble Sort for an array of size 10,000.", "For sorting a leaderboard of game scores with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting employee records by salary where the dataset (size 10,000) doesn't fit in memory.", "Explain the time complexity of Merge Sort for input size n in the best, average, and worst cases.", "Explain the time complexity of Counting Sort for input size 100 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting search results by relevance where the dataset (size 10) doesn't fit in memory.", "Explain how External Sorting would handle sorting delivery routes by distance where the dataset (size 100) doesn't fit in memory.", "Explain how External Sorting would handle sorting search results by relevance where the dataset (size 1,000) doesn't fit in memory.", "For sorting a leaderboard of game scores with 10 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Shell Sort for an array of size 10^6.", "Explain the time complexity of Insertion Sort for input size 100 in the best, average, and worst cases.", "For sorting employee records by salary with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting a nearly-sorted list after a small update where the dataset (size n) doesn't fit in memory.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting search results by relevance.", "Explain the time complexity of Heap Sort for input size 1,000 in the best, average, and worst cases.", "For sorting search results by relevance with 10 items, which sorting algorithm would you recommend, and why?", "For sorting a leaderboard of game scores with 100 items, which sorting algorithm would you recommend, and why?", "For sorting delivery routes by distance with 10 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Quick Sort for input size 10 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting employee records by salary where the dataset (size 10^6) doesn't fit in memory.", "Explain how External Sorting would handle sorting a list of names alphabetically where the dataset (size 100) doesn't fit in memory.", "For sorting exam scores of students with 100 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Merge Sort for an array of size 10^6.", "Explain the time complexity of Radix Sort for input size 10^6 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Merge Sort for an array of size 1,000.", "Explain how External Sorting would handle sorting product prices on an e-commerce site where the dataset (size 1,000) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Quick Sort for an array of size 100.", "Explain how External Sorting would handle sorting product prices on an e-commerce site where the dataset (size 100) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Quick Sort for an array of size 1,000.", "Explain the time complexity of Insertion Sort for input size 10,000 in the best, average, and worst cases.", "Explain the time complexity of Counting Sort for input size 10,000 in the best, average, and worst cases.", "For sorting exam scores of students with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Bucket Sort for an array of size 10^6.", "Explain how the 'divide and conquer' strategy applies to Shell Sort for an array of size n.", "Explain how the 'divide and conquer' strategy applies to Selection Sort for an array of size 10,000.", "Explain how the 'divide and conquer' strategy applies to Insertion Sort for an array of size 10,000.", "For sorting delivery routes by distance with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting a nearly-sorted list after a small update where the dataset (size 10) doesn't fit in memory.", "Explain the time complexity of Heap Sort for input size 10,000 in the best, average, and worst cases.", "Explain the time complexity of Shell Sort for input size 1,000 in the best, average, and worst cases.", "Explain the time complexity of Counting Sort for input size 10^6 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a list of names alphabetically where the dataset (size n) doesn't fit in memory.", "Explain how External Sorting would handle sorting log entries by timestamp where the dataset (size 10) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Radix Sort for an array of size 10^6.", "For sorting exam scores of students with n items, which sorting algorithm would you recommend, and why?", "For sorting a huge dataset that doesn't fit in memory with 10,000 items, which sorting algorithm would you recommend, and why?", "For sorting search results by relevance with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting search results by relevance where the dataset (size 10^6) doesn't fit in memory.", "For sorting product prices on an e-commerce site with 100 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Bubble Sort for an array of size 10.", "Explain the time complexity of Quick Sort for input size 1,000 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a deck of playing cards where the dataset (size 10^6) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Heap Sort for an array of size 10^6.", "Explain how the 'divide and conquer' strategy applies to Shell Sort for an array of size 10,000.", "Explain the time complexity of Quick Sort for input size n in the best, average, and worst cases.", "Explain how External Sorting would handle sorting product prices on an e-commerce site where the dataset (size 10,000) doesn't fit in memory.", "For sorting product prices on an e-commerce site with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Quick Sort for an array of size 10,000.", "For sorting search results by relevance with 100 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Selection Sort for an array of size 10.", "Explain the time complexity of Heap Sort for input size 10^6 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a leaderboard of game scores where the dataset (size 10,000) doesn't fit in memory.", "Explain the time complexity of Radix Sort for input size 1,000 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Insertion Sort for an array of size 10^6.", "Explain how the 'divide and conquer' strategy applies to Radix Sort for an array of size 10.", "Explain how External Sorting would handle sorting search results by relevance where the dataset (size n) doesn't fit in memory.", "Explain the time complexity of Quick Sort for input size 10,000 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Counting Sort for an array of size 10^6.", "Explain how External Sorting would handle sorting a huge dataset that doesn't fit in memory where the dataset (size n) doesn't fit in memory.", "Explain the time complexity of Counting Sort for input size n in the best, average, and worst cases.", "Explain the time complexity of Radix Sort for input size 10,000 in the best, average, and worst cases.", "For sorting a huge dataset that doesn't fit in memory with 10 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Merge Sort for input size 10,000 in the best, average, and worst cases.", "Explain the time complexity of Radix Sort for input size 10 in the best, average, and worst cases.", "For sorting a list of names alphabetically with 10 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Bucket Sort for an array of size 10,000.", "For sorting a deck of playing cards with 10 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Merge Sort for an array of size 10.", "Explain the time complexity of Quick Sort for input size 100 in the best, average, and worst cases.", "For sorting a huge dataset that doesn't fit in memory with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting delivery routes by distance where the dataset (size n) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Merge Sort for an array of size 10,000.", "Explain how External Sorting would handle sorting log entries by timestamp where the dataset (size 100) doesn't fit in memory.", "Explain the time complexity of Bubble Sort for input size 10^6 in the best, average, and worst cases.", "Explain the time complexity of Bubble Sort for input size 10 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Bucket Sort for an array of size 100.", "Explain why Insertion Sort is preferred for small or nearly-sorted arrays despite O(n\u00b2) worst case, for sorting delivery routes by distance.", "Explain how the 'divide and conquer' strategy applies to Bucket Sort for an array of size n.", "Explain the time complexity of Selection Sort for input size 100 in the best, average, and worst cases.", "For sorting a list of names alphabetically with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Insertion Sort for an array of size n.", "Explain the time complexity of Bucket Sort for input size 1,000 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting exam scores of students where the dataset (size 1,000) doesn't fit in memory.", "For sorting search results by relevance with n items, which sorting algorithm would you recommend, and why?", "For sorting exam scores of students with 10 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Heap Sort for an array of size 100.", "Explain how External Sorting would handle sorting search results by relevance where the dataset (size 100) doesn't fit in memory.", "Explain how External Sorting would handle sorting employee records by salary where the dataset (size 10) doesn't fit in memory.", "Explain the time complexity of Selection Sort for input size n in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Radix Sort for an array of size n.", "Explain how the 'divide and conquer' strategy applies to Selection Sort for an array of size n.", "Explain how External Sorting would handle sorting log entries by timestamp where the dataset (size 10,000) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Bubble Sort for an array of size 1,000.", "Explain how the 'divide and conquer' strategy applies to Bubble Sort for an array of size 100.", "For sorting product prices on an e-commerce site with 1,000 items, which sorting algorithm would you recommend, and why?", "For sorting employee records by salary with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Insertion Sort for an array of size 10.", "For sorting log entries by timestamp with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Heap Sort for input size n in the best, average, and worst cases.", "Explain the time complexity of Counting Sort for input size 1,000 in the best, average, and worst cases.", "For sorting a leaderboard of game scores with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Heap Sort for an array of size 1,000.", "Explain how External Sorting would handle sorting a list of names alphabetically where the dataset (size 10^6) doesn't fit in memory.", "For sorting a nearly-sorted list after a small update with 100 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Bubble Sort for an array of size n.", "Explain how the 'divide and conquer' strategy applies to Counting Sort for an array of size 10,000.", "For sorting a nearly-sorted list after a small update with 10 items, which sorting algorithm would you recommend, and why?", "For sorting a list of names alphabetically with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Counting Sort for input size 10 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a leaderboard of game scores where the dataset (size 1,000) doesn't fit in memory.", "For sorting a deck of playing cards with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Radix Sort for an array of size 1,000.", "Explain how External Sorting would handle sorting a deck of playing cards where the dataset (size 10,000) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Radix Sort for an array of size 10,000.", "Explain the time complexity of Shell Sort for input size 10^6 in the best, average, and worst cases.", "Explain the time complexity of Bucket Sort for input size 100 in the best, average, and worst cases.", "For sorting a deck of playing cards with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Merge Sort for an array of size n.", "Explain how External Sorting would handle sorting a leaderboard of game scores where the dataset (size n) doesn't fit in memory.", "Explain how External Sorting would handle sorting delivery routes by distance where the dataset (size 10,000) doesn't fit in memory.", "For sorting a deck of playing cards with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Shell Sort for input size 10,000 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Heap Sort for an array of size 10.", "Explain how the 'divide and conquer' strategy applies to Shell Sort for an array of size 1,000.", "For sorting search results by relevance with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting exam scores of students where the dataset (size 10) doesn't fit in memory.", "Explain how External Sorting would handle sorting delivery routes by distance where the dataset (size 10^6) doesn't fit in memory.", "Explain how the 'divide and conquer' strategy applies to Counting Sort for an array of size 1,000.", "Explain how the 'divide and conquer' strategy applies to Quick Sort for an array of size 10^6.", "For sorting a nearly-sorted list after a small update with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Insertion Sort for an array of size 1,000.", "Explain how External Sorting would handle sorting exam scores of students where the dataset (size n) doesn't fit in memory.", "For sorting a list of names alphabetically with 10,000 items, which sorting algorithm would you recommend, and why?", "For sorting a leaderboard of game scores with 10,000 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Heap Sort for an array of size n.", "Explain how External Sorting would handle sorting a nearly-sorted list after a small update where the dataset (size 100) doesn't fit in memory.", "Explain how External Sorting would handle sorting employee records by salary where the dataset (size n) doesn't fit in memory.", "Explain how External Sorting would handle sorting log entries by timestamp where the dataset (size 10^6) doesn't fit in memory.", "For sorting a deck of playing cards with 100 items, which sorting algorithm would you recommend, and why?", "Explain how the 'divide and conquer' strategy applies to Insertion Sort for an array of size 100.", "For sorting log entries by timestamp with 1,000 items, which sorting algorithm would you recommend, and why?", "Explain how External Sorting would handle sorting product prices on an e-commerce site where the dataset (size 10^6) doesn't fit in memory.", "Explain how External Sorting would handle sorting log entries by timestamp where the dataset (size 1,000) doesn't fit in memory.", "Explain the time complexity of Bubble Sort for input size 1,000 in the best, average, and worst cases.", "Explain the time complexity of Insertion Sort for input size 1,000 in the best, average, and worst cases.", "Explain the time complexity of Radix Sort for input size n in the best, average, and worst cases.", "Explain the time complexity of Selection Sort for input size 1,000 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a deck of playing cards where the dataset (size n) doesn't fit in memory.", "Explain how External Sorting would handle sorting exam scores of students where the dataset (size 100) doesn't fit in memory.", "Explain how External Sorting would handle sorting delivery routes by distance where the dataset (size 1,000) doesn't fit in memory.", "Explain the time complexity of Bubble Sort for input size n in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Counting Sort for an array of size 100.", "Explain the time complexity of Selection Sort for input size 10,000 in the best, average, and worst cases.", "Explain how the 'divide and conquer' strategy applies to Merge Sort for an array of size 100.", "Explain the time complexity of Heap Sort for input size 10 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a huge dataset that doesn't fit in memory where the dataset (size 1,000) doesn't fit in memory.", "Explain the time complexity of Bucket Sort for input size n in the best, average, and worst cases.", "For sorting employee records by salary with 10^6 items, which sorting algorithm would you recommend, and why?", "Explain the time complexity of Heap Sort for input size 100 in the best, average, and worst cases.", "Explain how External Sorting would handle sorting a deck of playing cards where the dataset (size 1,000) doesn't fit in memory."], "hard": ["Design a randomized pivot-selection strategy for Selection Sort to achieve expected O(n log n) time for sorting log entries by timestamp with n elements, avoiding the O(n\u00b2) worst case.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting delivery routes by distance, and discuss when it outperforms comparison-based sorts for 1,000 elements.", "Design a randomized pivot-selection strategy for Selection Sort to achieve expected O(n log n) time for sorting a leaderboard of game scores with n elements, avoiding the O(n\u00b2) worst case.", "Prove informally why Comparison-based sorting algorithms cannot beat O(n log n) in the worst case, for an array of size 10,000.", "Critically evaluate: 'Selection Sort is always the best choice for sorting.' Discuss counter-examples using sorting log entries by timestamp at scale 10,000.", "Critically evaluate: 'Counting Sort is always the best choice for sorting.' Discuss counter-examples using sorting a list of names alphabetically at scale n.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting a huge dataset that doesn't fit in memory with 10^6 elements.", "Design a randomized pivot-selection strategy for Counting Sort to achieve expected O(n log n) time for sorting a nearly-sorted list after a small update with 1,000 elements, avoiding the O(n\u00b2) worst case.", "Design an External Merge Sort approach for sorting a dataset of size 1,000 (context: sorting a huge dataset that doesn't fit in memory) that doesn't fit in memory.", "Explain how Merge Sort's O(n) extra space could be reduced using an in-place merge technique, and discuss the time-complexity trade-off, for 1,000 elements.", "Prove informally why Comparison-based sorting algorithms cannot beat O(n log n) in the worst case, for an array of size n.", "Design a randomized pivot-selection strategy for Selection Sort to achieve expected O(n log n) time for sorting exam scores of students with 10,000 elements, avoiding the O(n\u00b2) worst case.", "Design a randomized pivot-selection strategy for Merge Sort to achieve expected O(n log n) time for sorting a huge dataset that doesn't fit in memory with 1,000 elements, avoiding the O(n\u00b2) worst case.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting a deck of playing cards with n elements.", "Critically evaluate: 'Shell Sort is always the best choice for sorting.' Discuss counter-examples using sorting employee records by salary at scale 10,000.", "Explain how Merge Sort's O(n) extra space could be reduced using an in-place merge technique, and discuss the time-complexity trade-off, for 10 elements.", "Design a randomized pivot-selection strategy for Radix Sort to achieve expected O(n log n) time for sorting delivery routes by distance with 100 elements, avoiding the O(n\u00b2) worst case.", "Critically evaluate: 'Merge Sort is always the best choice for sorting.' Discuss counter-examples using sorting a leaderboard of game scores at scale n.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting a nearly-sorted list after a small update at 10^6.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting exam scores of students with 100 elements.", "Design a randomized pivot-selection strategy for Heap Sort to achieve expected O(n log n) time for sorting delivery routes by distance with n elements, avoiding the O(n\u00b2) worst case.", "Prove informally why Comparison-based sorting algorithms cannot beat O(n log n) in the worst case, for an array of size 1,000.", "Explain how Merge Sort's O(n) extra space could be reduced using an in-place merge technique, and discuss the time-complexity trade-off, for 100 elements.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting a list of names alphabetically at 10,000.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting a leaderboard of game scores at 10^6.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting a huge dataset that doesn't fit in memory, and discuss when it outperforms comparison-based sorts for n elements.", "Critically evaluate: 'Shell Sort is always the best choice for sorting.' Discuss counter-examples using sorting a nearly-sorted list after a small update at scale n.", "Prove informally why Comparison-based sorting algorithms cannot beat O(n log n) in the worst case, for an array of size 10.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting a list of names alphabetically with 100 elements.", "Design a randomized pivot-selection strategy for Heap Sort to achieve expected O(n log n) time for sorting a list of names alphabetically with 100 elements, avoiding the O(n\u00b2) worst case.", "Explain how Merge Sort's O(n) extra space could be reduced using an in-place merge technique, and discuss the time-complexity trade-off, for 10,000 elements.", "Design a randomized pivot-selection strategy for Insertion Sort to achieve expected O(n log n) time for sorting a leaderboard of game scores with 10^6 elements, avoiding the O(n\u00b2) worst case.", "Design an External Merge Sort approach for sorting a dataset of size n (context: sorting exam scores of students) that doesn't fit in memory.", "Critically evaluate: 'Bucket Sort is always the best choice for sorting.' Discuss counter-examples using sorting a deck of playing cards at scale 1,000.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting a list of names alphabetically with n elements.", "Critically evaluate: 'Counting Sort is always the best choice for sorting.' Discuss counter-examples using sorting log entries by timestamp at scale 100.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting a deck of playing cards at n.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting a nearly-sorted list after a small update with 100 elements.", "Critically evaluate: 'Quick Sort is always the best choice for sorting.' Discuss counter-examples using sorting a huge dataset that doesn't fit in memory at scale n.", "Critically evaluate: 'Bucket Sort is always the best choice for sorting.' Discuss counter-examples using sorting a leaderboard of game scores at scale 10,000.", "Design a randomized pivot-selection strategy for Insertion Sort to achieve expected O(n log n) time for sorting a list of names alphabetically with 1,000 elements, avoiding the O(n\u00b2) worst case.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting log entries by timestamp, and discuss when it outperforms comparison-based sorts for 10,000 elements.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting search results by relevance with 10^6 elements.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting delivery routes by distance with 10 elements.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting exam scores of students with n elements.", "Prove informally why Comparison-based sorting algorithms cannot beat O(n log n) in the worst case, for an array of size 10^6.", "Explain how Merge Sort's O(n) extra space could be reduced using an in-place merge technique, and discuss the time-complexity trade-off, for n elements.", "Design an External Merge Sort approach for sorting a dataset of size 1,000 (context: sorting log entries by timestamp) that doesn't fit in memory.", "Design a randomized pivot-selection strategy for Heap Sort to achieve expected O(n log n) time for sorting a huge dataset that doesn't fit in memory with 1,000 elements, avoiding the O(n\u00b2) worst case.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting search results by relevance, and discuss when it outperforms comparison-based sorts for 1,000 elements.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting a leaderboard of game scores, and discuss when it outperforms comparison-based sorts for 100 elements.", "Design an External Merge Sort approach for sorting a dataset of size 10,000 (context: sorting exam scores of students) that doesn't fit in memory.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting employee records by salary, and discuss when it outperforms comparison-based sorts for 1,000 elements.", "Prove informally why Comparison-based sorting algorithms cannot beat O(n log n) in the worst case, for an array of size 100.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting a list of names alphabetically, and discuss when it outperforms comparison-based sorts for n elements.", "Critically evaluate: 'Selection Sort is always the best choice for sorting.' Discuss counter-examples using sorting employee records by salary at scale 1,000.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting log entries by timestamp, and discuss when it outperforms comparison-based sorts for 10 elements.", "Critically evaluate: 'Shell Sort is always the best choice for sorting.' Discuss counter-examples using sorting a huge dataset that doesn't fit in memory at scale 10^6.", "Design a randomized pivot-selection strategy for Bubble Sort to achieve expected O(n log n) time for sorting a nearly-sorted list after a small update with 100 elements, avoiding the O(n\u00b2) worst case.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting exam scores of students at 1,000.", "Design an External Merge Sort approach for sorting a dataset of size n (context: sorting a huge dataset that doesn't fit in memory) that doesn't fit in memory.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting a deck of playing cards, and discuss when it outperforms comparison-based sorts for n elements.", "Critically evaluate: 'Selection Sort is always the best choice for sorting.' Discuss counter-examples using sorting search results by relevance at scale n.", "Design a randomized pivot-selection strategy for Bucket Sort to achieve expected O(n log n) time for sorting a deck of playing cards with n elements, avoiding the O(n\u00b2) worst case.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting log entries by timestamp at 100.", "Critically evaluate: 'Merge Sort is always the best choice for sorting.' Discuss counter-examples using sorting a list of names alphabetically at scale 10^6.", "Critically evaluate: 'Insertion Sort is always the best choice for sorting.' Discuss counter-examples using sorting delivery routes by distance at scale 100.", "Critically evaluate: 'Heap Sort is always the best choice for sorting.' Discuss counter-examples using sorting log entries by timestamp at scale 10.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting exam scores of students, and discuss when it outperforms comparison-based sorts for 10 elements.", "Design a randomized pivot-selection strategy for Insertion Sort to achieve expected O(n log n) time for sorting a nearly-sorted list after a small update with 10 elements, avoiding the O(n\u00b2) worst case.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting product prices on an e-commerce site with 10 elements.", "Design a randomized pivot-selection strategy for Heap Sort to achieve expected O(n log n) time for sorting a nearly-sorted list after a small update with 1,000 elements, avoiding the O(n\u00b2) worst case.", "Design an External Merge Sort approach for sorting a dataset of size 10 (context: sorting a leaderboard of game scores) that doesn't fit in memory.", "Critically evaluate: 'Selection Sort is always the best choice for sorting.' Discuss counter-examples using sorting search results by relevance at scale 10.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting product prices on an e-commerce site at n.", "Critically evaluate: 'Insertion Sort is always the best choice for sorting.' Discuss counter-examples using sorting a huge dataset that doesn't fit in memory at scale 100.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting search results by relevance, and discuss when it outperforms comparison-based sorts for n elements.", "Design a randomized pivot-selection strategy for Insertion Sort to achieve expected O(n log n) time for sorting log entries by timestamp with n elements, avoiding the O(n\u00b2) worst case.", "Critically evaluate: 'Heap Sort is always the best choice for sorting.' Discuss counter-examples using sorting log entries by timestamp at scale 1,000.", "Critically evaluate: 'Selection Sort is always the best choice for sorting.' Discuss counter-examples using sorting a leaderboard of game scores at scale 100.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting search results by relevance at n.", "Design a randomized pivot-selection strategy for Quick Sort to achieve expected O(n log n) time for sorting exam scores of students with 10,000 elements, avoiding the O(n\u00b2) worst case.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting employee records by salary, and discuss when it outperforms comparison-based sorts for n elements.", "Critically evaluate: 'Quick Sort is always the best choice for sorting.' Discuss counter-examples using sorting search results by relevance at scale 100.", "Critically evaluate: 'Radix Sort is always the best choice for sorting.' Discuss counter-examples using sorting exam scores of students at scale 1,000.", "Design an External Merge Sort approach for sorting a dataset of size 10,000 (context: sorting search results by relevance) that doesn't fit in memory.", "Design an External Merge Sort approach for sorting a dataset of size 1,000 (context: sorting product prices on an e-commerce site) that doesn't fit in memory.", "Critically evaluate: 'Merge Sort is always the best choice for sorting.' Discuss counter-examples using sorting a deck of playing cards at scale n.", "Design an External Merge Sort approach for sorting a dataset of size 100 (context: sorting product prices on an e-commerce site) that doesn't fit in memory.", "Design a randomized pivot-selection strategy for Insertion Sort to achieve expected O(n log n) time for sorting exam scores of students with 10^6 elements, avoiding the O(n\u00b2) worst case.", "Design an External Merge Sort approach for sorting a dataset of size 1,000 (context: sorting a nearly-sorted list after a small update) that doesn't fit in memory.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting a deck of playing cards, and discuss when it outperforms comparison-based sorts for 10,000 elements.", "Design a randomized pivot-selection strategy for Insertion Sort to achieve expected O(n log n) time for sorting log entries by timestamp with 10 elements, avoiding the O(n\u00b2) worst case.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting log entries by timestamp at 10^6.", "Explain the trade-offs between Heap Sort's guaranteed O(n log n) and Quick Sort's average-case O(n log n) but worst-case O(n\u00b2), for sorting a list of names alphabetically at 10.", "Design a Hybrid Sorting approach (e.g. Timsort-like: Insertion Sort for small runs + Merge Sort) and explain why it performs well for sorting a deck of playing cards with 10,000 elements.", "Design an External Merge Sort approach for sorting a dataset of size 10^6 (context: sorting a leaderboard of game scores) that doesn't fit in memory.", "Critically evaluate: 'Counting Sort is always the best choice for sorting.' Discuss counter-examples using sorting delivery routes by distance at scale 10.", "Explain how Radix Sort achieves O(d\u00b7(n+k)) time for sorting a list of names alphabetically, and discuss when it outperforms comparison-based sorts for 10^6 elements.", "Design an External Merge Sort approach for sorting a dataset of size 1,000 (context: sorting search results by relevance) that doesn't fit in memory."]}}</script>
+<script>
+  const raw = document.getElementById('chdata').textContent;
+  const data = JSON.parse(raw);
+
+  function renderList(id, items, prefix){
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(q => `<li>${q}</li>`).join('');
+  }
+  renderList('interview-coding-list', data.interview.coding);
+  renderList('list-easy', data.practice.easy);
+  renderList('list-medium', data.practice.medium);
+  renderList('list-hard', data.practice.hard);
+
+  function toggleQ(level){
+    const wrap = document.getElementById('wrap-' + level);
+    wrap.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
